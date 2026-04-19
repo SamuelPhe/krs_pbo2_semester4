@@ -14,23 +14,17 @@ public class login_form extends javax.swing.JFrame {
     public login_form() {
         initComponents();
         database = new database();
-        
-        // Setup dropdown pilihan role
+    // Setup dropdown pilihan role
         jComboBox1.removeAllItems();
         jComboBox1.addItem("Mahasiswa");
         jComboBox1.addItem("Dosen");
         jComboBox1.addItem("Admin");
-        
-        // Set password field agar karakter tersembunyi
-        jTextField1.setEchoChar('•');
-    }
-
-    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    } // <--- KURUNG INI YANG SEBELUMNYA HILANG    
+   private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
         String role     = jComboBox1.getSelectedItem().toString();
         String username = jTextField2.getText().trim();
-        String password = String.valueOf(jTextField1.getPassword()).trim();
+        String password = String.valueOf(jPasswordField1.getPassword());
 
-        // Validasi input kosong
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Username dan password tidak boleh kosong!",
@@ -52,204 +46,53 @@ public class login_form extends javax.swing.JFrame {
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
-                "Terjadi kesalahan: " + e.getMessage(),
+                "Terjadi kesalahan database: " + e.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void loginSebagaiMahasiswa(String username, String password) throws SQLException {
-        // Username mahasiswa = id_mahasiswa (angka)
         int idMahasiswa;
         try {
             idMahasiswa = Integer.parseInt(username);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this,
-                "Username mahasiswa harus berupa ID (angka)!",
-                "Peringatan", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "ID Mahasiswa harus berupa angka!");
             return;
         }
 
         ResultSet rs = database.loginMahasiswa(idMahasiswa, password);
         if (rs != null && rs.next()) {
-            String namaMahasiswa = rs.getString("nama_mahasiswa");
-            int idProdi          = rs.getInt("id_prodi");
-            int idDosenPA        = rs.getInt("id_dosen_pa");
-
-            JOptionPane.showMessageDialog(this,
-                "Selamat datang, " + namaMahasiswa + "!",
-                "Login Berhasil", JOptionPane.INFORMATION_MESSAGE);
-
-            // Buka form mahasiswa, tutup form login
-            // Contoh: new dashboard_mahasiswa(idMahasiswa, namaMahasiswa).setVisible(true);
+            JOptionPane.showMessageDialog(this, "Selamat datang, " + rs.getString("nama_mahasiswa") + "!");
+            // new DashboardMahasiswa(idMahasiswa).setVisible(true); // Buka form mhs jika ada
             this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this,
-                "ID atau password mahasiswa salah!",
-                "Login Gagal", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "ID atau password salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void loginSebagaiDosen(String username, String password) throws SQLException {
-        // Username dosen = nama_dosen
         ResultSet rs = database.loginDosen(username, password);
         if (rs != null && rs.next()) {
-            String namaDosen = rs.getString("nama_dosen");
-            int idDosen      = rs.getInt("id_dosen");
-            String posisi    = rs.getString("posisi");
-
-            JOptionPane.showMessageDialog(this,
-                "Selamat datang, " + namaDosen + " (" + posisi + ")!",
-                "Login Berhasil", JOptionPane.INFORMATION_MESSAGE);
-
-            // Buka form dosen, tutup form login
-            // Contoh: new dashboard_dosen(idDosen, namaDosen).setVisible(true);
+            JOptionPane.showMessageDialog(this, "Selamat datang, " + rs.getString("nama_dosen") + "!");
+            // new DashboardDosen().setVisible(true); // Buka form dosen jika ada
             this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this,
-                "Username atau password dosen salah!",
-                "Login Gagal", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Username atau password dosen salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void loginSebagaiAdmin(String username, String password) throws SQLException {
-        // Username admin = nama_admin
         ResultSet rs = database.loginAdmin(username, password);
         if (rs != null && rs.next()) {
-            String namaAdmin = rs.getString("nama_admin");
-            int idAdmin      = rs.getInt("id_admin");
-
-            JOptionPane.showMessageDialog(this,
-                "Selamat datang, " + namaAdmin + "!",
-                "Login Berhasil", JOptionPane.INFORMATION_MESSAGE);
-
-            // Buka form admin, tutup form login
-            // Contoh: new dashboard_admin(idAdmin, namaAdmin).setVisible(true);
+            JOptionPane.showMessageDialog(this, "Selamat datang Admin!");
+            // new DashboardAdmin().setVisible(true); // Buka form admin jika ada
             this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this,
-                "Username atau password admin salah!",
-                "Login Gagal", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Username atau password admin salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">
-    private void initComponents() {
 
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField1 = new javax.swing.JPasswordField(); // Password field
-        jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Login - Sistem KRS Akademik");
-
-        jLabel1.setText("Login Sistem KRS");
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18));
-
-        jLabel2.setText("Login Sebagai:");
-        jLabel3.setText("Username / ID:");
-        jLabel4.setText("Password:");
-
-        jButton1.setText("Login");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loginButtonActionPerformed(evt);
-            }
-        });
-
-        // Layout menggunakan GroupLayout
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(50, 50, 50)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4))
-                        .addGap(20, 20, 20)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(50, Short.MAX_VALUE))
-        );
-
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(jLabel1)
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(25, 25, 25)
-                .addComponent(jButton1)
-                .addContainerGap(30, Short.MAX_VALUE))
-        );
-
-        pack();
-        setLocationRelativeTo(null); // Tampil di tengah layar
-    }
-    // </editor-fold>
-
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new login_form().setVisible(true);
-            }
-        });
-    }
-
-    // Deklarasi variabel
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JPasswordField jTextField1; // Password
-    private javax.swing.JTextField jTextField2;     // Username
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-}
-/**
- *
- * @author TUF
- */
-public class login_form extends javax.swing.JPanel {
-
-    /**
-     * Creates new form login_form
-     */
-    public login_form() {
-        initComponents();
-    }
-
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
     
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -281,8 +124,10 @@ public class login_form extends javax.swing.JPanel {
         jComboBox1 = new javax.swing.JComboBox<>();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jPasswordField1 = new javax.swing.JPasswordField();
+        jButton2 = new javax.swing.JButton();
 
         jPanel3.setBackground(new java.awt.Color(0, 102, 102));
 
@@ -508,12 +353,23 @@ public class login_form extends javax.swing.JPanel {
 
         jLabel18.setText("Password");
 
-        jTextField1.addActionListener(this::jTextField1ActionPerformed);
-
         jTextField2.addActionListener(this::jTextField2ActionPerformed);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        jButton1.setText("Login");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
+        jButton1.addActionListener(this::jButton1ActionPerformed);
+
+        jPasswordField1.setText("jPasswordField1");
+
+        jButton2.setText("Reset");
+        jButton2.addActionListener(this::jButton2ActionPerformed);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -527,11 +383,17 @@ public class login_form extends javax.swing.JPanel {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
-                            .addComponent(jTextField1)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(29, 29, 29)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPasswordField1))))
                 .addContainerGap(46, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(75, 75, 75)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(74, 74, 74))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -547,17 +409,17 @@ public class login_form extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel18)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         jLabel1.getAccessibleContext().setAccessibleName("Login");
         jLabel1.getAccessibleContext().setAccessibleDescription("");
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
         // TODO add your handling code here:
@@ -567,10 +429,28 @@ public class login_form extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+                                        
+        // Panggil metode logika yang sudah kita buat di atas
+        loginButtonActionPerformed(evt);
+    
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1MouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+jTextField2.setText("");
+jPasswordField1.setText("");         // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -595,7 +475,27 @@ public class login_form extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
+public static void main(String args[]) {
+        /* Set look and feel (opsional, agar tampilan bagus) */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(login_form.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+
+        /* Perintah utama untuk memunculkan form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new login_form().setVisible(true);
+            }
+        });
+    }
 }
