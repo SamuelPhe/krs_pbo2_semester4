@@ -363,8 +363,6 @@ public class login_form extends javax.swing.JFrame {
         });
         jButton1.addActionListener(this::jButton1ActionPerformed);
 
-        jPasswordField1.setText("jPasswordField1");
-
         jButton2.setText("Reset");
         jButton2.addActionListener(this::jButton2ActionPerformed);
 
