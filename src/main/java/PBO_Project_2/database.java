@@ -7,7 +7,7 @@ public class database {
     // ─── Konfigurasi Koneksi ───────────────────────────────────────────────────
     private static final String HOST     = "localhost";
     private static final String PORT     = "3306";
-    private static final String DB_NAME  = "akademik";
+    private static final String DB_NAME  = "krs_db";
     private static final String USER     = "root";
     private static final String PASSWORD = "";
 
@@ -32,6 +32,49 @@ public class database {
             System.out.println("Driver MySQL tidak ditemukan: " + e.getMessage());
         } catch (SQLException e) {
             System.out.println("Gagal koneksi ke database: " + e.getMessage());
+        }
+    }
+    // ─── Fungsi Login untuk Mahasiswa ──────────────────────────────────────────
+    public ResultSet loginMahasiswa(int idMahasiswa, String password) {
+        try {
+            // Gunakan PreparedStatement untuk keamanan (SQL Injection protection)
+            String sql = "SELECT * FROM mahasiswa WHERE id_mahasiswa = ? AND password = ?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, String.valueOf(idMahasiswa));
+            pst.setString(2, password);
+            return pst.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error login mahasiswa: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // ─── Fungsi Login untuk Dosen ──────────────────────────────────────────────
+    public ResultSet loginDosen(String username, String password) {
+        try {
+            // Berdasarkan struktur SQL anda, dosen menggunakan nama_dosen atau id_dosen
+            String sql = "SELECT * FROM dosen WHERE nama_dosen = ? AND password = ?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, username);
+            pst.setString(2, password);
+            return pst.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error login dosen: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // ─── Fungsi Login untuk Admin ──────────────────────────────────────────────
+    public ResultSet loginAdmin(String username, String password) {
+        try {
+            String sql = "SELECT * FROM admin WHERE nama_admin = ? AND password = ?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, username);
+            pst.setString(2, password);
+            return pst.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error login admin: " + e.getMessage());
+            return null;
         }
     }
 
@@ -178,18 +221,7 @@ public class database {
     }
 
     // LOGIN DOSEN
-    public ResultSet loginDosen(String namaDosen, String password) {
-        String sql = "SELECT * FROM dosen WHERE nama_dosen = ? AND password = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, namaDosen);
-            ps.setString(2, password);
-            return ps.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Gagal login dosen: " + e.getMessage());
-            return null;
-        }
-    }
+    
 
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -284,19 +316,7 @@ public class database {
         }
     }
 
-    // LOGIN MAHASISWA
-    public ResultSet loginMahasiswa(int idMahasiswa, String password) {
-        String sql = "SELECT * FROM mahasiswa WHERE id_mahasiswa = ? AND password = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, idMahasiswa);
-            ps.setString(2, password);
-            return ps.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Gagal login mahasiswa: " + e.getMessage());
-            return null;
-        }
-    }
+    
 
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -637,18 +657,7 @@ public class database {
         }
     }
 
-    public ResultSet loginAdmin(String namaAdmin, String password) {
-        String sql = "SELECT * FROM admin WHERE nama_admin = ? AND password = ?";
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, namaAdmin);
-            ps.setString(2, password);
-            return ps.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Gagal login admin: " + e.getMessage());
-            return null;
-        }
-    }
+    
 
     public boolean updateAdmin(int idAdmin, String namaAdmin, String password) {
         String sql = "UPDATE admin SET nama_admin = ?, password = ? WHERE id_admin = ?";
