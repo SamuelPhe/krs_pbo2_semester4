@@ -13,6 +13,8 @@ public class login_form extends javax.swing.JFrame {
 
     public login_form() {
         initComponents();
+        this.setSize(1024, 600); // Ganti angka ini sesuai ukuran desain Figma Anda (Lebar, Tinggi)
+        this.setLocationRelativeTo(null); // Ini ajaib: bikin form langsung muncul di TENGGAH layar!
         database = new database();
     // Setup dropdown pilihan role
         jComboBox1.removeAllItems();
@@ -52,48 +54,47 @@ public class login_form extends javax.swing.JFrame {
         }
     }
 
-    private void loginSebagaiMahasiswa(String username, String password) throws SQLException {
-        int idMahasiswa;
-        try {
-            idMahasiswa = Integer.parseInt(username);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "ID Mahasiswa harus berupa angka!");
-            return;
-        }
-
-        ResultSet rs = database.loginMahasiswa(idMahasiswa, password);
+  private void loginSebagaiMahasiswa(String nama, String password) throws SQLException {
+        ResultSet rs = database.loginMahasiswa(nama, password);
         if (rs != null && rs.next()) {
-            JOptionPane.showMessageDialog(this, "Selamat datang, " + rs.getString("nama_mahasiswa") + "!");
-            // new DashboardMahasiswa(idMahasiswa).setVisible(true); // Buka form mhs jika ada
-            this.dispose();
+            String namaMhs = rs.getString("nama_mahasiswa");
+            JOptionPane.showMessageDialog(this, "Selamat datang, " + namaMhs + "!");
+            
+            // Redirect ke halaman dashboard
+            new dashboard(namaMhs, "Mahasiswa").setVisible(true);
+            this.dispose(); // Tutup halaman login
         } else {
-            JOptionPane.showMessageDialog(this, "ID atau password salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Nama Mahasiswa atau password salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void loginSebagaiDosen(String username, String password) throws SQLException {
-        ResultSet rs = database.loginDosen(username, password);
+    private void loginSebagaiDosen(String nama, String password) throws SQLException {
+        ResultSet rs = database.loginDosen(nama, password);
         if (rs != null && rs.next()) {
-            JOptionPane.showMessageDialog(this, "Selamat datang, " + rs.getString("nama_dosen") + "!");
-            // new DashboardDosen().setVisible(true); // Buka form dosen jika ada
-            this.dispose();
+            String namaDsn = rs.getString("nama_dosen");
+            JOptionPane.showMessageDialog(this, "Selamat datang, " + namaDsn + "!");
+            
+            // Redirect ke halaman dashboard
+            new dashboard(namaDsn, "Dosen").setVisible(true);
+            this.dispose(); // Tutup halaman login
         } else {
-            JOptionPane.showMessageDialog(this, "Username atau password dosen salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Nama Dosen atau password salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void loginSebagaiAdmin(String username, String password) throws SQLException {
-        ResultSet rs = database.loginAdmin(username, password);
+    private void loginSebagaiAdmin(String nama, String password) throws SQLException {
+        ResultSet rs = database.loginAdmin(nama, password);
         if (rs != null && rs.next()) {
-            JOptionPane.showMessageDialog(this, "Selamat datang Admin!");
-            // new DashboardAdmin().setVisible(true); // Buka form admin jika ada
-            this.dispose();
+            String namaAdm = rs.getString("nama_admin");
+            JOptionPane.showMessageDialog(this, "Selamat datang, Admin " + namaAdm + "!");
+            
+            // Redirect ke halaman dashboard
+            new dashboard(namaAdm, "Admin").setVisible(true);
+            this.dispose(); // Tutup halaman login
         } else {
-            JOptionPane.showMessageDialog(this, "Username atau password admin salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Nama Admin atau password salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-
     
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -121,14 +122,13 @@ public class login_form extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
-        jLabel1 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox<>();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jPasswordField1 = new javax.swing.JPasswordField();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         jPanel3.setBackground(new java.awt.Color(0, 102, 102));
 
@@ -345,17 +345,16 @@ public class login_form extends javax.swing.JFrame {
                     .addContainerGap()))
         );
 
-        jLabel1.setText("Login with:");
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mahasiswa", "Admin", "Kaprodi ", "Dosen PA ", "Dosen", " " }));
         jComboBox1.addActionListener(this::jComboBox1ActionPerformed);
-
-        jLabel17.setText("Username:");
-
-        jLabel18.setText("Password");
+        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 210, 350, 40));
 
         jTextField2.addActionListener(this::jTextField2ActionPerformed);
+        getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 280, 350, 40));
 
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton1.setText("Login");
         jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -363,61 +362,21 @@ public class login_form extends javax.swing.JFrame {
             }
         });
         jButton1.addActionListener(this::jButton1ActionPerformed);
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 430, 230, 40));
+
+        jPasswordField1.addActionListener(this::jPasswordField1ActionPerformed);
+        getContentPane().add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 350, 350, 40));
 
         jButton2.setText("Reset");
         jButton2.addActionListener(this::jButton2ActionPerformed);
+        getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 370, -1, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel18)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel17))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(29, 29, 29)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jPasswordField1))))
-                .addContainerGap(46, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(75, 75, 75)
-                .addComponent(jButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(74, 74, 74))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel17)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel18)
-                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
-                .addContainerGap(39, Short.MAX_VALUE))
-        );
+        jButton3.setText("Sign Up");
+        jButton3.addActionListener(this::jButton3ActionPerformed);
+        getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 490, 90, 30));
 
-        jLabel1.getAccessibleContext().setAccessibleName("Login");
-        jLabel1.getAccessibleContext().setAccessibleDescription("");
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Login (2).png"))); // NOI18N
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
@@ -444,12 +403,23 @@ jTextField2.setText("");
 jPasswordField1.setText("");         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPasswordField1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // Membuka form sign up dan menutup form login
+        new sign_up().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -459,8 +429,6 @@ jPasswordField1.setText("");         // TODO add your handling code here:
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

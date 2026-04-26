@@ -35,12 +35,12 @@ public class database {
         }
     }
     // ─── Fungsi Login untuk Mahasiswa ──────────────────────────────────────────
-    public ResultSet loginMahasiswa(int idMahasiswa, String password) {
+    public ResultSet loginMahasiswa(String nama, String password) {
         try {
-            // Gunakan PreparedStatement untuk keamanan (SQL Injection protection)
-            String sql = "SELECT * FROM mahasiswa WHERE id_mahasiswa = ? AND password = ?";
+            // Mencari berdasarkan kolom nama_mahasiswa yang sudah ada di DB Anda
+            String sql = "SELECT * FROM mahasiswa WHERE nama_mahasiswa = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, String.valueOf(idMahasiswa));
+            pst.setString(1, nama);
             pst.setString(2, password);
             return pst.executeQuery();
         } catch (SQLException e) {
@@ -50,12 +50,12 @@ public class database {
     }
 
     // ─── Fungsi Login untuk Dosen ──────────────────────────────────────────────
-    public ResultSet loginDosen(String username, String password) {
+    public ResultSet loginDosen(String nama, String password) {
         try {
-            // Berdasarkan struktur SQL anda, dosen menggunakan nama_dosen atau id_dosen
+            // Mencari berdasarkan kolom nama_dosen yang sudah ada di DB Anda
             String sql = "SELECT * FROM dosen WHERE nama_dosen = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, username);
+            pst.setString(1, nama); 
             pst.setString(2, password);
             return pst.executeQuery();
         } catch (SQLException e) {
@@ -65,11 +65,12 @@ public class database {
     }
 
     // ─── Fungsi Login untuk Admin ──────────────────────────────────────────────
-    public ResultSet loginAdmin(String username, String password) {
+    public ResultSet loginAdmin(String nama, String password) {
         try {
+            // Mencari berdasarkan kolom nama_admin yang sudah ada di DB Anda
             String sql = "SELECT * FROM admin WHERE nama_admin = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, username);
+            pst.setString(1, nama);
             pst.setString(2, password);
             return pst.executeQuery();
         } catch (SQLException e) {
@@ -228,22 +229,26 @@ public class database {
     //  CRUD - MAHASISWA
     // ══════════════════════════════════════════════════════════════════════════
 
-    public boolean tambahMahasiswa(int idProdi, int idDosenPA, String namaMahasiswa, int angkatan, String password) {
-        String sql = "INSERT INTO mahasiswa (id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, password) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idProdi);
-            ps.setInt(2, idDosenPA);
-            ps.setString(3, namaMahasiswa);
-            ps.setInt(4, angkatan);
-            ps.setString(5, password);
-            ps.executeUpdate();
-            return true;
+    
+    public boolean tambahMahasiswa(int idProdi, int idDosenPA, String nama, int angkatan, String password) {
+        try {
+            // Sesuaikan nama kolom dengan yang ada di SQLyog Anda!
+            String sql = "INSERT INTO mahasiswa (id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, password) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setInt(1, idProdi);
+            pst.setInt(2, idDosenPA);
+            pst.setString(3, nama);
+            pst.setInt(4, angkatan);
+            pst.setString(5, password);
+            
+            int rowsAffected = pst.executeUpdate();
+            return rowsAffected > 0; // Mengembalikan true jika berhasil tersimpan
         } catch (SQLException e) {
-            System.out.println("Gagal menambah mahasiswa: " + e.getMessage());
+            System.out.println("Error tambah mahasiswa: " + e.getMessage());
             return false;
         }
     }
-
+    
     public ResultSet getAllMahasiswa() {
         String sql = "SELECT m.*, p.nama_prodi, d.nama_dosen AS nama_dosen_pa " +
                      "FROM mahasiswa m " +
@@ -316,7 +321,34 @@ public class database {
         }
     }
 
-    
+    // ----- Sign Up ------
+   // 1. Fungsi untuk mengambil data Prodi
+    public ResultSet getDaftarProdi() {
+        try {
+            // Pastikan nama tabelnya 'prodi'
+            String sql = "SELECT * FROM prodi"; 
+            Statement stmt = conn.createStatement();
+            return stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            System.out.println("Error ambil prodi: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // 2. Fungsi untuk mengambil data Dosen PA
+    public ResultSet getDaftarDosen() {
+        try {
+            // Pastikan nama tabelnya 'dosen'
+            String sql = "SELECT * FROM dosen"; 
+            Statement stmt = conn.createStatement();
+            return stmt.executeQuery(sql);
+        } catch (SQLException e) {
+            System.out.println("Error ambil dosen: " + e.getMessage());
+            return null;
+        }
+    }
+
+
 
 
     // ══════════════════════════════════════════════════════════════════════════
