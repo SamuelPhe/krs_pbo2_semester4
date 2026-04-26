@@ -311,7 +311,6 @@ public class data_krs extends javax.swing.JFrame {
     }//GEN-LAST:event_backActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-
         JComboBox<String> cbNamaMhs = new JComboBox<>();
         JComboBox<String> cbNamaDosen = new JComboBox<>();
         cbNamaDosen.addItem("-- Belum Di-ACC --");
@@ -346,7 +345,8 @@ public class data_krs extends javax.swing.JFrame {
             "Tanggal Pengajuan:", dateSpinner
         };
 
-        int option = JOptionPane.showConfirmDialog(this, formFields, "Tambah Data KRS", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        // PERUBAHAN DI SINI: MENGGUNAKAN PLAIN_MESSAGE
+        int option = JOptionPane.showConfirmDialog(this, formFields, "Tambah Data KRS", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         
         if (option == JOptionPane.OK_OPTION) {
             try {
@@ -396,7 +396,7 @@ public class data_krs extends javax.swing.JFrame {
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
 
-        int baris = tabelKRS.getSelectedRow();
+int baris = tabelKRS.getSelectedRow();
         if (baris == -1) {
             JOptionPane.showMessageDialog(this, "Silakan pilih baris tabel yang ingin diedit terlebih dahulu!");
             return;
@@ -454,7 +454,8 @@ public class data_krs extends javax.swing.JFrame {
             "Tanggal Pengajuan:", dateSpinner
         };
 
-        int option = JOptionPane.showConfirmDialog(this, formFields, "Edit Data KRS (ID: " + idKrs + ")", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        // PERUBAHAN DI SINI: MENGGUNAKAN PLAIN_MESSAGE
+        int option = JOptionPane.showConfirmDialog(this, formFields, "Edit Data KRS (ID: " + idKrs + ")", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         
         if (option == JOptionPane.OK_OPTION) {
             try {
