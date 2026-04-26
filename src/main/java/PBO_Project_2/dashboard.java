@@ -50,6 +50,7 @@ public class dashboard extends javax.swing.JFrame {
         Logout = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         btnMaster = new javax.swing.JButton();
+        KRSButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -68,6 +69,9 @@ public class dashboard extends javax.swing.JFrame {
         btnMaster.setText("Master Data");
         btnMaster.addActionListener(this::btnMasterActionPerformed);
 
+        KRSButton.setText("Data KRS");
+        KRSButton.addActionListener(this::KRSButtonActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -85,6 +89,7 @@ public class dashboard extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(KRSButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnMaster, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(Master, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addContainerGap(93, Short.MAX_VALUE))
@@ -100,7 +105,9 @@ public class dashboard extends javax.swing.JFrame {
                 .addComponent(Master)
                 .addGap(18, 18, 18)
                 .addComponent(btnMaster)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 127, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(KRSButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
                 .addComponent(Logout)
                 .addGap(14, 14, 14))
         );
@@ -150,6 +157,12 @@ public class dashboard extends javax.swing.JFrame {
     this.dispose();
     }//GEN-LAST:event_btnMasterActionPerformed
 
+    private void KRSButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KRSButtonActionPerformed
+    data_krs dk = new data_krs(namaLogin, roleLogin);
+    dk.setVisible(true);
+    this.dispose();        // TODO add your handling code here:
+    }//GEN-LAST:event_KRSButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -176,6 +189,7 @@ public class dashboard extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton KRSButton;
     private javax.swing.JButton Logout;
     private javax.swing.JButton Master;
     private javax.swing.JButton btnMaster;

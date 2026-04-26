@@ -37,6 +37,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                           <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="KRSButton" alignment="0" max="32767" attributes="0"/>
                               <Component id="btnMaster" alignment="0" max="32767" attributes="0"/>
                               <Component id="Master" alignment="0" max="32767" attributes="0"/>
                           </Group>
@@ -58,7 +59,9 @@
               <Component id="Master" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="btnMaster" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="127" max="32767" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="KRSButton" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="86" max="32767" attributes="0"/>
               <Component id="Logout" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
           </Group>
@@ -107,6 +110,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMasterActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="KRSButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Data KRS"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="KRSButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
