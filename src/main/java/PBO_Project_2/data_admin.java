@@ -71,8 +71,10 @@ public class data_admin extends javax.swing.JFrame {
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         back = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         tabelAdmin.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -87,53 +89,30 @@ public class data_admin extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tabelAdmin);
 
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 640, 290));
+
+        bthAdd.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         bthAdd.setText("Add");
         bthAdd.addActionListener(this::bthAddActionPerformed);
+        getContentPane().add(bthAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 140, 190, -1));
 
+        btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnEdit.setText("Edit");
         btnEdit.addActionListener(this::btnEditActionPerformed);
+        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 230, 190, -1));
 
+        btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.addActionListener(this::btnDeleteActionPerformed);
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 320, 190, -1));
 
+        back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         back.setText("Back");
         back.addActionListener(this::backActionPerformed);
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 150, 40));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(bthAdd)
-                            .addComponent(btnEdit)
-                            .addComponent(btnDelete)))
-                    .addComponent(back))
-                .addContainerGap(31, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(66, 66, 66)
-                        .addComponent(bthAdd)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnEdit)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnDelete)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
-                .addComponent(back)
-                .addContainerGap())
-        );
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Dosen (1).png"))); // NOI18N
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -228,6 +207,7 @@ public class data_admin extends javax.swing.JFrame {
     private javax.swing.JButton bthAdd;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tabelAdmin;
     // End of variables declaration//GEN-END:variables

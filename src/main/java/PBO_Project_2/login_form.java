@@ -124,9 +124,9 @@ public class login_form extends javax.swing.JFrame {
         buttonGroup2 = new javax.swing.ButtonGroup();
         jComboBox1 = new javax.swing.JComboBox<>();
         jTextField2 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         jPasswordField1 = new javax.swing.JPasswordField();
         jButton2 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
@@ -349,10 +349,17 @@ public class login_form extends javax.swing.JFrame {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Mahasiswa", "Admin", "Kaprodi ", "Dosen PA ", "Dosen", " " }));
         jComboBox1.addActionListener(this::jComboBox1ActionPerformed);
-        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 210, 350, 40));
+        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 230, 350, 40));
 
         jTextField2.addActionListener(this::jTextField2ActionPerformed);
-        getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 280, 350, 40));
+        getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 300, 350, 40));
+
+        jPasswordField1.addActionListener(this::jPasswordField1ActionPerformed);
+        getContentPane().add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 370, 350, 40));
+
+        jButton2.setText("Reset");
+        jButton2.addActionListener(this::jButton2ActionPerformed);
+        getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 390, -1, -1));
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton1.setText("Login");
@@ -364,19 +371,12 @@ public class login_form extends javax.swing.JFrame {
         jButton1.addActionListener(this::jButton1ActionPerformed);
         getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 430, 230, 40));
 
-        jPasswordField1.addActionListener(this::jPasswordField1ActionPerformed);
-        getContentPane().add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 350, 350, 40));
-
-        jButton2.setText("Reset");
-        jButton2.addActionListener(this::jButton2ActionPerformed);
-        getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 370, -1, -1));
-
         jButton3.setText("Sign Up");
         jButton3.addActionListener(this::jButton3ActionPerformed);
-        getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 490, 90, 30));
+        getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 510, 90, 30));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Login (2).png"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
@@ -409,8 +409,8 @@ jPasswordField1.setText("");         // TODO add your handling code here:
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // Membuka form sign up dan menutup form login
-        new sign_up().setVisible(true);
-        this.dispose();
+       new sign_up().setVisible(true);
+    this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 
 

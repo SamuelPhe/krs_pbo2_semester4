@@ -37,55 +37,37 @@ public class masterdata extends javax.swing.JFrame {
         btnMatkul = new javax.swing.JButton();
         btnJadwal = new javax.swing.JButton();
         back = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel1.setText("Pilih Data Yang Ingin Diubah:");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 6, -1, -1));
 
+        btnProdi.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnProdi.setText("Data Prodi");
         btnProdi.addActionListener(this::btnProdiActionPerformed);
+        getContentPane().add(btnProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 140, 280, -1));
 
+        btnMatkul.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnMatkul.setText("Data Matkul");
         btnMatkul.addActionListener(this::btnMatkulActionPerformed);
+        getContentPane().add(btnMatkul, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 280, -1));
 
+        btnJadwal.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnJadwal.setText("Data Jadwal");
         btnJadwal.addActionListener(this::btnJadwalActionPerformed);
+        getContentPane().add(btnJadwal, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, 280, -1));
 
+        back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         back.setText("Back");
         back.setToolTipText("");
         back.addActionListener(this::backActionPerformed);
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 530, -1, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(back)
-                    .addComponent(btnJadwal)
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(btnProdi, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnMatkul, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(135, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(btnProdi)
-                .addGap(18, 18, 18)
-                .addComponent(btnMatkul)
-                .addGap(18, 18, 18)
-                .addComponent(btnJadwal)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
-                .addComponent(back)
-                .addGap(24, 24, 24))
-        );
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Master Data.png"))); // NOI18N
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 610, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -149,5 +131,6 @@ public class masterdata extends javax.swing.JFrame {
     private javax.swing.JButton btnMatkul;
     private javax.swing.JButton btnProdi;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 }

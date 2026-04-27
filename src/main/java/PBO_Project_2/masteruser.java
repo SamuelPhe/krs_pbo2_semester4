@@ -40,55 +40,34 @@ public class masteruser extends javax.swing.JFrame {
         btnDos = new javax.swing.JButton();
         btnAdmin = new javax.swing.JButton();
         back = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        btnMahasiswa.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnMahasiswa.setText("Data Mahasiswa");
         btnMahasiswa.addActionListener(this::btnMahasiswaActionPerformed);
+        getContentPane().add(btnMahasiswa, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 130, 300, 40));
 
+        btnDos.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDos.setText("Data Dosen");
         btnDos.addActionListener(this::btnDosActionPerformed);
+        getContentPane().add(btnDos, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 300, -1));
 
+        btnAdmin.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnAdmin.setText("Data Admin");
         btnAdmin.setToolTipText("");
         btnAdmin.addActionListener(this::btnAdminActionPerformed);
+        getContentPane().add(btnAdmin, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 270, 300, -1));
 
+        back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         back.setText("Back");
         back.addActionListener(this::backActionPerformed);
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 520, -1, -1));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel1.setText("Pilih Data Yang Ingin Diubah:");
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(back)
-                    .addComponent(btnDos)
-                    .addComponent(btnMahasiswa)
-                    .addComponent(btnAdmin))
-                .addContainerGap(135, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnMahasiswa)
-                .addGap(18, 18, 18)
-                .addComponent(btnDos)
-                .addGap(18, 18, 18)
-                .addComponent(btnAdmin)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
-                .addComponent(back)
-                .addGap(19, 19, 19))
-        );
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Master User.png"))); // NOI18N
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -154,6 +133,6 @@ public class masteruser extends javax.swing.JFrame {
     private javax.swing.JButton btnAdmin;
     private javax.swing.JButton btnDos;
     private javax.swing.JButton btnMahasiswa;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
 }

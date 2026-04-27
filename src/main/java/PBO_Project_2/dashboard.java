@@ -30,7 +30,7 @@ public class dashboard extends javax.swing.JFrame {
     // Set teks pada label variabel 'user'
     user.setText("Selamat datang di dashboard, " + namaUser + "!");
 
-    this.setSize(1024, 600); 
+    this.setSize(1024, 640); 
     this.setLocationRelativeTo(null); 
 }
     // -----------------------
@@ -51,68 +51,43 @@ public class dashboard extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         btnMaster = new javax.swing.JButton();
         KRSButton = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        Master.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         Master.setText("Master User");
         Master.addActionListener(this::MasterActionPerformed);
+        getContentPane().add(Master, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 190, -1));
 
-        user.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        user.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         user.setText("Selamat Datang di Dashboard, ...");
+        getContentPane().add(user, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 40, 770, -1));
 
+        Logout.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         Logout.setText("Log Out");
         Logout.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         Logout.addActionListener(this::LogoutActionPerformed);
+        getContentPane().add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 540, -1, -1));
+        Logout.getAccessibleContext().setAccessibleDescription("");
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel1.setText("Pilih Fitur yang Ingin Digunakan:");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, -1, -1));
 
+        btnMaster.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnMaster.setText("Master Data");
         btnMaster.addActionListener(this::btnMasterActionPerformed);
+        getContentPane().add(btnMaster, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 220, 190, -1));
 
+        KRSButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         KRSButton.setText("Data KRS");
         KRSButton.addActionListener(this::KRSButtonActionPerformed);
+        getContentPane().add(KRSButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 280, 190, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(Logout)
-                .addGap(28, 28, 28))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(user, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(KRSButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnMaster, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(Master, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                .addContainerGap(93, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(user)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(Master)
-                .addGap(18, 18, 18)
-                .addComponent(btnMaster)
-                .addGap(18, 18, 18)
-                .addComponent(KRSButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
-                .addComponent(Logout)
-                .addGap(14, 14, 14))
-        );
-
-        Logout.getAccessibleContext().setAccessibleDescription("");
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/home page (2).png"))); // NOI18N
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -194,6 +169,7 @@ public class dashboard extends javax.swing.JFrame {
     private javax.swing.JButton Master;
     private javax.swing.JButton btnMaster;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel user;
     // End of variables declaration//GEN-END:variables
 }
