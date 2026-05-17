@@ -13,6 +13,7 @@ public class masteruser extends javax.swing.JFrame {
     private String roleSesi;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(masteruser.class.getName());
 
+    
     /**
      * Creates new form masteruser
      */
@@ -22,10 +23,18 @@ public class masteruser extends javax.swing.JFrame {
 }
     
     public masteruser(String nama, String role) {
-    this.namaSesi = nama; // Terima titipan nama
-    this.roleSesi = role; // Terima titipan role
-    initComponents();
-}
+        this.namaSesi = nama; 
+        this.roleSesi = role; 
+        initComponents();
+        
+        // --- SATPAM MASTER USER KHUSUS MAHASISWA ---
+        if (roleSesi.equalsIgnoreCase("mahasiswa")) {
+            btnAdmin.setVisible(false); // Mahasiswa tidak boleh tahu daftar Admin sistem!
+            
+            // Untuk Data Dosen, mahasiswa boleh lihat daftar dosennya (Read-Only)
+            // Jadi tombol Data Dosen biarkan tetap muncul.
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -82,18 +91,33 @@ public class masteruser extends javax.swing.JFrame {
     }//GEN-LAST:event_backActionPerformed
 
     private void btnMahasiswaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMahasiswaActionPerformed
-        // Tetap bawa namaSesi dan roleSesi supaya pas back nama user nggak hilang
-    data_mahasiswa mhs = new data_mahasiswa(namaSesi, roleSesi);
-    mhs.setVisible(true);
-    mhs.setLocationRelativeTo(null);
-    this.dispose();
+       // --- LOGIKA BARU: CARI ID SESI MAHASISWA TERLEBIH DAHULU ---
+        String idMahasiswaSesi = "";
+        try {
+            java.sql.Connection conn = new database().getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement("SELECT id_mahasiswa FROM mahasiswa WHERE nama_mahasiswa = ?");
+            ps.setString(1, namaSesi);
+            java.sql.ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                idMahasiswaSesi = rs.getString("id_mahasiswa");
+            }
+        } catch (Exception e) {
+            System.out.println("Gagal mencari ID Sesi di masteruser: " + e.getMessage());
+        }
+
+        // Sekarang kita kirim 3 parameter lengkap (Nama, Role, ID) agar data_mahasiswa tidak error
+        data_mahasiswa mhs = new data_mahasiswa(namaSesi, roleSesi, idMahasiswaSesi);
+        mhs.setVisible(true);
+        mhs.setLocationRelativeTo(null);
+        this.dispose();
     }//GEN-LAST:event_btnMahasiswaActionPerformed
 
     private void btnDosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDosActionPerformed
-    data_dosen dos = new data_dosen(namaSesi, roleSesi);
-    dos.setVisible(true);
-    dos.setLocationRelativeTo(null);
-    this.dispose();
+   // Pastikan parameter namaSesi dan roleSesi ikut dikirim
+        data_dosen dos = new data_dosen(namaSesi, roleSesi);
+        dos.setVisible(true);
+        dos.setLocationRelativeTo(null);
+        this.dispose();
     }//GEN-LAST:event_btnDosActionPerformed
 
     private void btnAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdminActionPerformed

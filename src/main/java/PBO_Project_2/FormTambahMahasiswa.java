@@ -28,12 +28,12 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
         isEdit = true;
         jLabel2.setText("Update Data Mahasiswa");
         txtId.setText(data[0]);
-        txtId.setEditable(false); // ID tidak boleh diganti saat edit
+        txtId.setEditable(false); 
         txtNama.setText(data[1]);
         cbProdi.setSelectedItem(data[2]);
         cbDosen.setSelectedItem(data[3]);
         txtAngkatan.setText(data[4]);
-        // Password biarkan kosong atau isi jika perlu
+        txtSemester.setText(data[5]); // <-- PANGGIL DATA LAMA SAAT EDIT
     }
 }
 
@@ -63,6 +63,8 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
         cbDosen = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
         txtConfirmPass = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        txtSemester = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -84,15 +86,19 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
 
         btnBatal.setText("Back");
         btnBatal.addActionListener(this::btnBatalActionPerformed);
-        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, -1, -1));
+        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 490, -1, -1));
 
         btnSimpan.setText("Save");
         btnSimpan.addActionListener(this::btnSimpanActionPerformed);
-        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 460, -1, -1));
+        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 490, -1, -1));
         getContentPane().add(cbProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 200, 370, -1));
         getContentPane().add(cbDosen, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 250, 370, -1));
         getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 691, -1, -1));
         getContentPane().add(txtConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 400, 370, -1));
+
+        jLabel10.setText("Semester");
+        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, -1, -1));
+        getContentPane().add(txtSemester, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 440, 370, -1));
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Mahasiswa.png"))); // NOI18N
         getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
@@ -133,24 +139,85 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
         int idDosen = 0;
         if (rsDosen.next()) { idDosen = rsDosen.getInt("id_dosen"); }
 
-        // 4. TENTUKAN SQL (INSERT atau UPDATE)
+        // 4. TENTUKAN SQL (INSERT atau UPDATE dengan proteksi password blank)
         String sql;
+        boolean gantiPassword = !pass.isEmpty(); // Bernilai true jika password diisi
+
         if (isEdit) {
-            sql = "UPDATE mahasiswa SET nama_mahasiswa=?, id_prodi=?, id_dosen_pa=?, angkatan=?, password=? WHERE id_mahasiswa=?";
+            if (gantiPassword) {
+                // Jika password baru diisi, update semuanya termasuk password
+                sql = "UPDATE mahasiswa SET nama_mahasiswa=?, id_prodi=?, id_dosen_pa=?, angkatan=?, semester=?, password=? WHERE id_mahasiswa=?";
+            } else {
+                // Jika password kosong, kolom password JANGAN DIKUTAK-KATIK
+                sql = "UPDATE mahasiswa SET nama_mahasiswa=?, id_prodi=?, id_dosen_pa=?, angkatan=?, semester=? WHERE id_mahasiswa=?";
+            }
         } else {
-            sql = "INSERT INTO mahasiswa (nama_mahasiswa, id_prodi, id_dosen_pa, angkatan, password, id_mahasiswa) VALUES (?, ?, ?, ?, ?, ?)";
+            // Untuk INSERT baru, password tetap wajib diisi
+            sql = "INSERT INTO mahasiswa (nama_mahasiswa, id_prodi, id_dosen_pa, angkatan, semester, password, id_mahasiswa) VALUES (?, ?, ?, ?, ?, ?, ?)";
         }
 
         PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setString(1, txtNama.getText());
-        pst.setInt(2, idProdi);
-        pst.setInt(3, idDosen);
-        pst.setString(4, txtAngkatan.getText());
-        pst.setString(5, pass);
-        pst.setString(6, txtId.getText());
+        
+        if (isEdit) {
+            if (gantiPassword) {
+                // Parameter jika ganti password (ada 7 parameter)
+                pst.setString(1, txtNama.getText());
+                pst.setInt(2, idProdi);
+                pst.setInt(3, idDosen);
+                pst.setString(4, txtAngkatan.getText());
+                pst.setString(5, txtSemester.getText());
+                pst.setString(6, pass); // Password baru masuk
+                pst.setString(7, txtId.getText());
+            } else {
+                // Parameter jika TIDAK ganti password (hanya 6 parameter, tanpa kolom password)
+                pst.setString(1, txtNama.getText());
+                pst.setInt(2, idProdi);
+                pst.setInt(3, idDosen);
+                pst.setString(4, txtAngkatan.getText());
+                pst.setString(5, txtSemester.getText());
+                pst.setString(6, txtId.getText()); // ID Mahasiswa bergeser ke urutan 6
+            }
+        } else {
+            // Parameter untuk INSERT biasa
+            pst.setString(1, txtNama.getText());
+            pst.setInt(2, idProdi);
+            pst.setInt(3, idDosen);
+            pst.setString(4, txtAngkatan.getText());
+            pst.setString(5, txtSemester.getText());
+            pst.setString(6, pass);
+            pst.setString(7, txtId.getText());
+        }
 
         pst.execute();
         JOptionPane.showMessageDialog(null, isEdit ? "Data Berhasil Diupdate" : "Data Berhasil Disimpan");
+        
+        // --- LOGIKA BARU: DETEKSI PERUBAHAN DATA APAPUN MILIK SENDIRI BERDASARKAN ID ---
+        if (this.getParent() instanceof data_mahasiswa) {
+            data_mahasiswa pFrame = (data_mahasiswa) this.getParent();
+            
+            // Ambil ID Mahasiswa yang sedang aktif dibuka di textfield JDialog ini
+            String idYangSedangDiedit = txtId.getText().trim();
+            
+            // Ambil ID Mahasiswa yang sedang login dari frame parent
+            String idLoginSaya = pFrame.getIdSesiMhs(); 
+            
+            // Jika role-nya mahasiswa DAN ID yang diedit adalah ID-nya sendiri
+            if (pFrame.getRoleSesi().equalsIgnoreCase("mahasiswa") && idYangSedangDiedit.equals(idLoginSaya)) {
+                
+                JOptionPane.showMessageDialog(this, 
+                    "Anda baru saja memperbarui data profil Anda sendiri.\nSistem memerlukan relog untuk memperbarui sesi Anda.", 
+                    "Pembaruan Profil Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                
+                // Tutup popup dan halaman master mahasiswa secara paksa
+                this.dispose();
+                pFrame.dispose();
+                
+                // Lempar langsung ke halaman login form
+                new login_form().setVisible(true);
+                return; // Keluar agar tidak mengeksekusi dispose() biasa di bawah
+            }
+        }
+        // --- BATAS LOGIKA BARU ---
         this.dispose();
 
     } catch (Exception e) {
@@ -228,6 +295,7 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
     private javax.swing.JComboBox<String> cbDosen;
     private javax.swing.JComboBox<String> cbProdi;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -241,5 +309,6 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtNama;
     private javax.swing.JTextField txtPass;
+    private javax.swing.JTextField txtSemester;
     // End of variables declaration//GEN-END:variables
 }

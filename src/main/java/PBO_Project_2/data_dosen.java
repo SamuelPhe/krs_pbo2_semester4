@@ -11,15 +11,26 @@ import java.sql.*;
  * @author User
  */
 public class data_dosen extends javax.swing.JFrame {
-    private String namaSesi, roleSesi;
-    // Deklarasi Logger agar tidak error di bagian bawah
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_dosen.class.getName());
+    
+    private String namaSesi, roleSesi; // Buat variabel penampung
 
+    // Pastikan konstruktor utama kamu menerima 2 parameter ini
     public data_dosen(String nama, String role) {
         this.namaSesi = nama;
         this.roleSesi = role;
         initComponents();
-        tampilkan_data();
+        tampilkan_data(); // Fungsi load tabel dosen kamu
+        
+        // --- SATPAM PENGAMAN DATA DOSEN MANDIRI ---
+        if (roleSesi.equalsIgnoreCase("mahasiswa")) {
+            btnAdd.setVisible(false);    // Sembunyikan tombol Add
+            btnEdit.setVisible(false);   // Sembunyikan tombol Edit
+            btnDelete.setVisible(false); // Sembunyikan tombol Delete
+        }
+    }
+
+    public data_dosen() {
+        initComponents();
     }
 
     private void tampilkan_data() {
