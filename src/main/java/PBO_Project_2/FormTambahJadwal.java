@@ -3,35 +3,49 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package PBO_Project_2;
-import javax.swing.table.DefaultTableModel;
+
 import javax.swing.JOptionPane;
 import java.sql.*;
+import java.util.Calendar;
+import java.util.Date;
 
-/**
- *
- * @author User
- */
 public class FormTambahJadwal extends javax.swing.JDialog {
     private boolean isEdit = false;
     private String idJadwalEdit;
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormTambahJadwal.class.getName());
 
-    /**
-     * Creates new form FormTambahJadwal
-     */
-   
-    // Pintu 1: Untuk Tambah Baru (btnAdd)
     public FormTambahJadwal(java.awt.Frame parent, boolean modal) {
-        this(parent, modal, null); // Melempar ke pintu 2 dengan data null
+        this(parent, modal, null); 
     }
 
-    // Pintu 2: Untuk Edit (btnEdit) atau Tambah Baru (lewat pintu 1)
     public FormTambahJadwal(java.awt.Frame parent, boolean modal, String[] data) {
         super(parent, modal);
         initComponents();
+        
+        // --- 1. MEMAKSA FORMAT JAM PADA JSPINNER ---
+        javax.swing.JSpinner.DateEditor editorMulai = new javax.swing.JSpinner.DateEditor(spinJamMulai, "HH:mm:ss");
+        spinJamMulai.setEditor(editorMulai);
+        
+        javax.swing.JSpinner.DateEditor editorSelesai = new javax.swing.JSpinner.DateEditor(spinJamSelesai, "HH:mm:ss");
+        spinJamSelesai.setEditor(editorSelesai);
+        
+        // --- 2. MENGATUR WAKTU AWAL MENJADI 00:00:00 ---
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date waktuNol = cal.getTime();
+        
+        spinJamMulai.setValue(waktuNol);
+        spinJamSelesai.setValue(waktuNol);
+        
+        // Load data dropdown dari master data
         isiPilihanMatkul();
         isiPilihanDosen();
+        isiPilihanKelas();
+        isiPilihanRuang();
         
+        // Jika dalam mode EDIT, timpakan nilai dengan data lama yang dipilih dari tabel
         if (data != null) {
             isEdit = true;
             idJadwalEdit = data[0];
@@ -39,48 +53,58 @@ public class FormTambahJadwal extends javax.swing.JDialog {
             cbMatkul.setSelectedItem(data[1]);
             cbDosen.setSelectedItem(data[2]);
             cbHari.setSelectedItem(data[3]);
-            txtKelas.setText(data[4]);
+            cbKelas.setSelectedItem(data[4]); 
             
-            // Pecah jam "08:00:00 - 10:00:00"
             try {
                 String[] jam = data[5].split(" - ");
-                txtJamMulai.setText(jam[0]);
-                txtJamSelesai.setText(jam[1]);
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss");
+                
+                spinJamMulai.setValue(sdf.parse(jam[0]));
+                spinJamSelesai.setValue(sdf.parse(jam[1]));
             } catch (Exception e) {
-                // Jaga-jaga kalau format jam di tabel berbeda
+                System.out.println("Gagal load jam lama: " + e.getMessage());
             }
             
-            txtRuang.setText(data[6]);
+            cbRuang.setSelectedItem(data[6]); 
         }
         this.setLocationRelativeTo(null);
     }
 
-private void isiPilihanMatkul() {
-    try {
-        Connection conn = new database().getConnection();
-        ResultSet res = conn.createStatement().executeQuery("SELECT nama_matkul FROM matkul");
-        cbMatkul.removeAllItems();
-        while (res.next()) {
-            cbMatkul.addItem(res.getString("nama_matkul"));
-        }
-    } catch (Exception e) {
-        System.out.println("Gagal load matkul: " + e.getMessage());
+    private void isiPilihanMatkul() {
+        try {
+            Connection conn = new database().getConnection();
+            ResultSet res = conn.createStatement().executeQuery("SELECT nama_matkul FROM matkul");
+            cbMatkul.removeAllItems();
+            while (res.next()) cbMatkul.addItem(res.getString("nama_matkul"));
+        } catch (Exception e) {}
     }
-}
 
-private void isiPilihanDosen() {
-    try {
-        Connection conn = new database().getConnection();
-        ResultSet res = conn.createStatement().executeQuery("SELECT nama_dosen FROM dosen");
-        cbDosen.removeAllItems();
-        while (res.next()) {
-            cbDosen.addItem(res.getString("nama_dosen"));
-        }
-    } catch (Exception e) {
-        System.out.println("Gagal load dosen: " + e.getMessage());
+    private void isiPilihanDosen() {
+        try {
+            Connection conn = new database().getConnection();
+            ResultSet res = conn.createStatement().executeQuery("SELECT nama_dosen FROM dosen");
+            cbDosen.removeAllItems();
+            while (res.next()) cbDosen.addItem(res.getString("nama_dosen"));
+        } catch (Exception e) {}
     }
-}
 
+    private void isiPilihanKelas() {
+        try {
+            Connection conn = new database().getConnection();
+            ResultSet res = conn.createStatement().executeQuery("SELECT nama_kelas FROM kelas");
+            cbKelas.removeAllItems();
+            while (res.next()) cbKelas.addItem(res.getString("nama_kelas"));
+        } catch (Exception e) {}
+    }
+
+    private void isiPilihanRuang() {
+        try {
+            Connection conn = new database().getConnection();
+            ResultSet res = conn.createStatement().executeQuery("SELECT nama_ruang FROM ruang");
+            cbRuang.removeAllItems();
+            while (res.next()) cbRuang.addItem(res.getString("nama_ruang"));
+        } catch (Exception e) {}
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -104,10 +128,10 @@ private void isiPilihanDosen() {
         cbMatkul = new javax.swing.JComboBox<>();
         cbDosen = new javax.swing.JComboBox<>();
         cbHari = new javax.swing.JComboBox<>();
-        txtJamMulai = new javax.swing.JTextField();
-        txtKelas = new javax.swing.JTextField();
-        txtRuang = new javax.swing.JTextField();
-        txtJamSelesai = new javax.swing.JTextField();
+        cbKelas = new javax.swing.JComboBox<>();
+        cbRuang = new javax.swing.JComboBox<>();
+        spinJamMulai = new javax.swing.JSpinner();
+        spinJamSelesai = new javax.swing.JSpinner();
         jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -138,15 +162,14 @@ private void isiPilihanDosen() {
 
         cbHari.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu" }));
         getContentPane().add(cbHari, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 200, 350, -1));
+        getContentPane().add(cbKelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 250, 160, -1));
+        getContentPane().add(cbRuang, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 300, 160, -1));
 
-        txtJamMulai.setText("00:00:00");
-        txtJamMulai.setToolTipText("");
-        getContentPane().add(txtJamMulai, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 250, 150, -1));
-        getContentPane().add(txtKelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 250, 150, -1));
-        getContentPane().add(txtRuang, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 300, 150, -1));
+        spinJamMulai.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.HOUR));
+        getContentPane().add(spinJamMulai, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 250, 160, -1));
 
-        txtJamSelesai.setText("00:00:00");
-        getContentPane().add(txtJamSelesai, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 300, 150, -1));
+        spinJamSelesai.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.HOUR));
+        getContentPane().add(spinJamSelesai, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 300, 160, -1));
 
         jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Jadwal.png"))); // NOI18N
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
@@ -159,92 +182,112 @@ private void isiPilihanDosen() {
     }//GEN-LAST:event_cbMatkulActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-      // --- LAPIS 1: VALIDASI INPUT KOSONG & RANGE JAM ---
-    if (txtKelas.getText().isEmpty() || txtRuang.getText().isEmpty() || 
-        txtJamMulai.getText().equals("00:00:00") || txtJamSelesai.getText().equals("00:00:00")) {
-        JOptionPane.showMessageDialog(this, "Semua data wajib diisi!");
-        return;
-    }
-
-    // Validasi Range Jam (00 - 23)
-    try {
-        String[] jm = txtJamMulai.getText().split(":");
-        String[] js = txtJamSelesai.getText().split(":");
-        int jamMulai = Integer.parseInt(jm[0]);
-        int jamSelesai = Integer.parseInt(js[0]);
-
-        if (jamMulai < 0 || jamMulai > 23 || jamSelesai < 0 || jamSelesai > 23) {
-            JOptionPane.showMessageDialog(this, "Jam tidak valid! Gunakan range 00:00:00 sampai 23:59:59");
+    if (cbMatkul.getSelectedItem() == null || cbDosen.getSelectedItem() == null || 
+            cbHari.getSelectedItem() == null || cbKelas.getSelectedItem() == null || cbRuang.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Semua data dropdown wajib dipilih!");
             return;
         }
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Format jam salah! Gunakan HH:mm:ss");
-        return;
-    }
 
-    try {
-        Connection conn = new database().getConnection();
-        
-        // --- LAPIS 2: CEK BENTROK JADWAL ---
-        // Logika: Cari jadwal yang harinya sama DAN ruangnya sama DAN jamnya tumpang tindih
-        String sqlCek = "SELECT * FROM jadwal WHERE hari = ? AND ruang = ? AND " +
-                        "((jam_mulai <= ? AND jam_selesai > ?) OR (jam_mulai < ? AND jam_selesai >= ?))";
-        
-        // Jika sedang EDIT, jangan cek bentrok dengan dirinya sendiri
-        if (isEdit) { sqlCek += " AND id_jadwal != " + idJadwalEdit; }
+        // Ambil string waktu dari JSpinner
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss");
+        String jamMulai = sdf.format(spinJamMulai.getValue());
+        String jamSelesai = sdf.format(spinJamSelesai.getValue());
 
-        PreparedStatement stCek = conn.prepareStatement(sqlCek);
-        stCek.setString(1, cbHari.getSelectedItem().toString().toLowerCase());
-        stCek.setString(2, txtRuang.getText());
-        stCek.setString(3, txtJamMulai.getText());
-        stCek.setString(4, txtJamMulai.getText());
-        stCek.setString(5, txtJamSelesai.getText());
-        stCek.setString(6, txtJamSelesai.getText());
-        
-        ResultSet rsCek = stCek.executeQuery();
-        if (rsCek.next()) {
-            JOptionPane.showMessageDialog(this, "JADWAL BENTROK!\nRuangan " + txtRuang.getText() + 
-                    " sudah terpakai pada jam tersebut.");
-            return; // Berhenti, jangan simpan
+        // Validasi logika: Jam Selesai tidak boleh mendahului atau sama dengan Jam Mulai
+        if (jamMulai.compareTo(jamSelesai) >= 0) {
+            JOptionPane.showMessageDialog(this, "Waktu tidak valid! Jam Selesai harus setelah Jam Mulai.");
+            return;
         }
 
-        // --- LAPIS 3: EKSEKUSI SIMPAN ---
-        // Ambil ID Matkul & Dosen (seperti kodingan sebelumnya)
-        PreparedStatement psMk = conn.prepareStatement("SELECT id_matkul FROM matkul WHERE nama_matkul=?");
-        psMk.setString(1, cbMatkul.getSelectedItem().toString());
-        ResultSet rsMk = psMk.executeQuery();
-        rsMk.next(); int idMk = rsMk.getInt("id_matkul");
+        try {
+            Connection conn = new database().getConnection();
+            
+            // --- CARI ID MASING-MASING MASTER DATA ---
+            PreparedStatement psMk = conn.prepareStatement("SELECT id_matkul FROM matkul WHERE nama_matkul=?");
+            psMk.setString(1, cbMatkul.getSelectedItem().toString());
+            ResultSet rsMk = psMk.executeQuery(); rsMk.next(); int idMk = rsMk.getInt("id_matkul");
 
-        PreparedStatement psDs = conn.prepareStatement("SELECT id_dosen FROM dosen WHERE nama_dosen=?");
-        psDs.setString(1, cbDosen.getSelectedItem().toString());
-        ResultSet rsDs = psDs.executeQuery();
-        rsDs.next(); int idDs = rsDs.getInt("id_dosen");
+            PreparedStatement psDs = conn.prepareStatement("SELECT id_dosen FROM dosen WHERE nama_dosen=?");
+            psDs.setString(1, cbDosen.getSelectedItem().toString());
+            ResultSet rsDs = psDs.executeQuery(); rsDs.next(); int idDs = rsDs.getInt("id_dosen");
 
-        String sql;
-        if (isEdit) {
-            sql = "UPDATE jadwal SET id_matkul=?, id_dosen=?, hari=?, kelas=?, jam_mulai=?, jam_selesai=?, ruang=? WHERE id_jadwal=?";
-        } else {
-            sql = "INSERT INTO jadwal (id_matkul, id_dosen, hari, kelas, jam_mulai, jam_selesai, ruang) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement psKl = conn.prepareStatement("SELECT id_kelas FROM kelas WHERE nama_kelas=?");
+            psKl.setString(1, cbKelas.getSelectedItem().toString());
+            ResultSet rsKl = psKl.executeQuery(); rsKl.next(); int idKl = rsKl.getInt("id_kelas");
+
+            PreparedStatement psRg = conn.prepareStatement("SELECT id_ruang FROM ruang WHERE nama_ruang=?");
+            psRg.setString(1, cbRuang.getSelectedItem().toString());
+            ResultSet rsRg = psRg.executeQuery(); rsRg.next(); int idRg = rsRg.getInt("id_ruang");
+
+            // --- REVISI UTAMA: SAFETY CHECK 3 LAPIS BENTROK ---
+            // Logika SQL: Mencari jadwal di hari yang sama, jam tumpang tindih, DAN (ruangnya sama ATAU dosennya sama ATAU kelasnya sama)
+            String sqlCek = "SELECT j.*, m.nama_matkul, d.nama_dosen, k.nama_kelas, r.nama_ruang " +
+                            "FROM jadwal j " +
+                            "JOIN matkul m ON j.id_matkul = m.id_matkul " +
+                            "JOIN dosen d ON j.id_dosen = d.id_dosen " +
+                            "JOIN kelas k ON j.kelas = k.id_kelas " +
+                            "JOIN ruang r ON j.ruang = r.id_ruang " +
+                            "WHERE j.hari = ? AND " +
+                            "((j.jam_mulai <= ? AND j.jam_selesai > ?) OR (j.jam_mulai < ? AND j.jam_selesai >= ?)) AND " +
+                            "(j.ruang = ? OR j.id_dosen = ? OR j.kelas = ?)";
+            
+            // Jika sedang mengedit, abaikan pengecekan terhadap ID jadwal itu sendiri
+            if (isEdit) { sqlCek += " AND j.id_jadwal != " + idJadwalEdit; }
+
+            PreparedStatement stCek = conn.prepareStatement(sqlCek);
+            stCek.setString(1, cbHari.getSelectedItem().toString().toLowerCase());
+            stCek.setString(2, jamMulai); 
+            stCek.setString(3, jamMulai);
+            stCek.setString(4, jamSelesai);
+            stCek.setString(5, jamSelesai);
+            stCek.setInt(6, idRg);
+            stCek.setInt(7, idDs);
+            stCek.setInt(8, idKl);
+            
+            ResultSet rsCek = stCek.executeQuery();
+            if (rsCek.next()) {
+                // Analisis jenis bentrok apa yang terjadi untuk memberikan pesan spesifik ke pengguna
+                String pesanError = "JADWAL BENTROK PADA JAM TERSEBUT!\n\nDetail Bentrok:";
+                if (rsCek.getInt("ruang") == idRg) {
+                    pesanError += "\n- Ruangan '" + cbRuang.getSelectedItem() + "' sudah terpakai.";
+                }
+                if (rsCek.getInt("id_dosen") == idDs) {
+                    pesanError += "\n- Dosen '" + cbDosen.getSelectedItem() + "' sudah mengajar di kelas lain.";
+                }
+                if (rsCek.getInt("kelas") == idKl) {
+                    pesanError += "\n- Kelas '" + cbKelas.getSelectedItem() + "' sudah memiliki jadwal kuliah lain (" + rsCek.getString("nama_matkul") + ").";
+                }
+                
+                JOptionPane.showMessageDialog(this, pesanError, "Peringatan Sistem", JOptionPane.WARNING_MESSAGE);
+                return; // Batalkan proses simpan
+            }
+
+            // --- EKSEKUSI DATA (INSERT / UPDATE) ---
+            String sql;
+            if (isEdit) {
+                sql = "UPDATE jadwal SET id_matkul=?, id_dosen=?, hari=?, kelas=?, jam_mulai=?, jam_selesai=?, ruang=? WHERE id_jadwal=?";
+            } else {
+                sql = "INSERT INTO jadwal (id_matkul, id_dosen, hari, kelas, jam_mulai, jam_selesai, ruang) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            }
+
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setInt(1, idMk);
+            pst.setInt(2, idDs);
+            pst.setString(3, cbHari.getSelectedItem().toString().toLowerCase());
+            pst.setInt(4, idKl);
+            pst.setString(5, jamMulai);
+            pst.setString(6, jamSelesai);
+            pst.setInt(7, idRg); 
+
+            if (isEdit) { pst.setString(8, idJadwalEdit); }
+
+            pst.execute();
+            JOptionPane.showMessageDialog(null, "Data Jadwal Berhasil Disimpan!");
+            this.dispose();
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error sistem database: " + e.getMessage());
         }
-
-        PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setInt(1, idMk);
-        pst.setInt(2, idDs);
-        pst.setString(3, cbHari.getSelectedItem().toString().toLowerCase());
-        pst.setString(4, txtKelas.getText());
-        pst.setString(5, txtJamMulai.getText());
-        pst.setString(6, txtJamSelesai.getText());
-        pst.setString(7, txtRuang.getText());
-
-        if (isEdit) { pst.setString(8, idJadwalEdit); }
-
-        pst.execute();
-        JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan!");
-        this.dispose();
-
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-    }
     }//GEN-LAST:event_btnSimpanActionPerformed
 
     private void btnBatalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBatalActionPerformed
@@ -268,7 +311,7 @@ private void isiPilihanDosen() {
                 }
             }
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        java.util.logging.Logger.getLogger(FormTambahJadwal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -293,7 +336,9 @@ private void isiPilihanDosen() {
     private javax.swing.JButton btnSimpan;
     private javax.swing.JComboBox<String> cbDosen;
     private javax.swing.JComboBox<String> cbHari;
+    private javax.swing.JComboBox<String> cbKelas;
     private javax.swing.JComboBox<String> cbMatkul;
+    private javax.swing.JComboBox<String> cbRuang;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -303,9 +348,7 @@ private void isiPilihanDosen() {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JTextField txtJamMulai;
-    private javax.swing.JTextField txtJamSelesai;
-    private javax.swing.JTextField txtKelas;
-    private javax.swing.JTextField txtRuang;
+    private javax.swing.JSpinner spinJamMulai;
+    private javax.swing.JSpinner spinJamSelesai;
     // End of variables declaration//GEN-END:variables
 }

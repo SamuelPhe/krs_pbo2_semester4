@@ -3,20 +3,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package PBO_Project_2;
+
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import java.sql.*;
 
-/**
- *
- * @author User
- */
 public class data_jadwal extends javax.swing.JFrame {
     
-    private String namaSesi, roleSesi; // Tambahkan variabel sesi
+    private String namaSesi, roleSesi;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_jadwal.class.getName());
 
-    // Constructor Utama untuk menerima data dari masterdata
     public data_jadwal(String nama, String role) {
         this.namaSesi = nama;
         this.roleSesi = role;
@@ -25,46 +21,48 @@ public class data_jadwal extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
     }
 
-    // Constructor Kosong (Biar NetBeans tidak rewel)
     public data_jadwal() {
         initComponents();
         tampilkan_data();
     }
 
     private void tampilkan_data() {
-    DefaultTableModel model = new DefaultTableModel();
-    model.addColumn("ID");
-    model.addColumn("Mata Kuliah");
-    model.addColumn("Dosen");
-    model.addColumn("Hari");
-    model.addColumn("Kelas");
-    model.addColumn("Jam");
-    model.addColumn("Ruang");
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
+        model.addColumn("Mata Kuliah");
+        model.addColumn("Dosen");
+        model.addColumn("Hari");
+        model.addColumn("Kelas");
+        model.addColumn("Jam");
+        model.addColumn("Ruang");
 
-    try {
-        Connection conn = new database().getConnection();
-        // Query tanpa id_admin
-        String sql = "SELECT jadwal.*, matkul.nama_matkul, dosen.nama_dosen FROM jadwal "
-                   + "JOIN matkul ON jadwal.id_matkul = matkul.id_matkul "
-                   + "JOIN dosen ON jadwal.id_dosen = dosen.id_dosen";
-        
-        ResultSet res = conn.createStatement().executeQuery(sql);
-        while (res.next()) {
-            model.addRow(new Object[]{
-                res.getString("id_jadwal"),
-                res.getString("nama_matkul"),
-                res.getString("nama_dosen"),
-                res.getString("hari"),
-                res.getString("kelas"),
-                res.getString("jam_mulai") + " - " + res.getString("jam_selesai"),
-                res.getString("ruang")
-            });
+        try {
+            Connection conn = new database().getConnection();
+            // PERBAIKAN: Tambah JOIN untuk tabel kelas dan ruang
+            String sql = "SELECT j.id_jadwal, m.nama_matkul, d.nama_dosen, j.hari, k.nama_kelas, j.jam_mulai, j.jam_selesai, r.nama_ruang "
+                       + "FROM jadwal j "
+                       + "JOIN matkul m ON j.id_matkul = m.id_matkul "
+                       + "JOIN dosen d ON j.id_dosen = d.id_dosen "
+                       + "JOIN kelas k ON j.kelas = k.id_kelas "
+                       + "JOIN ruang r ON j.ruang = r.id_ruang";
+            
+            ResultSet res = conn.createStatement().executeQuery(sql);
+            while (res.next()) {
+                model.addRow(new Object[]{
+                    res.getString("id_jadwal"),
+                    res.getString("nama_matkul"),
+                    res.getString("nama_dosen"),
+                    res.getString("hari"),
+                    res.getString("nama_kelas"),
+                    res.getString("jam_mulai") + " - " + res.getString("jam_selesai"),
+                    res.getString("nama_ruang")
+                });
+            }
+            tabelJadwal.setModel(model);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error load jadwal: " + e.getMessage());
         }
-        tabelJadwal.setModel(model);
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
     }
-}
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -128,7 +126,7 @@ public class data_jadwal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-       masterdata md = new masterdata(namaSesi, roleSesi);
+      masterdata md = new masterdata(namaSesi, roleSesi);
         md.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_backActionPerformed
@@ -140,50 +138,45 @@ public class data_jadwal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        int baris = tabelJadwal.getSelectedRow();
-    if (baris != -1) {
-        // Ambil semua data dari kolom tabel
-        String[] data = {
-            tabelJadwal.getValueAt(baris, 0).toString(), // id_jadwal
-            tabelJadwal.getValueAt(baris, 1).toString(), // nama_matkul
-            tabelJadwal.getValueAt(baris, 2).toString(), // nama_dosen
-            tabelJadwal.getValueAt(baris, 3).toString(), // hari
-            tabelJadwal.getValueAt(baris, 4).toString(), // kelas
-            tabelJadwal.getValueAt(baris, 5).toString(), // jam (format: 00:00 - 00:00)
-            tabelJadwal.getValueAt(baris, 6).toString()  // ruang
-        };
-        
-        // Buka popup dengan membawa data
-        FormTambahJadwal popup = new FormTambahJadwal(this, true, data);
-        popup.setVisible(true);
-        tampilkan_data(); // Refresh tabel setelah edit
-    } else {
-        JOptionPane.showMessageDialog(this, "Pilih baris jadwal yang mau diedit!");
-    }
+       int baris = tabelJadwal.getSelectedRow();
+        if (baris != -1) {
+            String[] data = {
+                tabelJadwal.getValueAt(baris, 0).toString(), // id_jadwal
+                tabelJadwal.getValueAt(baris, 1).toString(), // nama_matkul
+                tabelJadwal.getValueAt(baris, 2).toString(), // nama_dosen
+                tabelJadwal.getValueAt(baris, 3).toString(), // hari
+                tabelJadwal.getValueAt(baris, 4).toString(), // kelas
+                tabelJadwal.getValueAt(baris, 5).toString(), // jam 
+                tabelJadwal.getValueAt(baris, 6).toString()  // ruang
+            };
+            FormTambahJadwal popup = new FormTambahJadwal(this, true, data);
+            popup.setVisible(true);
+            tampilkan_data();
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih baris jadwal yang mau diedit!");
+        }
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
        int baris = tabelJadwal.getSelectedRow();
-    if (baris != -1) {
-        String id = tabelJadwal.getValueAt(baris, 0).toString();
-        int konfirm = JOptionPane.showConfirmDialog(this, "Hapus jadwal dengan ID " + id + "?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
-        
-        if (konfirm == JOptionPane.YES_OPTION) {
-            try {
-                Connection conn = new database().getConnection();
-                PreparedStatement pst = conn.prepareStatement("DELETE FROM jadwal WHERE id_jadwal=?");
-                pst.setString(1, id);
-                pst.execute();
-                
-                JOptionPane.showMessageDialog(this, "Jadwal berhasil dihapus");
-                tampilkan_data();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Gagal hapus: " + e.getMessage());
+        if (baris != -1) {
+            String id = tabelJadwal.getValueAt(baris, 0).toString();
+            int konfirm = JOptionPane.showConfirmDialog(this, "Hapus jadwal ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+            if (konfirm == JOptionPane.YES_OPTION) {
+                try {
+                    Connection conn = new database().getConnection();
+                    PreparedStatement pst = conn.prepareStatement("DELETE FROM jadwal WHERE id_jadwal=?");
+                    pst.setString(1, id);
+                    pst.execute();
+                    JOptionPane.showMessageDialog(this, "Jadwal berhasil dihapus");
+                    tampilkan_data();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Gagal hapus: " + e.getMessage());
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih jadwal yang mau dihapus!");
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Pilih jadwal yang mau dihapus!");
-    }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     /**

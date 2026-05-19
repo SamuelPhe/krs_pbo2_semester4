@@ -126,16 +126,44 @@ public class dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_MasterActionPerformed
 
     private void btnMasterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMasterActionPerformed
-    masterdata md = new masterdata(namaLogin, roleLogin); // Sesuaikan dengan variabel globalmu
-    md.setVisible(true);
-    md.setLocationRelativeTo(null);
-    this.dispose();
+   if (roleLogin.equalsIgnoreCase("admin")) {
+            // Kalau Admin, buka halaman manajemen master data (bisa utak-atik semuanya)
+            masterdata md = new masterdata(namaLogin, roleLogin); 
+            md.setVisible(true);
+            md.setLocationRelativeTo(null);
+            this.dispose();
+        } else if (roleLogin.equalsIgnoreCase("mahasiswa")) {
+            // Kalau Mahasiswa, arahkan ke halaman khusus "Informasi Akademik" / Read-only
+            // Atau jika belum membuat halaman khusus melihat jadwal, munculkan pesan saja:
+            JOptionPane.showMessageDialog(this, 
+                "Menu Master Data hanya untuk Admin.\nUntuk melihat Jadwal dan Mata Kuliah, silakan gunakan menu 'Data KRS'.", 
+                "Akses Terbatas", JOptionPane.INFORMATION_MESSAGE);
+        }
     }//GEN-LAST:event_btnMasterActionPerformed
 
     private void KRSButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KRSButtonActionPerformed
-    data_krs dk = new data_krs(namaLogin, roleLogin);
-    dk.setVisible(true);
-    this.dispose();        // TODO add your handling code here:
+    // Gunakan roleLogin dan namaLogin sesuai variabel globalmu
+        if (roleLogin.equalsIgnoreCase("admin")) {
+            
+            data_krs halamanAdmin = new data_krs(namaLogin, roleLogin);
+            halamanAdmin.setVisible(true);
+            
+        } else if (roleLogin.equalsIgnoreCase("mahasiswa")) {
+            
+            Pengajuan_KRS halamanMhs = new Pengajuan_KRS(namaLogin, roleLogin);
+            halamanMhs.setVisible(true);
+            
+        } else if (roleLogin.equalsIgnoreCase("dosen")) {
+            
+            // Nanti kita buat form persetujuannya
+            javax.swing.JOptionPane.showMessageDialog(this, "Halaman ACC KRS Dosen segera hadir!");
+            // Persetujuan_KRS halamanDsn = new Persetujuan_KRS(namaLogin, roleLogin);
+            // halamanDsn.setVisible(true);
+            return; // Tahan dulu biar gak error
+            
+        }
+        
+        this.dispose(); // Tutup halaman dashboard
     }//GEN-LAST:event_KRSButtonActionPerformed
 
     /**
@@ -160,7 +188,7 @@ public class dashboard extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new dashboard().setVisible(true));
+       java.awt.EventQueue.invokeLater(() -> new dashboard("", "").setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

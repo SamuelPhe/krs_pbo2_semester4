@@ -37,6 +37,8 @@ public class masterdata extends javax.swing.JFrame {
         btnMatkul = new javax.swing.JButton();
         btnJadwal = new javax.swing.JButton();
         back = new javax.swing.JButton();
+        btnRuang = new javax.swing.JButton();
+        btnKelas = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -65,6 +67,16 @@ public class masterdata extends javax.swing.JFrame {
         back.setToolTipText("");
         back.addActionListener(this::backActionPerformed);
         getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 530, -1, -1));
+
+        btnRuang.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        btnRuang.setText("Data Ruang");
+        btnRuang.addActionListener(this::btnRuangActionPerformed);
+        getContentPane().add(btnRuang, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 370, 280, -1));
+
+        btnKelas.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        btnKelas.setText("Data Kelas");
+        btnKelas.addActionListener(this::btnKelasActionPerformed);
+        getContentPane().add(btnKelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 440, 280, -1));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Master Data.png"))); // NOI18N
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 610, -1));
@@ -100,6 +112,18 @@ public class masterdata extends javax.swing.JFrame {
     this.dispose();
     }//GEN-LAST:event_btnJadwalActionPerformed
 
+    private void btnRuangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRuangActionPerformed
+       // Membuka FormRuang (Daftar Tabel Ruang)
+    FormRuang fr = new FormRuang();
+    fr.setVisible(true);
+    }//GEN-LAST:event_btnRuangActionPerformed
+
+    private void btnKelasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKelasActionPerformed
+     // Membuka FormKelas (Daftar Tabel Kelas)
+    FormKelas fk = new FormKelas();
+    fk.setVisible(true);
+    }//GEN-LAST:event_btnKelasActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -128,8 +152,10 @@ public class masterdata extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton back;
     private javax.swing.JButton btnJadwal;
+    private javax.swing.JButton btnKelas;
     private javax.swing.JButton btnMatkul;
     private javax.swing.JButton btnProdi;
+    private javax.swing.JButton btnRuang;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables

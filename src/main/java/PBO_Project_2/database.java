@@ -34,10 +34,10 @@ public class database {
             System.out.println("Gagal koneksi ke database: " + e.getMessage());
         }
     }
-    // ─── Fungsi Login untuk Mahasiswa ──────────────────────────────────────────
+
+    // ─── Fungsi Login ──────────────────────────────────────────
     public ResultSet loginMahasiswa(String nama, String password) {
         try {
-            // Mencari berdasarkan kolom nama_mahasiswa yang sudah ada di DB Anda
             String sql = "SELECT * FROM mahasiswa WHERE nama_mahasiswa = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, nama);
@@ -49,10 +49,8 @@ public class database {
         }
     }
 
-    // ─── Fungsi Login untuk Dosen ──────────────────────────────────────────────
     public ResultSet loginDosen(String nama, String password) {
         try {
-            // Mencari berdasarkan kolom nama_dosen yang sudah ada di DB Anda
             String sql = "SELECT * FROM dosen WHERE nama_dosen = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, nama); 
@@ -64,10 +62,8 @@ public class database {
         }
     }
 
-    // ─── Fungsi Login untuk Admin ──────────────────────────────────────────────
     public ResultSet loginAdmin(String nama, String password) {
         try {
-            // Mencari berdasarkan kolom nama_admin yang sudah ada di DB Anda
             String sql = "SELECT * FROM admin WHERE nama_admin = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, nama);
@@ -79,7 +75,7 @@ public class database {
         }
     }
 
-    // ─── Tutup Koneksi ─────────────────────────────────────────────────────────
+    // ─── Manajemen Koneksi ─────────────────────────────────────────────────────────
     public void disconnect() {
         try {
             if (conn != null && !conn.isClosed()) {
@@ -154,7 +150,6 @@ public class database {
         }
     }
 
-
     // ══════════════════════════════════════════════════════════════════════════
     //  CRUD - DOSEN
     // ══════════════════════════════════════════════════════════════════════════
@@ -221,30 +216,29 @@ public class database {
         }
     }
 
-    // LOGIN DOSEN
-    
-
 
     // ══════════════════════════════════════════════════════════════════════════
     //  CRUD - MAHASISWA
     // ══════════════════════════════════════════════════════════════════════════
-
     
-    public boolean tambahMahasiswa(int idProdi, int idDosenPA, String nama, int angkatan, String password) {
+    // PERHATIKAN PARAMETERNYA SEKARANG ADA TAMBAHAN 'int semester'
+    public boolean tambahMahasiswa(int idProdi, int idDosen, String nama, int angkatan, int semester, String password) {
+        // Jangan lupa tambahkan kolom 'semester' di query INSERT
+        String sql = "INSERT INTO mahasiswa (id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, semester, password) VALUES (?, ?, ?, ?, ?, ?)";
+        
         try {
-            // Sesuaikan nama kolom dengan yang ada di SQLyog Anda!
-            String sql = "INSERT INTO mahasiswa (id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, password) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setInt(1, idProdi);
-            pst.setInt(2, idDosenPA);
+            pst.setInt(2, idDosen);
             pst.setString(3, nama);
             pst.setInt(4, angkatan);
-            pst.setString(5, password);
+            pst.setInt(5, semester); // <-- MASUKKAN DATA SEMESTER KE DATABASE
+            pst.setString(6, password);
             
-            int rowsAffected = pst.executeUpdate();
-            return rowsAffected > 0; // Mengembalikan true jika berhasil tersimpan
-        } catch (SQLException e) {
-            System.out.println("Error tambah mahasiswa: " + e.getMessage());
+            pst.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println("Gagal menambahkan mahasiswa: " + e.getMessage());
             return false;
         }
     }
@@ -279,7 +273,6 @@ public class database {
         }
     }
 
-    // READ - mahasiswa berdasarkan dosen PA
     public ResultSet getMahasiswaByDosenPA(int idDosenPA) {
         String sql = "SELECT m.*, p.nama_prodi FROM mahasiswa m " +
                      "JOIN prodi p ON m.id_prodi = p.id_prodi " +
@@ -321,11 +314,9 @@ public class database {
         }
     }
 
-    // ----- Sign Up ------
-   // 1. Fungsi untuk mengambil data Prodi
+    // ----- Sign Up Tools ------
     public ResultSet getDaftarProdi() {
         try {
-            // Pastikan nama tabelnya 'prodi'
             String sql = "SELECT * FROM prodi"; 
             Statement stmt = conn.createStatement();
             return stmt.executeQuery(sql);
@@ -335,10 +326,8 @@ public class database {
         }
     }
 
-    // 2. Fungsi untuk mengambil data Dosen PA
     public ResultSet getDaftarDosen() {
         try {
-            // Pastikan nama tabelnya 'dosen'
             String sql = "SELECT * FROM dosen"; 
             Statement stmt = conn.createStatement();
             return stmt.executeQuery(sql);
@@ -347,8 +336,6 @@ public class database {
             return null;
         }
     }
-
-
 
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -403,15 +390,113 @@ public class database {
         }
     }
 
+    // ══════════════════════════════════════════════════════════════════════════
+    //  CRUD - KELAS & RUANG
+    // ══════════════════════════════════════════════════════════════════════════
+
+    public boolean tambahKelas(String namaKelas) {
+        String sql = "INSERT INTO kelas (nama_kelas) VALUES (?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, namaKelas);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public ResultSet getAllKelas() {
+        try {
+            return conn.createStatement().executeQuery("SELECT * FROM kelas");
+        } catch (SQLException e) { return null; }
+    }
+
+    public boolean updateKelas(int idKelas, String namaKelas) {
+        String sql = "UPDATE kelas SET nama_kelas = ? WHERE id_kelas = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, namaKelas); ps.setInt(2, idKelas); return ps.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
+
+    public boolean deleteKelas(int idKelas) {
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM kelas WHERE id_kelas = ?")) {
+            ps.setInt(1, idKelas); return ps.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
+
+    public boolean tambahRuang(String namaRuang) {
+        String sql = "INSERT INTO ruang (nama_ruang) VALUES (?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, namaRuang); return ps.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
+
+    public ResultSet getAllRuang() {
+        try { return conn.createStatement().executeQuery("SELECT * FROM ruang");
+        } catch (SQLException e) { return null; }
+    }
+
+    public boolean updateRuang(int idRuang, String namaRuang) {
+        String sql = "UPDATE ruang SET nama_ruang = ? WHERE id_ruang = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, namaRuang); ps.setInt(2, idRuang); return ps.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
+
+    public boolean deleteRuang(int idRuang) {
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM ruang WHERE id_ruang = ?")) {
+            ps.setInt(1, idRuang); return ps.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
+
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  CRUD - JADWAL
+    //  CRUD - JADWAL & CEK BENTROK
     // ══════════════════════════════════════════════════════════════════════════
+
+    public String cekBentrokJadwal(int idDosen, String hari, int idKelas, String jamMulai, String jamSelesai, int idRuang, String tahunAjaran, String semester, int idJadwalKecuali) {
+        String sql = "SELECT * FROM jadwal WHERE hari = ? AND tahun_ajaran = ? AND semester = ? " +
+                     "AND (jam_mulai < ? AND jam_selesai > ?) " +
+                     "AND (id_dosen = ? OR ruang = ? OR kelas = ?) ";
+
+        if (idJadwalKecuali > 0) {
+            sql += "AND id_jadwal != " + idJadwalKecuali; 
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, hari);
+            ps.setString(2, tahunAjaran);
+            ps.setString(3, semester);
+            ps.setString(4, jamSelesai);
+            ps.setString(5, jamMulai);
+            ps.setInt(6, idDosen);
+            ps.setInt(7, idRuang);  
+            ps.setInt(8, idKelas);  
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                if (rs.getInt("id_dosen") == idDosen) return "Gagal: Dosen sudah mengajar di jadwal lain pada jam tersebut!";
+                if (rs.getInt("ruang") == idRuang) return "Gagal: Ruangan sudah dipakai kelas lain pada jam tersebut!"; 
+                if (rs.getInt("kelas") == idKelas) return "Gagal: Kelas mahasiswa sudah memiliki mata kuliah lain di jam tersebut!"; 
+                return "Gagal: Terjadi bentrok jadwal!";
+            }
+        } catch (SQLException e) {
+            System.out.println("Error cek bentrok: " + e.getMessage());
+            return "Error database saat mengecek bentrok.";
+        }
+        return null; 
+    }
 
     public boolean tambahJadwal(int idMatkul, int idDosen, int idProdi,
-                                 String hari, String kelas, String jamMulai,
-                                 String jamSelesai, String ruang,
+                                 String hari, int idKelas, String jamMulai,
+                                 String jamSelesai, int idRuang,
                                  String tahunAjaran, String semester) {
+                                 
+        String pesanBentrok = cekBentrokJadwal(idDosen, hari, idKelas, jamMulai, jamSelesai, idRuang, tahunAjaran, semester, -1);
+        if (pesanBentrok != null) {
+            System.out.println(pesanBentrok);
+            return false; 
+        }
+
         String sql = "INSERT INTO jadwal (id_matkul, id_dosen, id_prodi, hari, kelas, " +
                      "jam_mulai, jam_selesai, ruang, tahun_ajaran, semester) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -420,10 +505,10 @@ public class database {
             ps.setInt(2, idDosen);
             ps.setInt(3, idProdi);
             ps.setString(4, hari);
-            ps.setString(5, kelas);
-            ps.setString(6, jamMulai);   // format "HH:MM:SS"
+            ps.setInt(5, idKelas);       
+            ps.setString(6, jamMulai);   
             ps.setString(7, jamSelesai);
-            ps.setString(8, ruang);
+            ps.setInt(8, idRuang);       
             ps.setString(9, tahunAjaran);
             ps.setString(10, semester);
             ps.executeUpdate();
@@ -433,13 +518,16 @@ public class database {
             return false;
         }
     }
-
+  
+    // PERBAIKAN: Join ke tabel kelas dan ruang agar memunculkan NAMA, bukan ANGKA
     public ResultSet getAllJadwal() {
-        String sql = "SELECT j.*, mk.nama_matkul, mk.sks, d.nama_dosen, p.nama_prodi " +
+        String sql = "SELECT j.*, mk.nama_matkul, mk.sks, d.nama_dosen, p.nama_prodi, kl.nama_kelas, r.nama_ruang " +
                      "FROM jadwal j " +
                      "JOIN matkul mk ON j.id_matkul = mk.id_matkul " +
-                     "JOIN dosen d  ON j.id_dosen  = d.id_dosen " +
-                     "JOIN prodi p  ON j.id_prodi  = p.id_prodi";
+                     "JOIN dosen d   ON j.id_dosen   = d.id_dosen " +
+                     "JOIN prodi p   ON j.id_prodi   = p.id_prodi " +
+                     "JOIN kelas kl  ON j.kelas      = kl.id_kelas " +
+                     "JOIN ruang r   ON j.ruang      = r.id_ruang";
         try {
             Statement st = conn.createStatement();
             return st.executeQuery(sql);
@@ -449,12 +537,14 @@ public class database {
         }
     }
 
-    // READ - jadwal berdasarkan prodi (untuk mahasiswa memilih matkul)
+    // PERBAIKAN: Join ke tabel kelas dan ruang agar memunculkan NAMA, bukan ANGKA
     public ResultSet getJadwalByProdi(int idProdi, String tahunAjaran, String semester) {
-        String sql = "SELECT j.*, mk.nama_matkul, mk.sks, d.nama_dosen " +
+        String sql = "SELECT j.*, mk.nama_matkul, mk.sks, d.nama_dosen, kl.nama_kelas, r.nama_ruang " +
                      "FROM jadwal j " +
                      "JOIN matkul mk ON j.id_matkul = mk.id_matkul " +
-                     "JOIN dosen d  ON j.id_dosen  = d.id_dosen " +
+                     "JOIN dosen d   ON j.id_dosen   = d.id_dosen " +
+                     "JOIN kelas kl  ON j.kelas      = kl.id_kelas " +
+                     "JOIN ruang r   ON j.ruang      = r.id_ruang " +
                      "WHERE j.id_prodi = ? AND j.tahun_ajaran = ? AND j.semester = ?";
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -469,9 +559,16 @@ public class database {
     }
 
     public boolean updateJadwal(int idJadwal, int idMatkul, int idDosen, int idProdi,
-                                 String hari, String kelas, String jamMulai,
-                                 String jamSelesai, String ruang,
+                                 String hari, int idKelas, String jamMulai,
+                                 String jamSelesai, int idRuang,
                                  String tahunAjaran, String semester) {
+                                 
+        String pesanBentrok = cekBentrokJadwal(idDosen, hari, idKelas, jamMulai, jamSelesai, idRuang, tahunAjaran, semester, idJadwal);
+        if (pesanBentrok != null) {
+            System.out.println(pesanBentrok);
+            return false; 
+        }
+
         String sql = "UPDATE jadwal SET id_matkul=?, id_dosen=?, id_prodi=?, hari=?, kelas=?, " +
                      "jam_mulai=?, jam_selesai=?, ruang=?, tahun_ajaran=?, semester=? WHERE id_jadwal=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -479,10 +576,10 @@ public class database {
             ps.setInt(2, idDosen);
             ps.setInt(3, idProdi);
             ps.setString(4, hari);
-            ps.setString(5, kelas);
+            ps.setInt(5, idKelas); 
             ps.setString(6, jamMulai);
             ps.setString(7, jamSelesai);
-            ps.setString(8, ruang);
+            ps.setInt(8, idRuang); 
             ps.setString(9, tahunAjaran);
             ps.setString(10, semester);
             ps.setInt(11, idJadwal);
@@ -504,12 +601,10 @@ public class database {
         }
     }
 
-
     // ══════════════════════════════════════════════════════════════════════════
     //  CRUD - KRS (Header)
     // ══════════════════════════════════════════════════════════════════════════
 
-    // CREATE - mahasiswa mengajukan KRS baru
     public int buatKRS(int idMahasiswa, int idDosenPA, String semester,
                         String tahunAjaran, String tanggalPengajuan) {
         String sql = "INSERT INTO krs (id_mahasiswa, id_dosen_pa, semester, tahun_ajaran, " +
@@ -519,24 +614,23 @@ public class database {
             ps.setInt(2, idDosenPA);
             ps.setString(3, semester);
             ps.setString(4, tahunAjaran);
-            ps.setString(5, tanggalPengajuan); // format "YYYY-MM-DD"
+            ps.setString(5, tanggalPengajuan); 
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) return rs.getInt(1); // kembalikan id_krs
+            if (rs.next()) return rs.getInt(1); 
         } catch (SQLException e) {
             System.out.println("Gagal membuat KRS: " + e.getMessage());
         }
         return -1;
     }
 
-    // READ - KRS berdasarkan mahasiswa
     public ResultSet getKRSByMahasiswa(int idMahasiswa) {
         String sql = "SELECT k.*, m.nama_mahasiswa, " +
                      "dp.nama_dosen AS nama_dosen_pa, " +
                      "da.nama_dosen AS nama_dosen_acc " +
                      "FROM krs k " +
                      "JOIN mahasiswa m ON k.id_mahasiswa = m.id_mahasiswa " +
-                     "JOIN dosen dp   ON k.id_dosen_pa  = dp.id_dosen " +
+                     "JOIN dosen dp  ON k.id_dosen_pa  = dp.id_dosen " +
                      "LEFT JOIN dosen da ON k.id_dosen_acc = da.id_dosen " +
                      "WHERE k.id_mahasiswa = ?";
         try {
@@ -544,30 +638,25 @@ public class database {
             ps.setInt(1, idMahasiswa);
             return ps.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Gagal mengambil KRS: " + e.getMessage());
             return null;
         }
     }
 
-    // READ - semua KRS (untuk dosen PA / admin)
     public ResultSet getAllKRS() {
         String sql = "SELECT k.*, m.nama_mahasiswa, " +
                      "dp.nama_dosen AS nama_dosen_pa, " +
                      "da.nama_dosen AS nama_dosen_acc " +
                      "FROM krs k " +
                      "JOIN mahasiswa m ON k.id_mahasiswa = m.id_mahasiswa " +
-                     "JOIN dosen dp   ON k.id_dosen_pa  = dp.id_dosen " +
+                     "JOIN dosen dp  ON k.id_dosen_pa  = dp.id_dosen " +
                      "LEFT JOIN dosen da ON k.id_dosen_acc = da.id_dosen";
         try {
-            Statement st = conn.createStatement();
-            return st.executeQuery(sql);
+            return conn.createStatement().executeQuery(sql);
         } catch (SQLException e) {
-            System.out.println("Gagal mengambil semua KRS: " + e.getMessage());
             return null;
         }
     }
 
-    // READ - KRS yang perlu di-acc oleh dosen PA tertentu
     public ResultSet getKRSByDosenPA(int idDosenPA) {
         String sql = "SELECT k.*, m.nama_mahasiswa " +
                      "FROM krs k " +
@@ -578,21 +667,18 @@ public class database {
             ps.setInt(1, idDosenPA);
             return ps.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Gagal mengambil KRS by dosen PA: " + e.getMessage());
             return null;
         }
     }
 
-    // UPDATE - dosen ACC / tolak KRS
     public boolean updateStatusKRS(int idKRS, int idDosenAcc, String statusKRS) {
         String sql = "UPDATE krs SET id_dosen_acc = ?, status_krs = ? WHERE id_krs = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idDosenAcc);
-            ps.setString(2, statusKRS); // "Disetujui" / "Ditolak"
+            ps.setString(2, statusKRS); 
             ps.setInt(3, idKRS);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println("Gagal update status KRS: " + e.getMessage());
             return false;
         }
     }
@@ -603,7 +689,6 @@ public class database {
             ps.setInt(1, idKRS);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println("Gagal menghapus KRS: " + e.getMessage());
             return false;
         }
     }
@@ -613,7 +698,6 @@ public class database {
     //  CRUD - KRS DETAIL
     // ══════════════════════════════════════════════════════════════════════════
 
-    // CREATE - tambah matkul ke KRS
     public boolean tambahKRSDetail(int idKRS, int idJadwal) {
         String sql = "INSERT INTO krs_detail (id_krs, id_jadwal) VALUES (?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -627,14 +711,16 @@ public class database {
         }
     }
 
-    // READ - detail KRS berdasarkan id_krs
+    // PERBAIKAN: Menambahkan Join untuk kelas dan ruang agar bisa dipanggil namanya
     public ResultSet getKRSDetailByKRS(int idKRS) {
         String sql = "SELECT kd.*, mk.nama_matkul, mk.sks, d.nama_dosen, " +
-                     "j.hari, j.kelas, j.jam_mulai, j.jam_selesai, j.ruang " +
+                     "j.hari, j.jam_mulai, j.jam_selesai, kl.nama_kelas, r.nama_ruang " +
                      "FROM krs_detail kd " +
                      "JOIN jadwal j  ON kd.id_jadwal = j.id_jadwal " +
                      "JOIN matkul mk ON j.id_matkul  = mk.id_matkul " +
                      "JOIN dosen d   ON j.id_dosen   = d.id_dosen " +
+                     "JOIN kelas kl  ON j.kelas      = kl.id_kelas " +
+                     "JOIN ruang r   ON j.ruang      = r.id_ruang " +
                      "WHERE kd.id_krs = ?";
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -646,7 +732,6 @@ public class database {
         }
     }
 
-    // UPDATE - input nilai ke krs_detail
     public boolean updateNilai(int idDetail, double nilai) {
         String sql = "UPDATE krs_detail SET nilai = ? WHERE id_detail = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -654,23 +739,19 @@ public class database {
             ps.setInt(2, idDetail);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println("Gagal update nilai: " + e.getMessage());
             return false;
         }
     }
 
-    // DELETE - hapus satu matkul dari KRS
     public boolean deleteKRSDetail(int idDetail) {
         String sql = "DELETE FROM krs_detail WHERE id_detail = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idDetail);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println("Gagal menghapus detail KRS: " + e.getMessage());
             return false;
         }
     }
-
 
     // ══════════════════════════════════════════════════════════════════════════
     //  CRUD - ADMIN
@@ -684,12 +765,9 @@ public class database {
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
-            System.out.println("Gagal menambah admin: " + e.getMessage());
             return false;
         }
     }
-
-    
 
     public boolean updateAdmin(int idAdmin, String namaAdmin, String password) {
         String sql = "UPDATE admin SET nama_admin = ?, password = ? WHERE id_admin = ?";
@@ -699,7 +777,6 @@ public class database {
             ps.setInt(3, idAdmin);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println("Gagal update admin: " + e.getMessage());
             return false;
         }
     }
@@ -710,46 +787,39 @@ public class database {
             ps.setInt(1, idAdmin);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println("Gagal menghapus admin: " + e.getMessage());
             return false;
         }
     }
 
-
     // ══════════════════════════════════════════════════════════════════════════
-    //  MAIN - Testing
+    //  MAIN - Testing (Disesuaikan parameternya)
     // ══════════════════════════════════════════════════════════════════════════
     public static void main(String[] args) {
         database db = new database();
 
         if (db.isConnected()) {
+            // PERBAIKAN: Hapus object 'db.' agar tidak warning karena DB_NAME adalah tipe static
             System.out.println("Status: Terhubung ke " + DB_NAME);
 
-            // Contoh alur lengkap:
-            // 1. Tambah prodi
-            db.tambahProdi("Teknik Informatika");
+            // 1. Tambah master (Jalankan sekali saja jika databasenya kosong)
+            // db.tambahProdi("Teknik Informatika");
+            // db.tambahDosen("Dr. Andi", "Dosen PA", "password123");
+            // db.tambahMahasiswa(1, 1, "Budi Santoso", 2023, "pass456");
+            // db.tambahMatkul("Pemrograman Berorientasi Objek", 3);
+            // db.tambahKelas("IF-47-01");
+            // db.tambahRuang("TULT-0101");
+            
+            // Note: Pastikan ID-ID di bawah ini benar ada di Database (1, 1, 1, dll)
+            // db.tambahJadwal(1, 1, 1, "Senin", 1, "08:00:00", "10:00:00", 1, "2024/2025", "Genap");
 
-            // 2. Tambah dosen
-            db.tambahDosen("Dr. Andi", "Dosen PA", "password123");
-
-            // 3. Tambah mahasiswa (id_prodi=1, id_dosen_pa=1)
-            db.tambahMahasiswa(1, 1, "Budi Santoso", 2023, "pass456");
-
-            // 4. Tambah matkul
-            db.tambahMatkul("Pemrograman Berorientasi Objek", 3);
-
-            // 5. Tambah jadwal
-            db.tambahJadwal(1, 1, 1, "Senin", "A", "08:00:00", "10:00:00",
-                            "R.101", "2024/2025", "Genap");
-
-            // 6. Buat KRS
+            // 7. Buat KRS
             int idKRS = db.buatKRS(1, 1, "Genap", "2024/2025", "2025-01-10");
             System.out.println("ID KRS dibuat: " + idKRS);
 
-            // 7. Tambah detail KRS (id_jadwal=1)
+            // 8. Tambah detail KRS (id_jadwal=1)
             db.tambahKRSDetail(idKRS, 1);
 
-            // 8. Tampilkan detail KRS
+            // 9. Tampilkan detail KRS (SEKARANG SUDAH BISA MUNCUL NAMA KELAS DAN RUANG)
             try {
                 ResultSet rs = db.getKRSDetailByKRS(idKRS);
                 System.out.println("\n=== Detail KRS ===");
@@ -758,17 +828,18 @@ public class database {
                         rs.getString("nama_matkul") + " | " +
                         rs.getInt("sks") + " SKS | " +
                         rs.getString("nama_dosen") + " | " +
+                        "Kelas: " + rs.getString("nama_kelas") + " | " + 
+                        "Ruang: " + rs.getString("nama_ruang") + " | " + 
                         rs.getString("hari") + " " +
                         rs.getString("jam_mulai") + "-" +
-                        rs.getString("jam_selesai") + " | " +
-                        rs.getString("ruang")
+                        rs.getString("jam_selesai")
                     );
                 }
             } catch (SQLException e) {
                 System.out.println("Error: " + e.getMessage());
             }
 
-            // 9. Dosen ACC KRS
+            // 10. Dosen ACC KRS
             db.updateStatusKRS(idKRS, 1, "Disetujui");
         }
 
