@@ -19,6 +19,13 @@ public class data_mahasiswa extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         aturHakAkses();
         tampilkan_data(); 
+        
+        // --- SATPAM PENGAMIDIL HAK AKSES ---
+      if (Session.getRole() != null && Session.getRole().equalsIgnoreCase("mahasiswa")) {
+            btnAdd.setVisible(false);
+            btnDelete.setVisible(false);
+            // Tombol Edit dibiarkan muncul karena mau dipakai buat edit data diri sendiri
+        }
     }
 
     // 2. Constructor untuk Mahasiswa (Menerima ID dari masteruser)
@@ -72,6 +79,10 @@ public class data_mahasiswa extends javax.swing.JFrame {
 
             ResultSet res = ps.executeQuery();
             while (res.next()) {
+                // Perhatikan: Kita sekarang mengambil nama_prodi dan nama_dosen, bukan lagi id-nya
+                String prodi = res.getString("nama_prodi");
+                String dosen = res.getString("nama_dosen");
+                
                 model.addRow(new Object[]{
                     res.getString("id_mahasiswa"), 
                     res.getString("nama_mahasiswa"), 
