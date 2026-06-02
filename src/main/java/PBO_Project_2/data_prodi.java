@@ -12,31 +12,29 @@ import javax.swing.table.DefaultTableModel;
  * @author User
  */
 public class data_prodi extends javax.swing.JFrame {
-    private String namaSesi, roleSesi; // Tambahkan ini
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_prodi.class.getName());
-
-    public data_prodi(String nama, String role) { // Constructor harus terima tamu
-        this.namaSesi = nama;
-        this.roleSesi = role;
-        initComponents();
-        tampilkan_data();
-    }
-    
-    // Jangan hapus yang kosong, biarkan buat preview desain
+    // Variabel namaSesi dan roleSesi dihapus
+private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_prodi.class.getName());
     public data_prodi() {
         initComponents();
+        tampilkan_data();
+        this.setLocationRelativeTo(null);
     }
     
-    private void tampilkan_data() {
+private void tampilkan_data() {
     DefaultTableModel model = new DefaultTableModel();
     model.addColumn("ID Prodi");
     model.addColumn("Nama Program Studi");
+    model.addColumn("ID Kaprodi"); // Tambahkan kolom baru
 
     try {
         Connection conn = new database().getConnection();
         ResultSet res = conn.createStatement().executeQuery("SELECT * FROM prodi");
         while (res.next()) {
-            model.addRow(new Object[]{res.getString("id_prodi"), res.getString("nama_prodi")});
+            model.addRow(new Object[]{
+                res.getString("id_prodi"), 
+                res.getString("nama_prodi"), 
+                res.getString("id_kaprodi") // Ambil dari database
+            });
         }
         tabelProdi.setModel(model);
     } catch (Exception e) {
@@ -111,18 +109,17 @@ public class data_prodi extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-    masterdata md = new masterdata(namaSesi, roleSesi);
-    md.setVisible(true);
-    md.setLocationRelativeTo(null);
-    this.dispose();
+    new masterdata().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_backActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
        int baris = tabelProdi.getSelectedRow();
     if (baris != -1) {
-        String[] data = {
-            tabelProdi.getValueAt(baris, 0).toString(),
-            tabelProdi.getValueAt(baris, 1).toString()
+       String[] data = {
+    tabelProdi.getValueAt(baris, 0).toString(),
+    tabelProdi.getValueAt(baris, 1).toString(),
+    tabelProdi.getValueAt(baris, 2) != null ? tabelProdi.getValueAt(baris, 2).toString() : ""
         };
         FormTambahProdi popup = new FormTambahProdi(this, true, data);
         popup.setVisible(true);

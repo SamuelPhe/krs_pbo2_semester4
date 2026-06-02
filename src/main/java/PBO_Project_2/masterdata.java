@@ -4,22 +4,16 @@
  */
 package PBO_Project_2;
 
+import javax.swing.JOptionPane;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class masterdata extends javax.swing.JFrame {
-    private String namaSesi, roleSesi;
-    // Tambahkan deklarasi logger ini
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(masterdata.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(masterdata.class.getName());
 
-    // Constructor untuk menerima kiriman data sesi
-    public masterdata(String nama, String role) {
-        this.namaSesi = nama;
-        this.roleSesi = role;
-        initComponents();
-        this.setLocationRelativeTo(null); // Biar muncul di tengah layar
-    }
-
-    // Constructor kosong agar preview NetBeans tidak error
     public masterdata() {
         initComponents();
+        this.setLocationRelativeTo(null);
     }
     
 
@@ -85,54 +79,37 @@ public class masterdata extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnProdiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProdiActionPerformed
-      data_prodi dp = new data_prodi(namaSesi, roleSesi);
-       dp.setVisible(true);
-       dp.setLocationRelativeTo(null);
-       this.dispose();
+     new data_prodi().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnProdiActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-       dashboard db = new dashboard(namaSesi, roleSesi);
-       db.setVisible(true);
-       db.setLocationRelativeTo(null);
-       this.dispose();
+      new dashboard().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_backActionPerformed
 
     private void btnMatkulActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMatkulActionPerformed
-    data_matkul dm = new data_matkul(namaSesi, roleSesi);
-    dm.setVisible(true);
-    dm.setLocationRelativeTo(null);
-    this.dispose();
+   new data_matkul().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnMatkulActionPerformed
 
     private void btnJadwalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJadwalActionPerformed
-    data_jadwal dm = new data_jadwal(namaSesi, roleSesi);
-    dm.setVisible(true);
-    dm.setLocationRelativeTo(null);
-    this.dispose();
+    new data_jadwal().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnJadwalActionPerformed
 
     private void btnRuangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRuangActionPerformed
-       // Membuka FormRuang (Daftar Tabel Ruang)
-    FormRuang fr = new FormRuang();
-    fr.setVisible(true);
+     new FormRuang().setVisible(true);
     }//GEN-LAST:event_btnRuangActionPerformed
 
     private void btnKelasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKelasActionPerformed
-     // Membuka FormKelas (Daftar Tabel Kelas)
-    FormKelas fk = new FormKelas();
-    fk.setVisible(true);
+    new FormKelas().setVisible(true);
     }//GEN-LAST:event_btnKelasActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -140,12 +117,9 @@ public class masterdata extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new masterdata().setVisible(true));
     }
 

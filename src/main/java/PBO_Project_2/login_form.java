@@ -2,101 +2,66 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-
 package PBO_Project_2;
+
 import java.sql.*;
 import javax.swing.*;
 
 public class login_form extends javax.swing.JFrame {
 
-    private database database;
+    // 1. Deklarasi Class-level variable
+    private database db;
 
     public login_form() {
         initComponents();
-        this.setSize(1024, 600); // Ganti angka ini sesuai ukuran desain Figma Anda (Lebar, Tinggi)
-        this.setLocationRelativeTo(null); // Ini ajaib: bikin form langsung muncul di TENGGAH layar!
-        database = new database();
-    // Setup dropdown pilihan role
+        this.setSize(1024, 600);
+        this.setLocationRelativeTo(null);
+        // Inisialisasi koneksi database sekali saja di konstruktor
+        this.db = new database();
+        
         jComboBox1.removeAllItems();
         jComboBox1.addItem("Mahasiswa");
         jComboBox1.addItem("Dosen");
         jComboBox1.addItem("Admin");
-    } // <--- KURUNG INI YANG SEBELUMNYA HILANG    
-   private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        String role     = jComboBox1.getSelectedItem().toString();
-        String username = jTextField2.getText().trim();
-        String password = String.valueOf(jPasswordField1.getPassword());
-
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Username dan password tidak boleh kosong!",
-                "Peringatan", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        try {
-        
-            switch (role) {
-                case "Mahasiswa":
-                    loginSebagaiMahasiswa(username, password);
-                    break;
-                case "Dosen":
-                    loginSebagaiDosen(username, password);
-                    break;
-                case "Admin":
-                    loginSebagaiAdmin(username, password);
-                    break;
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                "Terjadi kesalahan database: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
-        }
     }
 
-  private void loginSebagaiMahasiswa(String nama, String password) throws SQLException {
-        ResultSet rs = database.loginMahasiswa(nama, password);
-        if (rs != null && rs.next()) {
-            String namaMhs = rs.getString("nama_mahasiswa");
-            JOptionPane.showMessageDialog(this, "Selamat datang, " + namaMhs + "!");
-            
-            // Redirect ke halaman dashboard
-            new dashboard(namaMhs, "Mahasiswa").setVisible(true);
-            this.dispose(); // Tutup halaman login
-        } else {
-            JOptionPane.showMessageDialog(this, "Nama Mahasiswa atau password salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+    // 3. Logic Login
+    // Ubah 3 method login ini di login_form.java
+private void loginSebagaiMahasiswa(String nama, String password) throws SQLException {
+    ResultSet rs = db.loginMahasiswa(nama, password);
+    if (rs != null && rs.next()) {
+        String idMhs = rs.getString("id_mahasiswa"); // Ambil ID dari database
+        String namaMhs = rs.getString("nama_mahasiswa");
+        Session.setSession(idMhs, namaMhs, "Mahasiswa", ""); 
+        new dashboard().setVisible(true);
+        this.dispose();
+    } else { JOptionPane.showMessageDialog(this, "Login Gagal!"); }
+}
 
-    private void loginSebagaiDosen(String nama, String password) throws SQLException {
-        ResultSet rs = database.loginDosen(nama, password);
-        if (rs != null && rs.next()) {
-            String namaDsn = rs.getString("nama_dosen");
-            JOptionPane.showMessageDialog(this, "Selamat datang, " + namaDsn + "!");
-            
-            // Redirect ke halaman dashboard
-            new dashboard(namaDsn, "Dosen").setVisible(true);
-            this.dispose(); // Tutup halaman login
-        } else {
-            JOptionPane.showMessageDialog(this, "Nama Dosen atau password salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+private void loginSebagaiDosen(String nama, String password) throws SQLException {
+    ResultSet rs = db.loginDosen(nama, password);
+    if (rs != null && rs.next()) {
+        String idDsn = rs.getString("id_dosen"); // Ambil ID dari database
+        String namaDsn = rs.getString("nama_dosen");
+        String posisi = rs.getString("posisi");
+        Session.setSession(idDsn, namaDsn, "Dosen", posisi);
+        new dashboard().setVisible(true);
+        this.dispose();
+    } else { JOptionPane.showMessageDialog(this, "Login Gagal!"); }
+}
 
-    private void loginSebagaiAdmin(String nama, String password) throws SQLException {
-        ResultSet rs = database.loginAdmin(nama, password);
-        if (rs != null && rs.next()) {
-            String namaAdm = rs.getString("nama_admin");
-            JOptionPane.showMessageDialog(this, "Selamat datang, Admin " + namaAdm + "!");
-            
-            // Redirect ke halaman dashboard
-            new dashboard(namaAdm, "Admin").setVisible(true);
-            this.dispose(); // Tutup halaman login
-        } else {
-            JOptionPane.showMessageDialog(this, "Nama Admin atau password salah!", "Gagal", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    
+private void loginSebagaiAdmin(String nama, String password) throws SQLException {
+    ResultSet rs = db.loginAdmin(nama, password);
+    if (rs != null && rs.next()) {
+        String idAdm = rs.getString("id_admin"); // Ambil ID dari database
+        String namaAdm = rs.getString("nama_admin");
+        Session.setSession(idAdm, namaAdm, "Admin", "");
+        new dashboard().setVisible(true);
+        this.dispose();
+    } else { JOptionPane.showMessageDialog(this, "Login Gagal!"); }
+}
+
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -388,10 +353,25 @@ public class login_form extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-                                        
-        // Panggil metode logika yang sudah kita buat di atas
-        loginButtonActionPerformed(evt);
-    
+         String role = jComboBox1.getSelectedItem().toString();
+        String username = jTextField2.getText().trim();
+        String password = String.valueOf(jPasswordField1.getPassword());
+
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username dan password tidak boleh kosong!");
+            return;
+        }
+
+        try {
+            switch (role) {
+                case "Mahasiswa": loginSebagaiMahasiswa(username, password); break;
+                case "Dosen":     loginSebagaiDosen(username, password); break;
+                case "Admin":     loginSebagaiAdmin(username, password); break;
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error database: " + e.getMessage());
+        }
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
@@ -399,8 +379,8 @@ public class login_form extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-jTextField2.setText("");
-jPasswordField1.setText("");         // TODO add your handling code here:
+        jTextField2.setText("");
+        jPasswordField1.setText("");         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
@@ -409,8 +389,8 @@ jPasswordField1.setText("");         // TODO add your handling code here:
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // Membuka form sign up dan menutup form login
-       new sign_up().setVisible(true);
-    this.dispose();
+        new sign_up().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 
 

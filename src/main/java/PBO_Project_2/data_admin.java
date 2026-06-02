@@ -10,26 +10,14 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
-/**
- *
- * @author User
- */
+
 public class data_admin extends javax.swing.JFrame {
-    private String namaSesi, roleSesi;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_admin.class.getName());
 
-    public data_admin(String nama, String role) {
-        this.namaSesi = nama;
-        this.roleSesi = role;
-        initComponents();
-        tampilkan_data();
-        
-        this.setLocationRelativeTo(null);
-    }
-
-    // Tambahkan constructor kosong agar tidak error di bagian main
     public data_admin() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        tampilkan_data();
     }
 
     private void tampilkan_data() {
@@ -50,12 +38,12 @@ public class data_admin extends javax.swing.JFrame {
                     res.getString("nama_admin")
                 });
             }
-            // PASTIKAN di Design, JTable kamu diberi nama variabel: tabelAdmin
             tabelAdmin.setModel(model);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Gagal load data: " + e.getMessage());
         }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -118,13 +106,8 @@ public class data_admin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-     masteruser mu = new masteruser(namaSesi, roleSesi);
-    
-    // TAMBAHKAN BARIS INI:
-    mu.setLocationRelativeTo(null); 
-    
-    mu.setVisible(true);
-    this.dispose();
+       new masteruser().setVisible(true); // Panggil langsung
+        this.dispose();
     }//GEN-LAST:event_backActionPerformed
 
     private void bthAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bthAddActionPerformed

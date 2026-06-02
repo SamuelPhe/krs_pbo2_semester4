@@ -6,35 +6,42 @@ package PBO_Project_2;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.ResultSet;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 public class data_mahasiswa extends javax.swing.JFrame {
     
-    private String namaSesi, roleSesi;
-    private String idMahasiswaSesi; // <-- VARIABEL BARU UNTUK MENAMPUNG ID
+    // Variabel untuk filter (null jika admin, ada isinya jika mahasiswa)
+    private String idMhsFilter = null;
 
-    // Ubah konstruktor utama agar menerima 3 parameter
-   // Di dalam konstruktor data_mahasiswa
-    public data_mahasiswa(String nama, String role, String idMhs) {
-        this.namaSesi = nama;
-        this.roleSesi = role;
-        this.idMahasiswaSesi = idMhs;
-        initComponents();
-        tampilkan_data(); 
-        
-        // --- SATPAM PENGAMIDIL HAK AKSES ---
-        if (roleSesi.equalsIgnoreCase("mahasiswa")) {
-            btnAdd.setVisible(false);    // Sembunyikan tombol Add
-            btnDelete.setVisible(false); // Sembunyikan tombol Delete
-            // Tombol Edit dibiarkan muncul karena mau dipakai buat edit data diri sendiri
-        }
-    }
-
+    // 1. Constructor untuk Admin
     public data_mahasiswa() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        aturHakAkses();
+        tampilkan_data(); 
+    }
+
+    // 2. Constructor untuk Mahasiswa (Menerima ID dari masteruser)
+    public data_mahasiswa(String id) {
+        initComponents();
+        this.setLocationRelativeTo(null);
+        this.idMhsFilter = id;
+        aturHakAkses();
+        tampilkan_data();
+    }
+
+    private void aturHakAkses() {
+        String role = Session.getRole();
+        if (role != null) {
+            if (role.equalsIgnoreCase("Mahasiswa")) {
+                btnAdd.setVisible(false);
+                btnDelete.setVisible(false);
+            } else if (role.equalsIgnoreCase("Dosen")) {
+                btnAdd.setVisible(false);
+                btnDelete.setVisible(false);
+                btnEdit.setVisible(false);
+            }
+        }
     }
 
     private void tampilkan_data() {
@@ -44,39 +51,41 @@ public class data_mahasiswa extends javax.swing.JFrame {
         model.addColumn("ID Prodi");
         model.addColumn("ID Dosen PA");
         model.addColumn("Angkatan");
-        model.addColumn("Semester"); // <-- TAMBAHAN BARU
+        model.addColumn("Semester");
 
-       try {
-            // --- MENGGUNAKAN LEFT JOIN UNTUK MENGAMBIL NAMA PRODI DAN DOSEN ---
+        try {
+            Connection conn = new database().getConnection();
             String sql = "SELECT m.id_mahasiswa, m.nama_mahasiswa, p.nama_prodi, d.nama_dosen, m.angkatan, m.semester " +
                          "FROM mahasiswa m " +
                          "LEFT JOIN prodi p ON m.id_prodi = p.id_prodi " +
                          "LEFT JOIN dosen d ON m.id_dosen_pa = d.id_dosen";
-                         
-            database db = new database(); 
-            Connection conn = db.getConnection();
-            Statement stm = conn.createStatement();
-            ResultSet res = stm.executeQuery(sql);
             
+            // Jika ada filter ID, tambahkan WHERE
+            if (idMhsFilter != null) {
+                sql += " WHERE m.id_mahasiswa = ?";
+            }
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            if (idMhsFilter != null) {
+                ps.setString(1, idMhsFilter);
+            }
+
+            ResultSet res = ps.executeQuery();
             while (res.next()) {
-                // Perhatikan: Kita sekarang mengambil nama_prodi dan nama_dosen, bukan lagi id-nya
-                String prodi = res.getString("nama_prodi");
-                String dosen = res.getString("nama_dosen");
-                
                 model.addRow(new Object[]{
                     res.getString("id_mahasiswa"), 
                     res.getString("nama_mahasiswa"), 
-                    (prodi == null) ? "Belum Diatur" : prodi, 
-                    (dosen == null) ? "Belum Diatur" : dosen, 
+                    res.getString("nama_prodi"), 
+                    res.getString("nama_dosen"), 
                     res.getString("angkatan"),
                     res.getString("semester")
                 });
             }
             tabelMhs.setModel(model);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Gagal load data: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Gagal load: " + e.getMessage());
         }
-    }
+    }  
     /**
      * Creates new form data_mahasiswa
      */
@@ -179,10 +188,9 @@ public class data_mahasiswa extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-    masteruser mu = new masteruser(namaSesi, roleSesi);
-        mu.setVisible(true);
-        mu.setLocationRelativeTo(null);
+    new masteruser().setVisible(true);
         this.dispose();
+    
     }//GEN-LAST:event_backActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
@@ -208,21 +216,20 @@ int baris = tabelMhs.getSelectedRow();
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void tabelMhsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelMhsMouseClicked
-      int baris = tabelMhs.getSelectedRow();
-        if (baris == -1) return;
+    int baris = tabelMhs.getSelectedRow();
+    if (baris == -1) return;
 
-        // Jika yang login saat ini adalah mahasiswa
-        if (roleSesi.equalsIgnoreCase("mahasiswa")) {
-            // Ambil ID mahasiswa pada baris tabel yang diklik (kolom indeks 0)
-            String idBarisTerpilih = tabelMhs.getValueAt(baris, 0).toString();
-            
-            // Bandingkan dengan idMahasiswaSesi (ID milik mahasiswa yang sedang login)
-            if (idBarisTerpilih.equals(idMahasiswaSesi)) {
-                btnEdit.setEnabled(true); // Nyalakan tombol jika itu datanya sendiri
-            } else {
-                btnEdit.setEnabled(false); // Matikan tombol jika itu data temannya
-            }
+    String idBarisTerpilih = tabelMhs.getValueAt(baris, 0).toString();
+
+    // Jika Role adalah Mahasiswa, cek apakah ID yang diklik adalah milik dia sendiri
+    if ("Mahasiswa".equalsIgnoreCase(Session.getRole())) {
+        // Kita bandingkan dengan idMhsFilter yang sudah di-set di constructor
+        if (idBarisTerpilih.equals(idMhsFilter)) {
+            btnEdit.setEnabled(true);
+        } else {
+            btnEdit.setEnabled(false);
         }
+    }
     }//GEN-LAST:event_tabelMhsMouseClicked
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
@@ -258,20 +265,7 @@ int baris = tabelMhs.getSelectedRow();
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new data_mahasiswa().setVisible(true));
     }
-    
-   // Fungsi pembantu agar JDialog bisa mengintip data sesi frame parent-nya
-    public String getNamaSesi() {
-        return this.namaSesi;
-    }
-
-    public String getRoleSesi() {
-        return this.roleSesi;
-    }
-
-    public String getIdSesiMhs() {
-        return this.idMahasiswaSesi;
-    }
-    
+   
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton back;

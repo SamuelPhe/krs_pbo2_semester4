@@ -8,22 +8,13 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import java.sql.*;
 
-public class data_jadwal extends javax.swing.JFrame {
-    
-    private String namaSesi, roleSesi;
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_jadwal.class.getName());
-
-    public data_jadwal(String nama, String role) {
-        this.namaSesi = nama;
-        this.roleSesi = role;
-        initComponents();
-        tampilkan_data();
-        this.setLocationRelativeTo(null);
-    }
-
+   public class data_jadwal extends javax.swing.JFrame {
+    // Variabel namaSesi dan roleSesi dihapus
+private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_jadwal.class.getName());
     public data_jadwal() {
         initComponents();
         tampilkan_data();
+        this.setLocationRelativeTo(null);
     }
 
     private void tampilkan_data() {
@@ -126,8 +117,8 @@ public class data_jadwal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-      masterdata md = new masterdata(namaSesi, roleSesi);
-        md.setVisible(true);
+     // Panggil langsung tanpa parameter
+        new masterdata().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_backActionPerformed
 

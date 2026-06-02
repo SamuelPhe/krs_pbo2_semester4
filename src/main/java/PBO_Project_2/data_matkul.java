@@ -12,20 +12,12 @@ import javax.swing.table.DefaultTableModel;
  * @author User
  */
 public class data_matkul extends javax.swing.JFrame {
-    private String namaSesi, roleSesi;
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_matkul.class.getName());
-
-    // --- TAMBAHKAN CONSTRUCTOR INI AGAR MASTERDATA TIDAK MERAH ---
-    public data_matkul(String nama, String role) {
-        this.namaSesi = nama;
-        this.roleSesi = role;
-        initComponents();
-        tampilkan_data();
-    }
-
+    // Variabel namaSesi dan roleSesi dihapus
+private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_matkul.class.getName());
     public data_matkul() {
         initComponents();
         tampilkan_data();
+        this.setLocationRelativeTo(null);
     }
 
     private void tampilkan_data() {
@@ -166,8 +158,7 @@ public class data_matkul extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-       masterdata md = new masterdata(namaSesi, roleSesi);
-        md.setVisible(true);
+      new masterdata().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_backActionPerformed
 

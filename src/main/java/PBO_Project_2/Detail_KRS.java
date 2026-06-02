@@ -11,14 +11,13 @@ public class Detail_KRS extends javax.swing.JDialog {
     private String idPengajuanAktif;
 
     // Konstruktor menerima ID Pengajuan yang dipilih
-    public Detail_KRS(java.awt.Frame parent, boolean modal, String idPengajuan) {
-        super(parent, modal);
-        this.idPengajuanAktif = idPengajuan;
-        initComponents();
-        this.setLocationRelativeTo(null);
-        
-        tampilkanDetailKRS();
-    }
+   public Detail_KRS(java.awt.Frame parent, boolean modal, String id) {
+    super(parent, modal);
+    this.idPengajuanAktif = id; // Pastikan variabel idPengajuanAktif sudah dideklarasikan di class ini
+    initComponents();
+    this.setLocationRelativeTo(null);
+    tampilkanDetailKRS(); // Panggil fungsi load datanya
+}
 
     // Konstruktor default cadangan agar tidak eror di method main
     public Detail_KRS(java.awt.Frame parent, boolean modal) {

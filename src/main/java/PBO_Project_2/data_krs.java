@@ -11,26 +11,19 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class data_krs extends javax.swing.JFrame {
+    // Variabel namaSesi dan roleSesi dihapus
 
-    private String namaSesi, roleSesi;
-
-    public data_krs(String nama, String role) {
-        this.namaSesi = nama;
-        this.roleSesi = role;
+    public data_krs() {
         initComponents();
         tampilkan_data();
         this.setLocationRelativeTo(null); 
         cekHakAkses(); 
     }
 
-    public data_krs() {
-        initComponents();
-        tampilkan_data();
-        this.setLocationRelativeTo(null);
-    }
-
-    private void cekHakAkses() {
-        if (roleSesi == null || !roleSesi.equalsIgnoreCase("admin")) {
+   private void cekHakAkses() {
+        // Ambil role dari Session
+        String role = Session.getRole();
+        if (role == null || !role.equalsIgnoreCase("admin")) {
             btnAdd.setVisible(false);
             btnEdit.setVisible(false);
             btnDelete.setVisible(false);
@@ -150,9 +143,7 @@ public class data_krs extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-    dashboard balik = new dashboard(namaSesi, roleSesi);
-        balik.setVisible(true);
-        balik.setLocationRelativeTo(null);
+   new dashboard().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_backActionPerformed
 
@@ -201,6 +192,16 @@ public class data_krs extends javax.swing.JFrame {
                 return;
             }
             
+            // --- VALIDASI TANGGAL (PENCEGAHAN) ---
+            java.util.Date dateMulai = (java.util.Date) spinMulai.getValue();
+            java.util.Date dateSelesai = (java.util.Date) spinSelesai.getValue();
+            
+            if (dateSelesai.before(dateMulai)) {
+                JOptionPane.showMessageDialog(this, "GAGAL: Tanggal Selesai (Penutupan) tidak boleh mendahului Tanggal Mulai (Pembukaan)!", "Kesalahan Tanggal", JOptionPane.ERROR_MESSAGE);
+                return; // Batalkan proses simpan
+            }
+            // -------------------------------------
+            
             try {
                 Connection conn = new database().getConnection();
                 
@@ -212,10 +213,10 @@ public class data_krs extends javax.swing.JFrame {
                 if (rsP.next()) idProdi = rsP.getInt("id_prodi");
 
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-                String tglMulai = sdf.format(spinMulai.getValue());
-                String tglSelesai = sdf.format(spinSelesai.getValue());
+                String tglMulai = sdf.format(dateMulai);
+                String tglSelesai = sdf.format(dateSelesai);
                 
-                // --- KODE BARU: CEK BENTROK SESI KRS ---
+                // --- KODE CEK BENTROK SESI KRS ---
                 String sqlCek = "SELECT id_krs FROM krs WHERE id_prodi = ? AND semester = ? AND tahun_ajaran = ? " +
                                 "AND (tanggal_mulai <= ? AND tanggal_selesai >= ?)";
                 
@@ -223,16 +224,15 @@ public class data_krs extends javax.swing.JFrame {
                 pstCek.setInt(1, idProdi);
                 pstCek.setString(2, txtSemester.getText());
                 pstCek.setString(3, txtTahun.getText());
-                pstCek.setString(4, tglSelesai); // Perhatikan: ini parameter untuk <= tglSelesai inputan
-                pstCek.setString(5, tglMulai);   // Perhatikan: ini parameter untuk >= tglMulai inputan
+                pstCek.setString(4, tglSelesai); 
+                pstCek.setString(5, tglMulai);   
                 
                 ResultSet rsCek = pstCek.executeQuery();
                 if (rsCek.next()) {
                     JOptionPane.showMessageDialog(this, "GAGAL: Sesi KRS untuk Prodi, Semester, dan Tahun Ajaran tersebut sudah ada pada rentang tanggal yang bersinggungan!", "Peringatan Bentrok", JOptionPane.WARNING_MESSAGE);
                     return; // Batalkan proses simpan
                 }
-                // --- BATAS KODE BARU ---
-
+                // ---------------------------------
              
                 String sql = "INSERT INTO krs (id_prodi, semester, tahun_ajaran, status_krs, tanggal_mulai, tanggal_selesai) VALUES (?, ?, ?, ?, ?, ?)";
                 PreparedStatement pst = conn.prepareStatement(sql);
@@ -255,7 +255,7 @@ public class data_krs extends javax.swing.JFrame {
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
                                      
-        int baris = tabelKRS.getSelectedRow();
+       int baris = tabelKRS.getSelectedRow();
         if (baris == -1) {
             JOptionPane.showMessageDialog(this, "Silakan pilih baris sesi KRS yang ingin diedit!");
             return;
@@ -305,6 +305,17 @@ public class data_krs extends javax.swing.JFrame {
         int option = JOptionPane.showConfirmDialog(this, formFields, "Edit Sesi KRS (ID Sesi: " + idKrs + ")", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         
         if (option == JOptionPane.OK_OPTION) {
+            
+            // --- VALIDASI TANGGAL (PENCEGAHAN) ---
+            java.util.Date dateMulai = (java.util.Date) spinMulai.getValue();
+            java.util.Date dateSelesai = (java.util.Date) spinSelesai.getValue();
+            
+            if (dateSelesai.before(dateMulai)) {
+                JOptionPane.showMessageDialog(this, "GAGAL: Tanggal Selesai (Penutupan) tidak boleh mendahului Tanggal Mulai (Pembukaan)!", "Kesalahan Tanggal", JOptionPane.ERROR_MESSAGE);
+                return; // Batalkan proses update
+            }
+            // -------------------------------------
+
             try {
                 Connection conn = new database().getConnection();
                 
@@ -315,10 +326,10 @@ public class data_krs extends javax.swing.JFrame {
                 if (rsP.next()) idProdi = rsP.getInt("id_prodi");
 
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-                String tglMulai = sdf.format(spinMulai.getValue());
-                String tglSelesai = sdf.format(spinSelesai.getValue());
+                String tglMulai = sdf.format(dateMulai);
+                String tglSelesai = sdf.format(dateSelesai);
                 
-                // --- KODE BARU: CEK BENTROK SESI KRS (UNTUK EDIT) ---
+                // --- KODE CEK BENTROK SESI KRS (UNTUK EDIT) ---
                 String sqlCek = "SELECT id_krs FROM krs WHERE id_prodi = ? AND semester = ? AND tahun_ajaran = ? " +
                                 "AND (tanggal_mulai <= ? AND tanggal_selesai >= ?) AND id_krs != ?";
                 
@@ -328,16 +339,15 @@ public class data_krs extends javax.swing.JFrame {
                 pstCek.setString(3, txtTahun.getText());
                 pstCek.setString(4, tglSelesai); 
                 pstCek.setString(5, tglMulai);   
-                pstCek.setString(6, idKrs); // Abaikan ID KRS yang sedang diedit
+                pstCek.setString(6, idKrs); 
                 
                 ResultSet rsCek = pstCek.executeQuery();
                 if (rsCek.next()) {
                     JOptionPane.showMessageDialog(this, "GAGAL: Perubahan bentrok dengan Sesi KRS lain yang sudah ada pada rentang tanggal tersebut!", "Peringatan Bentrok", JOptionPane.WARNING_MESSAGE);
                     return; // Batalkan proses update
                 }
-                // --- BATAS KODE BARU ---
+                // ----------------------------------------------
 
-               
                 String sql = "UPDATE krs SET id_prodi=?, semester=?, tahun_ajaran=?, status_krs=?, tanggal_mulai=?, tanggal_selesai=? WHERE id_krs=?";
                 PreparedStatement pst = conn.prepareStatement(sql);
                 pst.setInt(1, idProdi);

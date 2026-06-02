@@ -3,40 +3,37 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package PBO_Project_2;
+
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class Pengajuan_KRS extends javax.swing.JFrame {
 
-    // --- VARIABEL GLOBAL ---
-    private String namaSesi, roleSesi;
+    // Hapus variabel namaSesi, roleSesi
     private int idMahasiswaAktif = -1; 
+    private static final Logger LOGGER = Logger.getLogger(Pengajuan_KRS.class.getName());
 
     // --- KONSTRUKTOR UTAMA ---
-    public Pengajuan_KRS(String nama, String role) {
-        this.namaSesi = nama;
-        this.roleSesi = role;
+    public Pengajuan_KRS() {
         initComponents();
         this.setLocationRelativeTo(null);
         
+        // Panggil fungsi-fungsi langsung
         cariIdMahasiswa();    
         tampilkanSesiAktif(); 
         tampilkanRiwayat();   
     }
-
-    public Pengajuan_KRS() {
-        initComponents();
-        this.setLocationRelativeTo(null);
-    }
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Pengajuan_KRS.class.getName());
+    // Contoh method di kelas Pengajuan_KRS.java
 
     // ================= FUNGSI 1: CARI ID MAHASISWA =================
     private void cariIdMahasiswa() {
         try {
             java.sql.Connection conn = new database().getConnection();
             java.sql.PreparedStatement ps = conn.prepareStatement("SELECT id_mahasiswa FROM mahasiswa WHERE nama_mahasiswa = ?");
-            ps.setString(1, namaSesi);
+            ps.setString(1, Session.getNama()); // Ambil nama dari Session
             java.sql.ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 idMahasiswaAktif = rs.getInt("id_mahasiswa");
@@ -46,7 +43,7 @@ public class Pengajuan_KRS extends javax.swing.JFrame {
         }
     }
 
-    // ================= FUNGSI 2: LOAD TABEL SESI AKTIF (TABEL ATAS) =================
+    // ================= FUNGSI 2: LOAD TABEL SESI AKTIF =================
     private void tampilkanSesiAktif() {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID Sesi");
@@ -57,13 +54,12 @@ public class Pengajuan_KRS extends javax.swing.JFrame {
 
         try {
             java.sql.Connection conn = new database().getConnection();
-            
             int idProdiMahasiswa = 0;
             int semesterMahasiswa = 0;
             
             String sqlCariMhs = "SELECT id_prodi, semester FROM mahasiswa WHERE nama_mahasiswa = ?";
             java.sql.PreparedStatement psCari = conn.prepareStatement(sqlCariMhs);
-            psCari.setString(1, namaSesi); 
+            psCari.setString(1, Session.getNama()); // Ambil nama dari Session
             java.sql.ResultSet rsCari = psCari.executeQuery();
             
             if (rsCari.next()) {
@@ -93,53 +89,70 @@ public class Pengajuan_KRS extends javax.swing.JFrame {
                     res.getString("tanggal_selesai")
                 });
             }
-            // PENTING: Set model bersih untuk mencegah Title 1 Title 2
             tabelSesiAktif.setModel(model); 
             
         } catch (Exception e) {
-            System.out.println("Error load sesi aktif ketat: " + e.getMessage());
+            System.out.println("Error load sesi aktif: " + e.getMessage());
         }
     }
     
-    // ================= FUNGSI 3: LOAD TABEL RIWAYAT SAYA (TABEL BAWAH) =================
+    // ================= FUNGSI 3: LOAD TABEL RIWAYAT SAYA =================
     private void tampilkanRiwayat() {
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID Pengajuan");
-        model.addColumn("Sesi (Sem/Thn)");
-        model.addColumn("Tgl Pengajuan");
-        model.addColumn("Dosen PA");
-        model.addColumn("Status");
+    DefaultTableModel model = new DefaultTableModel();
+    model.addColumn("ID Pengajuan");
+    model.addColumn("Sesi (Sem/Thn)");
+    model.addColumn("Tgl Pengajuan");
+    model.addColumn("Dosen PA");
+    model.addColumn("Status");
 
-        try {
-            java.sql.Connection conn = new database().getConnection();
+    try {
+        java.sql.Connection conn = new database().getConnection();
+        String sql = "SELECT pk.id_pengajuan, k.semester, k.tahun_ajaran, pk.tanggal_pengajuan, d.nama_dosen, pk.status_acc " +
+                     "FROM pengajuan_krs pk " +
+                     "JOIN krs k ON pk.id_krs = k.id_krs " +
+                     "JOIN mahasiswa m ON pk.id_mahasiswa = m.id_mahasiswa " +
+                     "LEFT JOIN dosen d ON m.id_dosen_pa = d.id_dosen " +
+                     "WHERE pk.id_mahasiswa = ?";
+        
+        java.sql.PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, idMahasiswaAktif);
+        java.sql.ResultSet res = ps.executeQuery();
+        
+        while (res.next()) {
+            String dsn = res.getString("nama_dosen");
+            model.addRow(new Object[]{
+                res.getString("id_pengajuan"),
+                "Sem " + res.getString("semester") + " (" + res.getString("tahun_ajaran") + ")",
+                res.getString("tanggal_pengajuan"),
+                (dsn == null) ? "Belum Diatur" : dsn,
+                res.getString("status_acc")
+            });
+        }
+        tabelRiwayat.setModel(model);
+        checkRevisi(); // Panggil ini setelah tabel dimuat
+    } catch (Exception e) {
+        System.out.println("Error load riwayat: " + e.getMessage());
+    }
+}
+    
+   private void checkRevisi() {
+    for (int i = 0; i < tabelRiwayat.getRowCount(); i++) {
+        String status = tabelRiwayat.getValueAt(i, 4).toString();
+        
+        if (status.equalsIgnoreCase("Ditolak")) {
+            String idPengajuan = tabelRiwayat.getValueAt(i, 0).toString();
+            // Panggil method dari database.java
+            String catatan = new database().getCatatanRevisi(idPengajuan); 
             
-            String sql = "SELECT pk.id_pengajuan, k.semester, k.tahun_ajaran, pk.tanggal_pengajuan, d.nama_dosen, pk.status_acc " +
-                         "FROM pengajuan_krs pk " +
-                         "JOIN krs k ON pk.id_krs = k.id_krs " +
-                         "JOIN mahasiswa m ON pk.id_mahasiswa = m.id_mahasiswa " +
-                         "LEFT JOIN dosen d ON m.id_dosen_pa = d.id_dosen " +
-                         "WHERE pk.id_mahasiswa = ?";
-                         
-            java.sql.PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, idMahasiswaAktif);
-            java.sql.ResultSet res = ps.executeQuery();
+            JOptionPane.showMessageDialog(this, 
+                "Perhatian! KRS Anda ditolak.\nAlasan: " + (catatan == null || catatan.isEmpty() ? "Tidak ada catatan" : catatan), 
+                "Status KRS", JOptionPane.WARNING_MESSAGE);
             
-            while (res.next()) {
-                String dsn = res.getString("nama_dosen");
-                model.addRow(new Object[]{
-                    res.getString("id_pengajuan"),
-                    "Sem " + res.getString("semester") + " (" + res.getString("tahun_ajaran") + ")",
-                    res.getString("tanggal_pengajuan"),
-                    (dsn == null) ? "Belum Diatur" : dsn,
-                    res.getString("status_acc")
-                });
-            }
-            // PENTING: Set model bersih untuk mencegah Title 1 Title 2
-            tabelRiwayat.setModel(model); 
-        } catch (Exception e) {
-            System.out.println("Error load riwayat: " + e.getMessage());
+            // Kita break agar popup tidak muncul berkali-kali jika ada banyak data
+            break; 
         }
     }
+}
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -271,30 +284,27 @@ public class Pengajuan_KRS extends javax.swing.JFrame {
     private void btnHapusPengajuanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusPengajuanActionPerformed
         int baris = tabelRiwayat.getSelectedRow();
     if (baris == -1) {
-        JOptionPane.showMessageDialog(this, "Silakan pilih riwayat pengajuan di tabel bawah yang ingin dihapus!");
+        JOptionPane.showMessageDialog(this, "Pilih riwayat pengajuan di tabel!");
         return;
     }
     
-    // KUNCI VALIDASI: Hanya status 'Draft' yang boleh dihapus
     String status = tabelRiwayat.getValueAt(baris, 4).toString();
-    if (!status.equalsIgnoreCase("Draft")) {
-        JOptionPane.showMessageDialog(this, "Pengajuan KRS yang sudah dikunci atau disetujui tidak dapat dihapus!");
+    // IZINKAN jika Draft ATAU Ditolak
+    if (!status.equalsIgnoreCase("Draft") && !status.equalsIgnoreCase("Ditolak")) {
+        JOptionPane.showMessageDialog(this, "Hanya status Draft atau Ditolak yang bisa dihapus!");
         return;
     }
 
-    int konfirmasi = JOptionPane.showConfirmDialog(this, "Yakin ingin membatalkan/menghapus pengajuan KRS ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+    int konfirmasi = JOptionPane.showConfirmDialog(this, "Yakin ingin menghapus?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
     if (konfirmasi == JOptionPane.YES_OPTION) {
         try {
             String idPengajuan = tabelRiwayat.getValueAt(baris, 0).toString();
             java.sql.Connection conn = new database().getConnection();
-            
             conn.createStatement().executeUpdate("DELETE FROM krs_detail WHERE id_pengajuan = " + idPengajuan);
             conn.createStatement().executeUpdate("DELETE FROM pengajuan_krs WHERE id_pengajuan = " + idPengajuan);
-            
-            JOptionPane.showMessageDialog(this, "Pengajuan KRS berhasil dihapus!");
             tampilkanRiwayat();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Gagal menghapus: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Gagal: " + e.getMessage());
         }
     }
     }//GEN-LAST:event_btnHapusPengajuanActionPerformed
@@ -341,36 +351,36 @@ public class Pengajuan_KRS extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBuatPengajuanActionPerformed
 
     private void btnIsiMatkulActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIsiMatkulActionPerformed
-      int baris = tabelRiwayat.getSelectedRow();
+   int baris = tabelRiwayat.getSelectedRow();
     if (baris == -1) {
-        JOptionPane.showMessageDialog(this, "Silakan pilih riwayat pengajuan di tabel bawah terlebih dahulu!");
+        JOptionPane.showMessageDialog(this, "Pilih riwayat pengajuan!");
         return;
     }
     
-    // KUNCI VALIDASI: Cek status krs detail riwayat
     String status = tabelRiwayat.getValueAt(baris, 4).toString();
-    if (!status.equalsIgnoreCase("Draft")) {
-        JOptionPane.showMessageDialog(this, "KRS sudah dikunci atau disetujui! Anda tidak bisa mengubah jadwal mata kuliah lagi.");
+    if (!status.equalsIgnoreCase("Draft") && !status.equalsIgnoreCase("Ditolak")) {
+        JOptionPane.showMessageDialog(this, "KRS sudah dikunci/disetujui!");
         return;
     }
     
-    String idPengajuanTerpilih = tabelRiwayat.getValueAt(baris, 0).toString();
-    Pilih_Jadwal pj = new Pilih_Jadwal(namaSesi, roleSesi, idPengajuanTerpilih);
+    String idPengajuan = tabelRiwayat.getValueAt(baris, 0).toString();
     
-    pj.addWindowListener(new java.awt.event.WindowAdapter() {
-        @Override
-        public void windowClosed(java.awt.event.WindowEvent e) {
-            tampilkanRiwayat(); 
+    // Jika Ditolak, ubah otomatis jadi Draft agar bisa diedit
+    if (status.equalsIgnoreCase("Ditolak")) {
+        try {
+            java.sql.Connection conn = new database().getConnection();
+            conn.createStatement().executeUpdate("UPDATE pengajuan_krs SET status_acc = 'Draft' WHERE id_pengajuan = " + idPengajuan);
+        } catch (Exception e) {
+            System.out.println("Gagal reset status: " + e.getMessage());
         }
-    });
-    
-    pj.setVisible(true);
+    }
+
+    // Buka form Pilih Jadwal
+    new Pilih_Jadwal(idPengajuan, 0).setVisible(true);
     }//GEN-LAST:event_btnIsiMatkulActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        dashboard balik = new dashboard(namaSesi, roleSesi);
-        balik.setVisible(true);
-        balik.setLocationRelativeTo(null);
+        new dashboard().setVisible(true); // Panggil langsung
         this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
@@ -433,11 +443,6 @@ public class Pengajuan_KRS extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -445,12 +450,9 @@ public class Pengajuan_KRS extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new Pengajuan_KRS().setVisible(true));
     }
 

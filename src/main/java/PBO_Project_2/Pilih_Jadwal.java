@@ -9,111 +9,183 @@ import javax.swing.JOptionPane;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class Pilih_Jadwal extends javax.swing.JFrame {
 
-    // Variabel global untuk menyimpan data sesi dan transaksi KRS
-    private String namaSesi, roleSesi;
     private String idPengajuanAktif;
     private int semesterMahasiswa = 0;
     private int idProdiMahasiswa = 0;
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Pilih_Jadwal.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Pilih_Jadwal.class.getName());
+    private int totalSKSExisting; // Simpan di variabel class
 
-    // Konstruktor utama yang dipanggil dari halaman Pengajuan_KRS
-    public Pilih_Jadwal(String nama, String role, String idPengajuan) {
-        this.namaSesi = nama;
-        this.roleSesi = role;
-        this.idPengajuanAktif = idPengajuan;
-        initComponents();
-        this.setLocationRelativeTo(null);
-        
-        // Ambil data semester mahasiswa terlebih dahulu sebelum memfilter jadwal
-        ambilSemesterMahasiswa();
-        tampilkanJadwalKuliah();
-    }
+// 1. Buat method ini
+private void initData() {
+    ambilSemesterMahasiswa();
+    tampilkanJadwalKuliah();
+}
 
-    // Konstruktor default bawaan NetBeans
-    public Pilih_Jadwal() {
-        initComponents();
-        this.setLocationRelativeTo(null);
-    }
+// 2. Konstruktor 1
+public Pilih_Jadwal(String idPengajuan, int totalSKS) {
+    this.idPengajuanAktif = idPengajuan;
+    this.totalSKSExisting = totalSKS;
+    initComponents();
+    this.setLocationRelativeTo(null);
+    initData(); // Panggil di sini
+}
+
+// 3. Konstruktor 2 (jika masih dipakai)
+public Pilih_Jadwal(String idPengajuan) {
+    this.idPengajuanAktif = idPengajuan;
+    initComponents();
+    this.setLocationRelativeTo(null);
+    initData(); // Panggil di sini
+}
     
-   
-    // ================= FUNGSI 1: AMBIL DATA SEMESTER MAHASISWA =================
+    // ================= FUNGSI 1: AMBIL DATA SEMESTER =================
     private void ambilSemesterMahasiswa() {
         try {
-        java.sql.Connection conn = new database().getConnection();
-        // Kita ambil id_prodi DAN semester sekaligus berdasarkan nama mahasiswa yang login
-        String sql = "SELECT id_prodi, semester FROM mahasiswa WHERE nama_mahasiswa = ?";
-        java.sql.PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, namaSesi); // namaSesi didapat dari data login pembuka form
-        java.sql.ResultSet rs = ps.executeQuery();
-        
-        if (rs.next()) {
-            this.idProdiMahasiswa = rs.getInt("id_prodi"); // Menyimpan ID Prodi (Misal: 1)
-            this.semesterMahasiswa = rs.getInt("semester"); // Menyimpan Semester (Misal: 4)
+            java.sql.Connection conn = new database().getConnection();
+            String sql = "SELECT id_prodi, semester FROM mahasiswa WHERE nama_mahasiswa = ?";
+            java.sql.PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, Session.getNama()); // Ambil langsung dari Session
+            java.sql.ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                this.idProdiMahasiswa = rs.getInt("id_prodi");
+                this.semesterMahasiswa = rs.getInt("semester");
+            }
+        } catch (Exception e) {
+            System.out.println("Error ambil data filter: " + e.getMessage());
         }
-    } catch (Exception e) {
-        System.out.println("Error ambil data filter mahasiswa: " + e.getMessage());
     }
-    }
-
-    // ================= FUNGSI 2: TAMPILKAN JADWAL TERFILTER KETAT =================
-    private void tampilkanJadwalKuliah() {
-      javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel();
     
-    // Kolom tabel di form Pilih_Jadwal kamu
-    model.addColumn("ID Jadwal");
-    model.addColumn("Mata Kuliah");
-    model.addColumn("SKS");
-    model.addColumn("Kelas");
-    model.addColumn("Hari");
-    model.addColumn("Jam");
-    model.addColumn("Ruang");
-
+    private int hitungTotalSKS() {
+    int total = 0;
     try {
         java.sql.Connection conn = new database().getConnection();
-        
-        // REVOLUSI QUERY: Kita JOIN 4 tabel sekaligus!
-        // j = jadwal, m = matkul, k = kelas, r = ruang (silakan sesuaikan nama tabel/kolom aslimu jika ada typo)
-        String sql = "SELECT j.id_jadwal, m.nama_matkul, m.sks, k.nama_kelas, j.hari, j.jam_mulai, j.jam_selesai, r.nama_ruang " +
-                     "FROM jadwal j " +
+        // Query untuk menjumlahkan SKS dari matkul yang sudah diambil di pengajuan ini
+        String sql = "SELECT SUM(m.sks) as total FROM krs_detail kd " +
+                     "JOIN jadwal j ON kd.id_jadwal = j.id_jadwal " +
                      "JOIN matkul m ON j.id_matkul = m.id_matkul " +
-                     "JOIN kelas k ON j.kelas = k.id_kelas " +   // <-- Ambil NAMA KELAS asli lewat ID Kelas
-                     "JOIN ruang r ON j.ruang = r.id_ruang " + // <-- Ambil NAMA RUANG asli lewat ID Ruang
-                     "WHERE m.id_prodi = ? AND m.semester = ?";
-                     
+                     "WHERE kd.id_pengajuan = ?";
         java.sql.PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, this.idProdiMahasiswa); 
-        ps.setInt(2, this.semesterMahasiswa); 
-        
-        java.sql.ResultSet res = ps.executeQuery();
-        
-        while (res.next()) {
-            // Gabungkan jam mulai dan jam selesai agar rapi di satu kolom
-            String waktuKuliah = res.getString("jam_mulai") + " - " + res.getString("jam_selesai");
-            
-            model.addRow(new Object[]{
-                res.getString("id_jadwal"),
-                res.getString("nama_matkul"),
-                res.getInt("sks"),
-                res.getString("nama_kelas"),   // Menampilkan nama asli kelas (Misal: "A", "B", "Reguler")
-                res.getString("hari"),
-                waktuKuliah,
-                res.getString("nama_ruang")  // Menampilkan nama asli ruang (Misal: "Lab 1", "Teori 2")
-            });
+        ps.setString(1, this.idPengajuanAktif);
+        java.sql.ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            total = rs.getInt("total");
         }
-        
-        tabelJadwal.setModel(model); 
-        // Pasang model data ke tabel
-        tabelJadwal.setModel(model); 
-        
-        // --- PANGGIL SI SATPAM AUTORESIZE DI SINI ---
-        aturLebarKolomOtomatis(tabelJadwal);
     } catch (Exception e) {
-        System.out.println("Error load jadwal kuliah lengkap: " + e.getMessage());
-        javax.swing.JOptionPane.showMessageDialog(this, "Gagal memuat jadwal: " + e.getMessage());
+        System.out.println("Error hitung SKS: " + e.getMessage());
     }
+    return total;
+}
+    
+    // Fungsi Cek: Apakah Matkul sudah diambil (duplikat)?
+private boolean isMatkulAlreadyTaken(String idPengajuan, String idJadwalBaru) {
+    try {
+        java.sql.Connection conn = new database().getConnection();
+        // Ambil id_matkul dari jadwal yang baru dipilih
+        String sqlGetMatkul = "SELECT id_matkul FROM jadwal WHERE id_jadwal = ?";
+        java.sql.PreparedStatement psMatkul = conn.prepareStatement(sqlGetMatkul);
+        psMatkul.setString(1, idJadwalBaru);
+        java.sql.ResultSet rsMatkul = psMatkul.executeQuery();
+        
+        if (rsMatkul.next()) {
+            int idMatkulBaru = rsMatkul.getInt("id_matkul");
+            // Cek apakah id_matkul ini sudah ada di pengajuan ini
+            String sqlCek = "SELECT kd.id_detail FROM krs_detail kd JOIN jadwal j ON kd.id_jadwal = j.id_jadwal " +
+                            "WHERE kd.id_pengajuan = ? AND j.id_matkul = ?";
+            java.sql.PreparedStatement psCek = conn.prepareStatement(sqlCek);
+            psCek.setString(1, idPengajuan);
+            psCek.setInt(2, idMatkulBaru);
+            return psCek.executeQuery().next();
+        }
+    } catch (Exception e) {
+        System.out.println("Error cek duplikat: " + e.getMessage());
+    }
+    return false;
+}
+
+// Fungsi Cek: Apakah Jadwal bentrok?
+private boolean isJadwalBentrok(String idPengajuan, String idJadwalBaru) {
+    try {
+        java.sql.Connection conn = new database().getConnection();
+        String sqlDetail = "SELECT hari, jam_mulai, jam_selesai FROM jadwal WHERE id_jadwal = ?";
+        java.sql.PreparedStatement psDetail = conn.prepareStatement(sqlDetail);
+        psDetail.setString(1, idJadwalBaru);
+        java.sql.ResultSet rsDetail = psDetail.executeQuery();
+        
+        if (rsDetail.next()) {
+            String hariBaru = rsDetail.getString("hari");
+            java.sql.Time mulaiBaru = rsDetail.getTime("jam_mulai");
+            java.sql.Time selesaiBaru = rsDetail.getTime("jam_selesai");
+            
+            // Logika bentrok: Hari sama DAN waktu beririsan
+            String sqlCek = "SELECT j.id_jadwal FROM krs_detail kd " +
+                            "JOIN jadwal j ON kd.id_jadwal = j.id_jadwal " +
+                            "WHERE kd.id_pengajuan = ? AND j.hari = ? " +
+                            "AND (j.jam_mulai < ? AND j.jam_selesai > ?)";
+            
+            java.sql.PreparedStatement psCek = conn.prepareStatement(sqlCek);
+            psCek.setString(1, idPengajuan);
+            psCek.setString(2, hariBaru);
+            psCek.setTime(3, selesaiBaru);
+            psCek.setTime(4, mulaiBaru);
+            
+            java.sql.ResultSet rsCek = psCek.executeQuery();
+            return rsCek.next(); 
+        }
+    } catch (Exception e) {
+        System.out.println("Error cek bentrok: " + e.getMessage());
+    }
+    return false;
+}
+    
+    // ================= FUNGSI 2: TAMPILKAN JADWAL =================
+    private void tampilkanJadwalKuliah() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID Jadwal");
+        model.addColumn("Mata Kuliah");
+        model.addColumn("SKS");
+        model.addColumn("Kelas");
+        model.addColumn("Hari");
+        model.addColumn("Jam");
+        model.addColumn("Ruang");
+
+        try {
+            java.sql.Connection conn = new database().getConnection();
+            String sql = "SELECT j.id_jadwal, m.nama_matkul, m.sks, k.nama_kelas, j.hari, j.jam_mulai, j.jam_selesai, r.nama_ruang " +
+                         "FROM jadwal j " +
+                         "JOIN matkul m ON j.id_matkul = m.id_matkul " +
+                         "JOIN kelas k ON j.kelas = k.id_kelas " +
+                         "JOIN ruang r ON j.ruang = r.id_ruang " +
+                         "WHERE m.id_prodi = ? AND m.semester = ?";
+                         
+            java.sql.PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, this.idProdiMahasiswa); 
+            ps.setInt(2, this.semesterMahasiswa); 
+            
+            java.sql.ResultSet res = ps.executeQuery();
+            
+            while (res.next()) {
+                String waktuKuliah = res.getString("jam_mulai") + " - " + res.getString("jam_selesai");
+                model.addRow(new Object[]{
+                    res.getString("id_jadwal"),
+                    res.getString("nama_matkul"),
+                    res.getInt("sks"),
+                    res.getString("nama_kelas"),
+                    res.getString("hari"),
+                    waktuKuliah,
+                    res.getString("nama_ruang")
+                });
+            }
+            tabelJadwal.setModel(model); 
+            aturLebarKolomOtomatis(tabelJadwal);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Gagal memuat jadwal: " + e.getMessage());
+        }
     }
 
     /**
@@ -192,37 +264,52 @@ public class Pilih_Jadwal extends javax.swing.JFrame {
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
      int barisTerpilih = tabelJadwal.getSelectedRow();
     if (barisTerpilih == -1) {
-        JOptionPane.showMessageDialog(this, "Silakan pilih mata kuliah dari tabel terlebih dahulu!");
+        JOptionPane.showMessageDialog(this, "Pilih mata kuliah terlebih dahulu!");
         return;
     }
 
     String idJadwal = tabelJadwal.getValueAt(barisTerpilih, 0).toString();
 
+    // 1. VALIDASI DUPLIKAT MATKUL
+    if (isMatkulAlreadyTaken(idPengajuanAktif, idJadwal)) {
+        JOptionPane.showMessageDialog(this, "Gagal! Mata kuliah ini sudah Anda ambil.");
+        return;
+    }
+
+    // 2. VALIDASI JADWAL BENTROK
+    if (isJadwalBentrok(idPengajuanAktif, idJadwal)) {
+        JOptionPane.showMessageDialog(this, "Gagal! Jadwal ini bentrok dengan mata kuliah lain.");
+        return;
+    }
+
+    // 3. VALIDASI SKS
+    int maxSKS = 24;
+    int totalSKS = hitungTotalSKS();
+    int sksBaru = Integer.parseInt(tabelJadwal.getValueAt(barisTerpilih, 2).toString());
+    
+    if ((totalSKS + sksBaru) > maxSKS) {
+        JOptionPane.showMessageDialog(this, "Gagal! Total SKS (" + (totalSKS + sksBaru) + ") melebihi batas maksimal (" + maxSKS + " SKS).");
+        return; 
+    }
+
+    // 4. INSERT KE DATABASE
     try {
         java.sql.Connection conn = new database().getConnection();
-        
-        // 1. Logika INSERT (Pastikan baris ini sudah aktif dan tidak di-comment)
         String sqlInsert = "INSERT INTO krs_detail (id_pengajuan, id_jadwal) VALUES (?, ?)";
         java.sql.PreparedStatement psInsert = conn.prepareStatement(sqlInsert);
         psInsert.setString(1, idPengajuanAktif); 
         psInsert.setString(2, idJadwal);
         psInsert.executeUpdate();
         
-        // 2. Munculkan pesan sukses
-        JOptionPane.showMessageDialog(this, "Mata kuliah berhasil ditambahkan ke daftar KRS Anda!");
-        
-        // 3. TAMBAHKAN BARIS INI (Sangat Penting!):
-        this.dispose(); // <--- Menutup form Pilih_Jadwal agar tabel di Pengajuan_KRS otomatis ter-refresh dan muncul list-nya
-        
+        JOptionPane.showMessageDialog(this, "Berhasil ditambahkan!");
+        this.dispose(); 
     } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Gagal menambahkan mata kuliah: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, "Gagal: " + e.getMessage());
     }
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-       // Kembalikan data namaSesi dan roleSesi agar dashboard asal tidak hilang datanya
-        Pengajuan_KRS pk = new Pengajuan_KRS(namaSesi, roleSesi);
-        pk.setVisible(true);
+     new Pengajuan_KRS().setVisible(true); // Panggil langsung
         this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
@@ -231,11 +318,6 @@ public class Pilih_Jadwal extends javax.swing.JFrame {
      */
    
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -243,38 +325,27 @@ public class Pilih_Jadwal extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new Pilih_Jadwal().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new Pilih_Jadwal("0").setVisible(true));
     }
-private void aturLebarKolomOtomatis(javax.swing.JTable tabel) {
-    // Mengambil model kolom dari tabel
-    final javax.swing.table.TableColumnModel columnModel = tabel.getColumnModel();
     
-    for (int kolom = 0; kolom < tabel.getColumnCount(); kolom++) {
-        int lebarMaksimal = 50; // Lebar minimal kolom (dalam pixel)
-        
-        // 1. Periksa panjang teks di Header Kolom (Judulnya)
-        javax.swing.table.TableCellRenderer headerRenderer = tabel.getTableHeader().getDefaultRenderer();
-        Object headerValue = tabel.getColumnName(kolom);
-        java.awt.Component headerComp = headerRenderer.getTableCellRendererComponent(tabel, headerValue, false, false, -1, kolom);
-        lebarMaksimal = Math.max(headerComp.getPreferredSize().width + 15, lebarMaksimal);
-        
-        // 2. Periksa panjang teks di setiap baris data pada kolom tersebut
-        for (int baris = 0; baris < tabel.getRowCount(); baris++) {
-            javax.swing.table.TableCellRenderer renderer = tabel.getCellRenderer(baris, kolom);
-            java.awt.Component comp = tabel.prepareRenderer(renderer, baris, kolom);
-            // Tambahkan padding 15 pixel agar teks tidak terlalu mepet dengan garis pembatas
-            lebarMaksimal = Math.max(comp.getPreferredSize().width + 15, lebarMaksimal);
+private void aturLebarKolomOtomatis(javax.swing.JTable tabel) {
+   final javax.swing.table.TableColumnModel columnModel = tabel.getColumnModel();
+        for (int kolom = 0; kolom < tabel.getColumnCount(); kolom++) {
+            int lebarMaksimal = 50;
+            javax.swing.table.TableCellRenderer headerRenderer = tabel.getTableHeader().getDefaultRenderer();
+            Object headerValue = tabel.getColumnName(kolom);
+            java.awt.Component headerComp = headerRenderer.getTableCellRendererComponent(tabel, headerValue, false, false, -1, kolom);
+            lebarMaksimal = Math.max(headerComp.getPreferredSize().width + 15, lebarMaksimal);
+            for (int baris = 0; baris < tabel.getRowCount(); baris++) {
+                javax.swing.table.TableCellRenderer renderer = tabel.getCellRenderer(baris, kolom);
+                java.awt.Component comp = tabel.prepareRenderer(renderer, baris, kolom);
+                lebarMaksimal = Math.max(comp.getPreferredSize().width + 15, lebarMaksimal);
+            }
+            columnModel.getColumn(kolom).setPreferredWidth(lebarMaksimal);
         }
-        
-        // 3. Set lebar baru yang paling maksimal ke kolom tersebut
-        columnModel.getColumn(kolom).setPreferredWidth(lebarMaksimal);
-    }
 }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;

@@ -3,39 +3,33 @@ package PBO_Project_2;
 import java.sql.*;
 
 public class database {
-
-    // ─── Konfigurasi Koneksi ───────────────────────────────────────────────────
     private static final String HOST     = "localhost";
     private static final String PORT     = "3306";
     private static final String DB_NAME  = "krs_db";
     private static final String USER     = "root";
     private static final String PASSWORD = "";
-
-    private static final String URL =
-        "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME +
-        "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-
+    private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    
     private Connection conn;
 
-    // ─── Konstruktor ───────────────────────────────────────────────────────────
     public database() {
         connect();
     }
 
-    // ─── Koneksi ke Database ───────────────────────────────────────────────────
     public void connect() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Koneksi berhasil ke database: " + DB_NAME);
-        } catch (ClassNotFoundException e) {
-            System.out.println("Driver MySQL tidak ditemukan: " + e.getMessage());
-        } catch (SQLException e) {
-            System.out.println("Gagal koneksi ke database: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Gagal koneksi: " + e.getMessage());
         }
     }
 
-    // ─── Fungsi Login ──────────────────────────────────────────
+    public Connection getConnection() {
+        return conn;
+    }
+
+    // FUNGSI LOGIN (Hanya melakukan query, tidak membuka dashboard)
     public ResultSet loginMahasiswa(String nama, String password) {
         try {
             String sql = "SELECT * FROM mahasiswa WHERE nama_mahasiswa = ? AND password = ?";
@@ -43,23 +37,17 @@ public class database {
             pst.setString(1, nama);
             pst.setString(2, password);
             return pst.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error login mahasiswa: " + e.getMessage());
-            return null;
-        }
+        } catch (SQLException e) { return null; }
     }
 
-    public ResultSet loginDosen(String nama, String password) {
+    public ResultSet loginDosen(String username, String password) {
         try {
             String sql = "SELECT * FROM dosen WHERE nama_dosen = ? AND password = ?";
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, nama); 
-            pst.setString(2, password);
-            return pst.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error login dosen: " + e.getMessage());
-            return null;
-        }
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            return ps.executeQuery();
+        } catch (Exception e) { return null; }
     }
 
     public ResultSet loginAdmin(String nama, String password) {
@@ -69,34 +57,7 @@ public class database {
             pst.setString(1, nama);
             pst.setString(2, password);
             return pst.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error login admin: " + e.getMessage());
-            return null;
-        }
-    }
-
-    // ─── Manajemen Koneksi ─────────────────────────────────────────────────────────
-    public void disconnect() {
-        try {
-            if (conn != null && !conn.isClosed()) {
-                conn.close();
-                System.out.println("Koneksi database ditutup.");
-            }
-        } catch (SQLException e) {
-            System.out.println("Gagal menutup koneksi: " + e.getMessage());
-        }
-    }
-
-    public boolean isConnected() {
-        try {
-            return conn != null && !conn.isClosed();
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
-    public Connection getConnection() {
-        return conn;
+        } catch (SQLException e) { return null; }
     }
 
 
@@ -791,27 +752,102 @@ public class database {
         }
     }
 
+  public int getJumlahBimbingan(String idDosen) {
+    int count = 0;
+    try {
+        // PERBAIKAN: Gunakan id_dosen_pa karena di buatKRS Anda menggunakan id_dosen_pa
+        String sql = "SELECT COUNT(*) AS total FROM krs WHERE id_dosen_pa = ? AND status_krs IN ('Ditinjau', 'Disetujui')";
+        
+        PreparedStatement pst = getConnection().prepareStatement(sql);
+        pst.setString(1, idDosen);
+        ResultSet rs = pst.executeQuery();
+        
+        if (rs.next()) {
+            count = rs.getInt("total");
+        }
+    } catch (Exception e) {
+        System.out.println("Error count bimbingan: " + e.getMessage());
+    }
+    return count;
+}
+    
+    // Tambahkan method ini di database.java
+public String getCatatanRevisi(String idPengajuan) {
+    String catatan = "";
+    try {
+        java.sql.Connection conn = getConnection();
+        String sql = "SELECT catatan_revisi FROM pengajuan_krs WHERE id_pengajuan = ?";
+        java.sql.PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, idPengajuan);
+        java.sql.ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            catatan = rs.getString("catatan_revisi");
+        }
+    } catch (Exception e) {
+        System.out.println("Error get catatan: " + e.getMessage());
+    }
+    return catatan;
+}
+    
+public int getIdProdiByKaprodi(int idDosen) {
+    String sql = "SELECT id_prodi FROM prodi WHERE id_kaprodi = ?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, idDosen);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt("id_prodi");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return -1; // Jika tidak ditemukan
+}
+
+public String getSqlFilter(String tabel, String idUser, String role) {
+    if (role.equalsIgnoreCase("Admin")) {
+        return "SELECT * FROM " + tabel; // Admin lihat semua
+    } else {
+        // Mahasiswa/Dosen lihat punya sendiri
+        // ID Primary Key tiap tabel biasanya id_mahasiswa / id_dosen
+        String kolomId = (tabel.equals("mahasiswa")) ? "id_mahasiswa" : "id_dosen";
+        return "SELECT * FROM " + tabel + " WHERE " + kolomId + " = '" + idUser + "'";
+    }
+}
+
+public void debugCekKolom(String namaTabel) {
+    try {
+        DatabaseMetaData meta = conn.getMetaData();
+        ResultSet columns = meta.getColumns(null, null, namaTabel, null);
+        System.out.println("--- DAFTAR KOLOM TABEL " + namaTabel + " ---");
+        while (columns.next()) {
+            System.out.println("Kolom: " + columns.getString("COLUMN_NAME"));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
     // ══════════════════════════════════════════════════════════════════════════
     //  MAIN - Testing (Disesuaikan parameternya)
     // ══════════════════════════════════════════════════════════════════════════
+
+    public void disconnect() {
+        try { if (conn != null) conn.close(); } catch (SQLException e) { System.out.println(e.getMessage()); }
+    }
+    
+    public boolean isConnected() {
+        try { return conn != null && !conn.isClosed(); } catch (SQLException e) { return false; }
+    }
+
+    // HANYA SATU MAIN METHOD DI SINI
     public static void main(String[] args) {
         database db = new database();
 
         if (db.isConnected()) {
-            // PERBAIKAN: Hapus object 'db.' agar tidak warning karena DB_NAME adalah tipe static
+         db.debugCekKolom("krs");        // Jalankan ini
+        db.debugCekKolom("krs_detail"); // Jalankan ini
+        db.disconnect();
             System.out.println("Status: Terhubung ke " + DB_NAME);
-
-            // 1. Tambah master (Jalankan sekali saja jika databasenya kosong)
-            // db.tambahProdi("Teknik Informatika");
-            // db.tambahDosen("Dr. Andi", "Dosen PA", "password123");
-            // db.tambahMahasiswa(1, 1, "Budi Santoso", 2023, "pass456");
-            // db.tambahMatkul("Pemrograman Berorientasi Objek", 3);
-            // db.tambahKelas("IF-47-01");
-            // db.tambahRuang("TULT-0101");
             
-            // Note: Pastikan ID-ID di bawah ini benar ada di Database (1, 1, 1, dll)
-            // db.tambahJadwal(1, 1, 1, "Senin", 1, "08:00:00", "10:00:00", 1, "2024/2025", "Genap");
-
             // 7. Buat KRS
             int idKRS = db.buatKRS(1, 1, "Genap", "2024/2025", "2025-01-10");
             System.out.println("ID KRS dibuat: " + idKRS);
@@ -819,7 +855,7 @@ public class database {
             // 8. Tambah detail KRS (id_jadwal=1)
             db.tambahKRSDetail(idKRS, 1);
 
-            // 9. Tampilkan detail KRS (SEKARANG SUDAH BISA MUNCUL NAMA KELAS DAN RUANG)
+            // 9. Tampilkan detail KRS
             try {
                 ResultSet rs = db.getKRSDetailByKRS(idKRS);
                 System.out.println("\n=== Detail KRS ===");
@@ -841,8 +877,9 @@ public class database {
 
             // 10. Dosen ACC KRS
             db.updateStatusKRS(idKRS, 1, "Disetujui");
+            
+            // PENTING: disconnect dipanggil DI DALAM main, sebelum penutup if
+            db.disconnect(); 
         }
-
-        db.disconnect();
     }
 }

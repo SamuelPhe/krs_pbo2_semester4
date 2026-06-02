@@ -17,8 +17,10 @@ public class FormTambahProdi extends javax.swing.JDialog {
 
     // Constructor Sakti (Bisa Add & Edit)
     public FormTambahProdi(java.awt.Frame parent, boolean modal, String[] data) {
-        super(parent, modal);
-        initComponents();
+    super(parent, modal);
+    initComponents();
+    loadDosenToDropdown(); // Panggil di sini
+    // ... (kode lainnya)
         
         if (data != null) {
             isEdit = true;
@@ -29,6 +31,36 @@ public class FormTambahProdi extends javax.swing.JDialog {
         }
     }
 
+    // Method untuk mengisi dropdown dengan data dosen
+private void loadDosenToDropdown() {
+    try {
+        Connection conn = new database().getConnection();
+        // Tambahkan WHERE untuk memfilter posisi
+        String sql = "SELECT id_dosen, nama_dosen FROM dosen WHERE posisi = 'Kaprodi'";
+        
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        
+        cmbKaprodi.removeAllItems();
+        cmbKaprodi.addItem("Pilih Kaprodi..."); 
+        
+        while (rs.next()) {
+            cmbKaprodi.addItem(new Item(rs.getInt("id_dosen"), rs.getString("nama_dosen")));
+        }
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Gagal memuat data: " + e.getMessage());
+    }
+}
+
+// Class pembantu untuk menyimpan ID dan Nama di dalam ComboBox
+class Item {
+    private int id;
+    private String nama;
+    public Item(int id, String nama) { this.id = id; this.nama = nama; }
+    public int getId() { return id; }
+    @Override
+    public String toString() { return nama; }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -45,6 +77,8 @@ public class FormTambahProdi extends javax.swing.JDialog {
         btnSimpan = new javax.swing.JButton();
         txtIdProdi = new javax.swing.JTextField();
         txtNamaProdi = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        cmbKaprodi = new javax.swing.JComboBox<>();
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -66,6 +100,10 @@ public class FormTambahProdi extends javax.swing.JDialog {
         getContentPane().add(txtIdProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 100, 410, -1));
         getContentPane().add(txtNamaProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 150, 410, -1));
 
+        jLabel5.setText("Kaprodi");
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 180, -1, -1));
+        getContentPane().add(cmbKaprodi, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 180, 410, -1));
+
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Prodi.png"))); // NOI18N
         getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
 
@@ -73,28 +111,45 @@ public class FormTambahProdi extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBatalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBatalActionPerformed
-        // TODO add your handling code here:
+       // Menutup jendela dialog saat tombol Back ditekan
+    this.dispose();
     }//GEN-LAST:event_btnBatalActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-        try {
+       // Validasi pemilihan dropdown
+    if (cmbKaprodi.getSelectedItem() == null || cmbKaprodi.getSelectedIndex() == 0) {
+        JOptionPane.showMessageDialog(this, "Silakan pilih Kaprodi!");
+        return;
+    }
+
+    Item selectedDosen = (Item) cmbKaprodi.getSelectedItem();
+
+    try {
         Connection conn = new database().getConnection();
         String sql;
         if (isEdit) {
-            sql = "UPDATE prodi SET nama_prodi=? WHERE id_prodi=?";
+            sql = "UPDATE prodi SET nama_prodi=?, id_kaprodi=? WHERE id_prodi=?";
         } else {
-            sql = "INSERT INTO prodi (nama_prodi, id_prodi) VALUES (?, ?)";
+            sql = "INSERT INTO prodi (nama_prodi, id_prodi, id_kaprodi) VALUES (?, ?, ?)";
         }
 
         PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setString(1, txtNamaProdi.getText());
-        pst.setString(2, txtIdProdi.getText());
+        if (isEdit) {
+            pst.setString(1, txtNamaProdi.getText());
+            pst.setInt(2, selectedDosen.getId());
+            pst.setString(3, txtIdProdi.getText());
+        } else {
+            pst.setString(1, txtNamaProdi.getText());
+            pst.setString(2, txtIdProdi.getText());
+            pst.setInt(3, selectedDosen.getId());
+        }
 
-        pst.execute();
+        pst.executeUpdate(); // Gunakan executeUpdate() untuk INSERT/UPDATE
         JOptionPane.showMessageDialog(null, "Data Prodi Berhasil Disimpan");
         this.dispose();
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        e.printStackTrace(); // Bantu cek detail error di console
     }
     }//GEN-LAST:event_btnSimpanActionPerformed
 
@@ -138,10 +193,12 @@ public class FormTambahProdi extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBatal;
     private javax.swing.JButton btnSimpan;
+    private javax.swing.JComboBox<Object> cmbKaprodi;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JTextField txtIdProdi;
     private javax.swing.JTextField txtNamaProdi;
     // End of variables declaration//GEN-END:variables

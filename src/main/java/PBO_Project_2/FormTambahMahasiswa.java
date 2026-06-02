@@ -121,69 +121,46 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
         database db = new database();
         Connection conn = db.getConnection();
 
-        // 2. LOGIKA AMBIL ID PRODI BERDASARKAN NAMA
+        // 2. Ambil ID Prodi & Dosen
         String namaProdi = cbProdi.getSelectedItem().toString();
-        String sqlProdi = "SELECT id_prodi FROM prodi WHERE nama_prodi = ?";
-        PreparedStatement pstProdi = conn.prepareStatement(sqlProdi);
+        PreparedStatement pstProdi = conn.prepareStatement("SELECT id_prodi FROM prodi WHERE nama_prodi = ?");
         pstProdi.setString(1, namaProdi);
         ResultSet rsProdi = pstProdi.executeQuery();
-        int idProdi = 0;
-        if (rsProdi.next()) { idProdi = rsProdi.getInt("id_prodi"); }
+        int idProdi = rsProdi.next() ? rsProdi.getInt("id_prodi") : 0;
 
-        // 3. LOGIKA AMBIL ID DOSEN BERDASARKAN NAMA
         String namaDosen = cbDosen.getSelectedItem().toString();
-        String sqlDosen = "SELECT id_dosen FROM dosen WHERE nama_dosen = ?";
-        PreparedStatement pstDosen = conn.prepareStatement(sqlDosen);
+        PreparedStatement pstDosen = conn.prepareStatement("SELECT id_dosen FROM dosen WHERE nama_dosen = ?");
         pstDosen.setString(1, namaDosen);
         ResultSet rsDosen = pstDosen.executeQuery();
-        int idDosen = 0;
-        if (rsDosen.next()) { idDosen = rsDosen.getInt("id_dosen"); }
+        int idDosen = rsDosen.next() ? rsDosen.getInt("id_dosen") : 0;
 
-        // 4. TENTUKAN SQL (INSERT atau UPDATE dengan proteksi password blank)
+        // 3. Tentukan SQL
         String sql;
-        boolean gantiPassword = !pass.isEmpty(); // Bernilai true jika password diisi
+        boolean gantiPassword = !pass.isEmpty();
 
         if (isEdit) {
-            if (gantiPassword) {
-                // Jika password baru diisi, update semuanya termasuk password
-                sql = "UPDATE mahasiswa SET nama_mahasiswa=?, id_prodi=?, id_dosen_pa=?, angkatan=?, semester=?, password=? WHERE id_mahasiswa=?";
-            } else {
-                // Jika password kosong, kolom password JANGAN DIKUTAK-KATIK
-                sql = "UPDATE mahasiswa SET nama_mahasiswa=?, id_prodi=?, id_dosen_pa=?, angkatan=?, semester=? WHERE id_mahasiswa=?";
-            }
+            sql = gantiPassword ? 
+                  "UPDATE mahasiswa SET nama_mahasiswa=?, id_prodi=?, id_dosen_pa=?, angkatan=?, semester=?, password=? WHERE id_mahasiswa=?" :
+                  "UPDATE mahasiswa SET nama_mahasiswa=?, id_prodi=?, id_dosen_pa=?, angkatan=?, semester=? WHERE id_mahasiswa=?";
         } else {
-            // Untuk INSERT baru, password tetap wajib diisi
             sql = "INSERT INTO mahasiswa (nama_mahasiswa, id_prodi, id_dosen_pa, angkatan, semester, password, id_mahasiswa) VALUES (?, ?, ?, ?, ?, ?, ?)";
         }
 
         PreparedStatement pst = conn.prepareStatement(sql);
+        pst.setString(1, txtNama.getText());
+        pst.setInt(2, idProdi);
+        pst.setInt(3, idDosen);
+        pst.setString(4, txtAngkatan.getText());
+        pst.setString(5, txtSemester.getText());
         
         if (isEdit) {
             if (gantiPassword) {
-                // Parameter jika ganti password (ada 7 parameter)
-                pst.setString(1, txtNama.getText());
-                pst.setInt(2, idProdi);
-                pst.setInt(3, idDosen);
-                pst.setString(4, txtAngkatan.getText());
-                pst.setString(5, txtSemester.getText());
-                pst.setString(6, pass); // Password baru masuk
+                pst.setString(6, pass);
                 pst.setString(7, txtId.getText());
             } else {
-                // Parameter jika TIDAK ganti password (hanya 6 parameter, tanpa kolom password)
-                pst.setString(1, txtNama.getText());
-                pst.setInt(2, idProdi);
-                pst.setInt(3, idDosen);
-                pst.setString(4, txtAngkatan.getText());
-                pst.setString(5, txtSemester.getText());
-                pst.setString(6, txtId.getText()); // ID Mahasiswa bergeser ke urutan 6
+                pst.setString(6, txtId.getText());
             }
         } else {
-            // Parameter untuk INSERT biasa
-            pst.setString(1, txtNama.getText());
-            pst.setInt(2, idProdi);
-            pst.setInt(3, idDosen);
-            pst.setString(4, txtAngkatan.getText());
-            pst.setString(5, txtSemester.getText());
             pst.setString(6, pass);
             pst.setString(7, txtId.getText());
         }
@@ -191,33 +168,17 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
         pst.execute();
         JOptionPane.showMessageDialog(null, isEdit ? "Data Berhasil Diupdate" : "Data Berhasil Disimpan");
         
-        // --- LOGIKA BARU: DETEKSI PERUBAHAN DATA APAPUN MILIK SENDIRI BERDASARKAN ID ---
-        if (this.getParent() instanceof data_mahasiswa) {
-            data_mahasiswa pFrame = (data_mahasiswa) this.getParent();
-            
-            // Ambil ID Mahasiswa yang sedang aktif dibuka di textfield JDialog ini
-            String idYangSedangDiedit = txtId.getText().trim();
-            
-            // Ambil ID Mahasiswa yang sedang login dari frame parent
-            String idLoginSaya = pFrame.getIdSesiMhs(); 
-            
-            // Jika role-nya mahasiswa DAN ID yang diedit adalah ID-nya sendiri
-            if (pFrame.getRoleSesi().equalsIgnoreCase("mahasiswa") && idYangSedangDiedit.equals(idLoginSaya)) {
-                
-                JOptionPane.showMessageDialog(this, 
-                    "Anda baru saja memperbarui data profil Anda sendiri.\nSistem memerlukan relog untuk memperbarui sesi Anda.", 
-                    "Pembaruan Profil Berhasil", JOptionPane.INFORMATION_MESSAGE);
-                
-                // Tutup popup dan halaman master mahasiswa secara paksa
-                this.dispose();
-                pFrame.dispose();
-                
-                // Lempar langsung ke halaman login form
-                new login_form().setVisible(true);
-                return; // Keluar agar tidak mengeksekusi dispose() biasa di bawah
-            }
+        // --- LOGIKA SESI (TANPA GETPARENT) ---
+        // Cek apakah mahasiswa yang sedang diedit adalah dirinya sendiri
+        String idYangSedangDiedit = txtId.getText().trim();
+        if ("mahasiswa".equalsIgnoreCase(Session.getRole()) && idYangSedangDiedit.equals(Session.getId())) {
+            JOptionPane.showMessageDialog(this, "Anda mengubah profil sendiri. Silakan login ulang.");
+            Session.clearSession(); // Bersihkan sesi
+            this.dispose();
+            new login_form().setVisible(true); // Kembali ke login
+            return;
         }
-        // --- BATAS LOGIKA BARU ---
+        
         this.dispose();
 
     } catch (Exception e) {

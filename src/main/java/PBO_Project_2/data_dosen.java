@@ -3,61 +3,70 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package PBO_Project_2;
+
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import java.sql.*;
-/**
- *
- * @author User
- */
+
 public class data_dosen extends javax.swing.JFrame {
-    
-    private String namaSesi, roleSesi; // Buat variabel penampung
+    // Variabel penampung ID jika dipanggil untuk edit profil sendiri
+    private String idDosenSpesifik = null;
 
-    // Pastikan konstruktor utama kamu menerima 2 parameter ini
-    public data_dosen(String nama, String role) {
-        this.namaSesi = nama;
-        this.roleSesi = role;
-        initComponents();
-        tampilkan_data(); // Fungsi load tabel dosen kamu
-        
-        // --- SATPAM PENGAMAN DATA DOSEN MANDIRI ---
-        if (roleSesi.equalsIgnoreCase("mahasiswa")) {
-            btnAdd.setVisible(false);    // Sembunyikan tombol Add
-            btnEdit.setVisible(false);   // Sembunyikan tombol Edit
-            btnDelete.setVisible(false); // Sembunyikan tombol Delete
-        }
-    }
-
+    // Constructor Default (Untuk Admin)
     public data_dosen() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        tampilkan_data();
+    }
+
+    // Constructor Baru (Untuk Dosen yang edit profilnya sendiri)
+    public data_dosen(String id) {
+        initComponents();
+        this.setLocationRelativeTo(null);
+        this.idDosenSpesifik = id;
+        tampilkan_data();
     }
 
     private void tampilkan_data() {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID Dosen");
         model.addColumn("Nama Dosen");
-        model.addColumn("Posisi"); 
+        model.addColumn("Posisi");
 
         try {
             database db = new database();
             Connection conn = db.getConnection();
-            // Gunakan kolom 'posisi' sesuai database
-            String sql = "SELECT id_dosen, nama_dosen, posisi FROM dosen";
-            ResultSet res = conn.createStatement().executeQuery(sql);
-            
+            String sql;
+            PreparedStatement ps;
+
+            // LOGIKA FILTER: Jika idDosenSpesifik tidak null, berarti dosen yang buka profilnya sendiri
+            if (idDosenSpesifik != null) {
+                sql = "SELECT * FROM dosen WHERE id_dosen = ?";
+                ps = conn.prepareStatement(sql);
+                ps.setString(1, idDosenSpesifik);
+            } else {
+                // Admin lihat semua
+                sql = "SELECT * FROM dosen";
+                ps = conn.prepareStatement(sql);
+            }
+
+            ResultSet res = ps.executeQuery();
             while (res.next()) {
                 model.addRow(new Object[]{
                     res.getString("id_dosen"),
                     res.getString("nama_dosen"),
-                    res.getString("posisi") 
+                    res.getString("posisi")
                 });
             }
             tabelDosen.setModel(model);
+            db.disconnect();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Gagal load data: " + e.getMessage());
         }
     }
+
+   
+
     /*
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -92,6 +101,11 @@ public class data_dosen extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tabelDosen.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabelDosenMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tabelDosen);
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 630, 320));
@@ -131,48 +145,70 @@ public class data_dosen extends javax.swing.JFrame {
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
        int baris = tabelDosen.getSelectedRow();
-    if (baris != -1) {
-        String[] data = {
-            tabelDosen.getValueAt(baris, 0).toString(),
-            tabelDosen.getValueAt(baris, 1).toString(),
-            tabelDosen.getValueAt(baris, 2).toString()
-        };
-        // Masukkan array 'data' ke sini
-        FormTambahDosen popup = new FormTambahDosen(this, true, data);
-        popup.setVisible(true);
-        tampilkan_data();
-    } else {
-        JOptionPane.showMessageDialog(this, "Pilih dosen dulu!");
-    }
+        if (baris != -1) {
+            String[] data = {
+                tabelDosen.getValueAt(baris, 0).toString(),
+                tabelDosen.getValueAt(baris, 1).toString(),
+                tabelDosen.getValueAt(baris, 2).toString()
+            };
+            FormTambahDosen popup = new FormTambahDosen(this, true, data);
+            popup.setVisible(true);
+            tampilkan_data();
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih dosen dulu!");
+        }
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        int baris = tabelDosen.getSelectedRow();
+       int baris = tabelDosen.getSelectedRow();
         if (baris != -1) {
-            String id = tabelDosen.getValueAt(baris, 0).toString();
+            String idStr = tabelDosen.getValueAt(baris, 0).toString();
+            int id = Integer.parseInt(idStr); // Ubah ke Int karena database.java butuhnya 'int'
+            
             int opsi = JOptionPane.showConfirmDialog(this, "Hapus Dosen ID: " + id + "?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+            
             if (opsi == JOptionPane.YES_OPTION) {
-                try {
-                    Connection conn = new database().getConnection();
-                    PreparedStatement pst = conn.prepareStatement("DELETE FROM dosen WHERE id_dosen=?");
-                    pst.setString(1, id);
-                    pst.execute();
+                database db = new database();
+                
+                // PANGGIL FUNGSI DELETE DARI CLASS DATABASE
+                boolean sukses = db.deleteDosen(id); 
+                
+                if (sukses) {
                     JOptionPane.showMessageDialog(this, "Data Berhasil Dihapus");
-                    tampilkan_data();
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, e.getMessage());
+                    tampilkan_data(); // Refresh tabel
+                } else {
+                    JOptionPane.showMessageDialog(this, "Data Gagal Dihapus!");
                 }
+                
+                db.disconnect(); // Tutup koneksi
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih data dosen yang ingin dihapus terlebih dahulu!");
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-    masteruser mu = new masteruser(namaSesi, roleSesi);
-    mu.setVisible(true);
-    mu.setLocationRelativeTo(null);
-    this.dispose();
+    new masteruser().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_backActionPerformed
 
+    private void tabelDosenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelDosenMouseClicked
+      int baris = tabelDosen.getSelectedRow();
+    if (baris == -1) return;
+
+    String idDosenTerpilih = tabelDosen.getValueAt(baris, 0).toString();
+
+    // Jika yang login adalah Dosen, cek apakah ID-nya sama dengan baris yang diklik
+    if (Session.getRole().equalsIgnoreCase("Dosen")) {
+        if (idDosenTerpilih.equals(Session.getId())) {
+            btnEdit.setEnabled(true); 
+        } else {
+            btnEdit.setEnabled(false);
+        }
+    }
+    }//GEN-LAST:event_tabelDosenMouseClicked
+
+   
     /**
      * @param args the command line arguments
      */

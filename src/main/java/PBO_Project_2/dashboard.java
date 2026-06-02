@@ -3,36 +3,62 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package PBO_Project_2;
+
 import javax.swing.JOptionPane;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author User
  */
 public class dashboard extends javax.swing.JFrame {
-    // Tambahkan ini untuk menyimpan data sementara
-    private String namaLogin;
-    private String roleLogin;
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(dashboard.class.getName());
 
-    /**
-     * Creates new form dashboard
-     */
+    private static final Logger LOGGER = Logger.getLogger(dashboard.class.getName());
+
     public dashboard() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        
+        tampilkanJumlahBimbingan();
+        
+        // Ambil data dan bersihkan spasi
+        String role = (Session.getRole() != null) ? Session.getRole().trim() : "";
+        String nama = Session.getNama();
+        String posisi = (Session.getPosisi() != null) ? Session.getPosisi().trim() : "";
+        
+        // Set teks selamat datang
+        if (role.equalsIgnoreCase("Dosen")) {
+            user.setText("Selamat Datang, " + posisi + " " + nama + "!");
+        } else {
+            user.setText("Selamat Datang, " + role + " " + nama + "!");
+        }
+        
+        // --- ATURAN VISIBILITAS TOMBOL ---
+        
+        // 1. Master User SELALU MUNCUL
+        Master.setVisible(true);
+        
+        // 2. Master Data SELALU MUNCUL (Tapi nanti diblokir saat diklik bagi non-admin)
+        btnMaster.setVisible(true);
+        
+        // 3. Jadwal Ajar HANYA untuk Dosen
+        btnJadwalAjar.setVisible(role.equalsIgnoreCase("Dosen"));
+        
+        // 4. Finalisasi KRS HANYA untuk Kaprodi (Hilang samsek untuk user lain)
+        boolean isKaprodi = (role.equalsIgnoreCase("Dosen") && posisi.equalsIgnoreCase("Kaprodi"));
+        btnFinalisasiKRS.setVisible(isKaprodi); 
     }
-// Pastikan Anda mengubah konstruktor yang INI, bukan public dashboard() yang kosong
-    public dashboard(String namaUser, String role) {
-    initComponents(); 
-    this.namaLogin = namaUser; // Simpan ke variabel global
-    this.roleLogin = role;     // Simpan ke variabel global
-
-    // Set teks pada label variabel 'user'
-    user.setText("Selamat datang di dashboard, " + namaUser + "!");
-
-    this.setSize(1024, 640); 
-    this.setLocationRelativeTo(null); 
-}
+    
+    private void tampilkanJumlahBimbingan() {
+        // Pastikan Session sudah menyimpan ID Dosen
+        String idDosen = Session.getId(); 
+        
+        // Instansiasi database dan panggil method
+        database db = new database();
+        int jumlah = db.getJumlahBimbingan(idDosen);
+    }
+    
     // -----------------------
     
     
@@ -51,6 +77,8 @@ public class dashboard extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         btnMaster = new javax.swing.JButton();
         KRSButton = new javax.swing.JButton();
+        btnJadwalAjar = new javax.swing.JButton();
+        btnFinalisasiKRS = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -86,6 +114,16 @@ public class dashboard extends javax.swing.JFrame {
         KRSButton.addActionListener(this::KRSButtonActionPerformed);
         getContentPane().add(KRSButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 280, 190, -1));
 
+        btnJadwalAjar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnJadwalAjar.setText("Jadwal Ajar");
+        btnJadwalAjar.addActionListener(this::btnJadwalAjarActionPerformed);
+        getContentPane().add(btnJadwalAjar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 340, 190, -1));
+
+        btnFinalisasiKRS.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnFinalisasiKRS.setText("Finalisasi KRS");
+        btnFinalisasiKRS.addActionListener(this::btnFinalisasiKRSActionPerformed);
+        getContentPane().add(btnFinalisasiKRS, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 400, 190, -1));
+
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/home page (2).png"))); // NOI18N
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
 
@@ -94,87 +132,71 @@ public class dashboard extends javax.swing.JFrame {
 
     private void LogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogoutActionPerformed
                                
-        // 1. Munculkan kotak pertanyaan
-        int konfirmasi = JOptionPane.showConfirmDialog(this, 
-                "Apakah Anda yakin ingin keluar?", 
-                "Konfirmasi Keluar", 
-                JOptionPane.YES_NO_OPTION, 
-                JOptionPane.QUESTION_MESSAGE);
-        
-        // 2. Jika user menjawab "Yes"
+       int konfirmasi = JOptionPane.showConfirmDialog(this, "Apakah Anda yakin ingin keluar?", "Konfirmasi Keluar", JOptionPane.YES_NO_OPTION);
         if (konfirmasi == JOptionPane.YES_OPTION) {
-            // Buka kembali halaman form login
             new login_form().setVisible(true);
-            
-            // Tutup halaman dashboard ini dengan aman
-            dashboard.this.dispose(); 
+            this.dispose();
         }
     }//GEN-LAST:event_LogoutActionPerformed
 
     private void MasterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MasterActionPerformed
-      try {
-        // Kirim namaLogin dan roleLogin ke masteruser
-        masteruser halMaster = new masteruser(namaLogin, roleLogin);
-        
-        halMaster.setVisible(true);
-        halMaster.setLocationRelativeTo(null);
-        this.dispose();
-    } catch (Exception e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Gagal pindah: " + e.getMessage());
-    }
-
+   // Admin, Dosen, Mahasiswa semua boleh masuk ke Master User
+    new masteruser().setVisible(true);
+    this.dispose();
     }//GEN-LAST:event_MasterActionPerformed
 
     private void btnMasterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMasterActionPerformed
-   if (roleLogin.equalsIgnoreCase("admin")) {
-            // Kalau Admin, buka halaman manajemen master data (bisa utak-atik semuanya)
-            masterdata md = new masterdata(namaLogin, roleLogin); 
-            md.setVisible(true);
-            md.setLocationRelativeTo(null);
+ String role = (Session.getRole() != null) ? Session.getRole().trim() : "";
+        
+        // --- LOGIKA ERROR JIKA BUKAN ADMIN ---
+        if (role.equalsIgnoreCase("Admin")) {
+            new masterdata().setVisible(true);
             this.dispose();
-        } else if (roleLogin.equalsIgnoreCase("mahasiswa")) {
-            // Kalau Mahasiswa, arahkan ke halaman khusus "Informasi Akademik" / Read-only
-            // Atau jika belum membuat halaman khusus melihat jadwal, munculkan pesan saja:
-            JOptionPane.showMessageDialog(this, 
-                "Menu Master Data hanya untuk Admin.\nUntuk melihat Jadwal dan Mata Kuliah, silakan gunakan menu 'Data KRS'.", 
-                "Akses Terbatas", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Akses Ditolak! Hanya Admin yang memiliki akses ke Master Data.");
         }
     }//GEN-LAST:event_btnMasterActionPerformed
 
     private void KRSButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KRSButtonActionPerformed
-    // Gunakan roleLogin dan namaLogin sesuai variabel globalmu
-        if (roleLogin.equalsIgnoreCase("admin")) {
-            
-            data_krs halamanAdmin = new data_krs(namaLogin, roleLogin);
-            halamanAdmin.setVisible(true);
-            
-        } else if (roleLogin.equalsIgnoreCase("mahasiswa")) {
-            
-            Pengajuan_KRS halamanMhs = new Pengajuan_KRS(namaLogin, roleLogin);
-            halamanMhs.setVisible(true);
-            
-        } else if (roleLogin.equalsIgnoreCase("dosen")) {
-            
-            // Nanti kita buat form persetujuannya
-            javax.swing.JOptionPane.showMessageDialog(this, "Halaman ACC KRS Dosen segera hadir!");
-            // Persetujuan_KRS halamanDsn = new Persetujuan_KRS(namaLogin, roleLogin);
-            // halamanDsn.setVisible(true);
-            return; // Tahan dulu biar gak error
-            
+  String role = (Session.getRole() != null) ? Session.getRole().trim() : "";
+        String posisi = (Session.getPosisi() != null) ? Session.getPosisi().trim() : ""; 
+
+        if (role.equalsIgnoreCase("admin")) {
+            new data_krs().setVisible(true);
+        } 
+        else if (role.equalsIgnoreCase("mahasiswa")) {
+            new Pengajuan_KRS().setVisible(true);
+        } 
+        else if (role.equalsIgnoreCase("dosen") && posisi.equalsIgnoreCase("Dosen PA")) {
+            new Acc_KRS_DosenPA().setVisible(true); 
+        } 
+        else if (role.equalsIgnoreCase("dosen") && posisi.equalsIgnoreCase("Kaprodi")) {
+            new Acc_KRS_DosenPA().setVisible(true); 
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Role atau Posisi Anda tidak memiliki akses ke halaman KRS.");
+            return;
         }
         
-        this.dispose(); // Tutup halaman dashboard
+        this.dispose();
     }//GEN-LAST:event_KRSButtonActionPerformed
+
+    private void btnJadwalAjarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJadwalAjarActionPerformed
+       new jadwal_ajar().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnJadwalAjarActionPerformed
+
+    private void btnFinalisasiKRSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalisasiKRSActionPerformed
+     // Karena tombol sudah di-set visible(false) untuk non-Kaprodi, 
+    // di sini cukup panggil formnya langsung
+    new Finalisasi_KRS().setVisible(true);
+    this.dispose();
+    }//GEN-LAST:event_btnFinalisasiKRSActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+   public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -182,19 +204,19 @@ public class dashboard extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
-       java.awt.EventQueue.invokeLater(() -> new dashboard("", "").setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new dashboard().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton KRSButton;
     private javax.swing.JButton Logout;
     private javax.swing.JButton Master;
+    private javax.swing.JButton btnFinalisasiKRS;
+    private javax.swing.JButton btnJadwalAjar;
     private javax.swing.JButton btnMaster;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

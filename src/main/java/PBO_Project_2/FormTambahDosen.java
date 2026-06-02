@@ -90,11 +90,17 @@ public class FormTambahDosen extends javax.swing.JDialog {
     }//GEN-LAST:event_btnBatalActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-      String pass = txtPass.getText();
+     String pass = txtPass.getText();
         String confirm = txtConfirmPass.getText();
 
         if (!pass.equals(confirm)) {
-            JOptionPane.showMessageDialog(this, "Password tidak cocok!");
+            JOptionPane.showMessageDialog(this, "Password dan Confirm Password tidak cocok!");
+            return;
+        }
+        
+        // Cegah password kosong jika ini adalah penambahan Dosen BARU (Bukan Edit)
+        if (!isEdit && pass.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Password wajib diisi untuk penambahan Dosen baru!");
             return;
         }
 
@@ -102,23 +108,67 @@ public class FormTambahDosen extends javax.swing.JDialog {
             database db = new database();
             Connection conn = db.getConnection();
             String sql;
+            PreparedStatement pst;
             
-            // Query menggunakan kolom 'posisi'
+            // Cek apakah kolom password diisi atau dibiarkan kosong
+            boolean gantiPassword = !pass.isEmpty(); 
+            
             if (isEdit) {
-                sql = "UPDATE dosen SET nama_dosen=?, posisi=?, password=? WHERE id_dosen=?";
+                if (gantiPassword) {
+                    // JIKA PASSWORD DIISI: Update data sekaligus ganti password
+                    sql = "UPDATE dosen SET nama_dosen=?, posisi=?, password=? WHERE id_dosen=?";
+                    pst = conn.prepareStatement(sql);
+                    pst.setString(1, txtNamaDosen.getText());
+                    pst.setString(2, cbRole.getSelectedItem().toString());
+                    pst.setString(3, pass);
+                    pst.setString(4, txtIdDosen.getText());
+                } else {
+                    // JIKA PASSWORD KOSONG: Abaikan kolom password (password lama aman)
+                    sql = "UPDATE dosen SET nama_dosen=?, posisi=? WHERE id_dosen=?";
+                    pst = conn.prepareStatement(sql);
+                    pst.setString(1, txtNamaDosen.getText());
+                    pst.setString(2, cbRole.getSelectedItem().toString());
+                    pst.setString(3, txtIdDosen.getText());
+                }
             } else {
+                // INSERT Dosen Baru
                 sql = "INSERT INTO dosen (nama_dosen, posisi, password, id_dosen) VALUES (?, ?, ?, ?)";
+                pst = conn.prepareStatement(sql);
+                pst.setString(1, txtNamaDosen.getText());
+                pst.setString(2, cbRole.getSelectedItem().toString());
+                pst.setString(3, pass);
+                pst.setString(4, txtIdDosen.getText());
             }
 
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setString(1, txtNamaDosen.getText());
-            pst.setString(2, cbRole.getSelectedItem().toString()); // Mengambil pilihan dari dropdown
-            pst.setString(3, pass);
-            pst.setString(4, txtIdDosen.getText());
-
             pst.execute();
-            JOptionPane.showMessageDialog(null, "Data Berhasil Disimpan");
+            JOptionPane.showMessageDialog(null, isEdit ? "Data Berhasil Diupdate!" : "Data Berhasil Disimpan!");
+            
+            // --- LOGIKA PAKSA RELOG (KHUSUS DOSEN YANG EDIT DATANYA SENDIRI) ---
+            if (this.getParent() instanceof data_dosen) {
+                data_dosen pFrame = (data_dosen) this.getParent();
+                
+                // --- LOGIKA PAKSA RELOG (GANTI BAGIAN INI) ---
+                    String namaYangDiedit = txtNamaDosen.getText().trim();
+                    String namaLoginSaya = Session.getNama(); // Mengambil dari Session
+
+                    // Cek apakah yang login adalah "dosen" dan sedang mengedit profilnya sendiri
+                    if (Session.getRole().equalsIgnoreCase("dosen") && namaYangDiedit.equalsIgnoreCase(namaLoginSaya)) {
+                        JOptionPane.showMessageDialog(this, 
+                            "Anda baru saja memperbarui data profil Anda sendiri.\nSistem memerlukan relog untuk memperbarui sesi Anda.", 
+                            "Pembaruan Profil Berhasil", JOptionPane.INFORMATION_MESSAGE);
+
+                        this.dispose();
+                        // Tutup frame utama (asumsi ini dipanggil dari data_dosen)
+                        // Jika masih ada error, cukup panggil dispose() pada frame aktif
+
+                        new login_form().setVisible(true);
+                        return; 
+                    }
+            }
+            
+            // Jika diedit oleh Admin atau edit dosen lain, tutup popup dengan normal
             this.dispose();
+            
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Gagal: " + e.getMessage());
         }

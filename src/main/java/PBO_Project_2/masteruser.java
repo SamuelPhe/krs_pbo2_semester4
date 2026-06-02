@@ -4,37 +4,34 @@
  */
 package PBO_Project_2;
 
-/**
- *
- * @author TUF
- */
-public class masteruser extends javax.swing.JFrame {
-    private String namaSesi;
-    private String roleSesi;
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(masteruser.class.getName());
+import javax.swing.JOptionPane;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-    
-    /**
-     * Creates new form masteruser
-     */
- 
-    public masteruser() {
+public class masteruser extends javax.swing.JFrame {
+    private static final Logger LOGGER = Logger.getLogger(masteruser.class.getName());
+
+   public masteruser() {
     initComponents();
-}
+    this.setLocationRelativeTo(null);
     
-    public masteruser(String nama, String role) {
-        this.namaSesi = nama; 
-        this.roleSesi = role; 
-        initComponents();
-        
-        // --- SATPAM MASTER USER KHUSUS MAHASISWA ---
-        if (roleSesi.equalsIgnoreCase("mahasiswa")) {
-            btnAdmin.setVisible(false); // Mahasiswa tidak boleh tahu daftar Admin sistem!
-            
-            // Untuk Data Dosen, mahasiswa boleh lihat daftar dosennya (Read-Only)
-            // Jadi tombol Data Dosen biarkan tetap muncul.
-        }
+    String role = Session.getRole();
+    
+    // Sembunyikan tombol Data Admin untuk selain Admin
+    btnAdmin.setVisible(role.equalsIgnoreCase("Admin"));
+    
+    // Jika Mahasiswa, sembunyikan tombol Dosen & Admin
+    if (role.equalsIgnoreCase("Mahasiswa")) {
+        btnDos.setVisible(false);
+        btnAdmin.setVisible(false);
     }
+    
+    // Jika Dosen, sembunyikan tombol Mahasiswa & Admin
+    if (role.equalsIgnoreCase("Dosen")) {
+        btnMahasiswa.setVisible(false);
+        btnAdmin.setVisible(false);
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -82,60 +79,50 @@ public class masteruser extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-    // Panggil dashboard kembali dengan membawa namaSesi dan roleSesi
-    dashboard balik = new dashboard(namaSesi, roleSesi);
-    
-    balik.setVisible(true);
-    balik.setLocationRelativeTo(null);
-    this.dispose(); // Tutup masteruser
+   new dashboard().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_backActionPerformed
 
     private void btnMahasiswaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMahasiswaActionPerformed
-       // --- LOGIKA BARU: CARI ID SESI MAHASISWA TERLEBIH DAHULU ---
-        String idMahasiswaSesi = "";
-        try {
-            java.sql.Connection conn = new database().getConnection();
-            java.sql.PreparedStatement ps = conn.prepareStatement("SELECT id_mahasiswa FROM mahasiswa WHERE nama_mahasiswa = ?");
-            ps.setString(1, namaSesi);
-            java.sql.ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                idMahasiswaSesi = rs.getString("id_mahasiswa");
-            }
-        } catch (Exception e) {
-            System.out.println("Gagal mencari ID Sesi di masteruser: " + e.getMessage());
-        }
-
-        // Sekarang kita kirim 3 parameter lengkap (Nama, Role, ID) agar data_mahasiswa tidak error
-        data_mahasiswa mhs = new data_mahasiswa(namaSesi, roleSesi, idMahasiswaSesi);
-        mhs.setVisible(true);
-        mhs.setLocationRelativeTo(null);
+     String role = Session.getRole();
+    
+    // UBAH LOGIKA: Admin boleh buka semua, Mahasiswa boleh buka dirinya sendiri
+    if (role.equalsIgnoreCase("Admin")) {
+        new data_mahasiswa().setVisible(true); // Admin buka tanpa filter
         this.dispose();
+    } else if (role.equalsIgnoreCase("Mahasiswa")) {
+        // Mahasiswa hanya bisa buka data_mahasiswa yang memfilter ID dirinya
+        new data_mahasiswa(Session.getId()).setVisible(true); 
+        this.dispose();
+    } else {
+        JOptionPane.showMessageDialog(this, "Akses Ditolak!");
+    }
     }//GEN-LAST:event_btnMahasiswaActionPerformed
 
     private void btnDosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDosActionPerformed
-   // Pastikan parameter namaSesi dan roleSesi ikut dikirim
-        data_dosen dos = new data_dosen(namaSesi, roleSesi);
-        dos.setVisible(true);
-        dos.setLocationRelativeTo(null);
+ String role = Session.getRole();
+    
+    if (role.equalsIgnoreCase("Admin")) {
+        new data_dosen().setVisible(true);
         this.dispose();
+    } else if (role.equalsIgnoreCase("Dosen")) {
+        // Dosen hanya bisa buka data_dosen yang memfilter ID dirinya
+        new data_dosen(Session.getId()).setVisible(true);
+        this.dispose();
+    } else {
+        JOptionPane.showMessageDialog(this, "Akses Ditolak!");
+    }
     }//GEN-LAST:event_btnDosActionPerformed
 
     private void btnAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdminActionPerformed
-    data_admin adm = new data_admin(namaSesi, roleSesi);
-    adm.setVisible(true);
-    adm.setLocationRelativeTo(null);
-    this.dispose();
+   new data_admin().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnAdminActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+   public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -143,14 +130,13 @@ public class masteruser extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new masteruser().setVisible(true));
     }
+        //</editor-fold>
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton back;
