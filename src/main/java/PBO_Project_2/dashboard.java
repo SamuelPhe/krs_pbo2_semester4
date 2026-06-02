@@ -36,18 +36,23 @@ public class dashboard extends javax.swing.JFrame {
         
         // --- ATURAN VISIBILITAS TOMBOL ---
         
-        // 1. Master User SELALU MUNCUL
-        Master.setVisible(true);
+       // --- ATURAN VISIBILITAS TOMBOL ---
         
-        // 2. Master Data SELALU MUNCUL (Tapi nanti diblokir saat diklik bagi non-admin)
-        btnMaster.setVisible(true);
+        // Cek apakah yang login adalah Admin
+        boolean isAdmin = role.equalsIgnoreCase("Admin");
+        
+        // 1. Master User HANYA untuk Admin
+        Master.setVisible(isAdmin);
+        
+        // 2. Master Data HANYA untuk Admin
+        btnMaster.setVisible(isAdmin);
         
         // 3. Jadwal Ajar HANYA untuk Dosen
         btnJadwalAjar.setVisible(role.equalsIgnoreCase("Dosen"));
         
         // 4. Finalisasi KRS HANYA untuk Kaprodi (Hilang samsek untuk user lain)
         boolean isKaprodi = (role.equalsIgnoreCase("Dosen") && posisi.equalsIgnoreCase("Kaprodi"));
-        btnFinalisasiKRS.setVisible(isKaprodi); 
+        btnFinalisasiKRS.setVisible(isKaprodi);
     }
     
     private void tampilkanJumlahBimbingan() {
