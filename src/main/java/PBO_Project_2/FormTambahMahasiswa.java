@@ -24,6 +24,10 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
     initComponents();
     tampilkan_combobox();
     
+    // --- TAMBAHKAN INI ---
+        this.setSize(602, 560); // Ganti angka ini sesuai ukuran desain aslimu
+       
+    
     if (data != null) {
         isEdit = true;
         jLabel2.setText("Update Data Mahasiswa");
@@ -56,52 +60,50 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
         jLabel7 = new javax.swing.JLabel();
         txtNama = new javax.swing.JTextField();
         txtAngkatan = new javax.swing.JTextField();
-        txtPass = new javax.swing.JTextField();
         btnBatal = new javax.swing.JButton();
         btnSimpan = new javax.swing.JButton();
         cbProdi = new javax.swing.JComboBox<>();
         cbDosen = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
-        txtConfirmPass = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
         txtSemester = new javax.swing.JTextField();
-        jLabel9 = new javax.swing.JLabel();
+        txtPass = new javax.swing.JPasswordField();
+        txtConfirmPass = new javax.swing.JPasswordField();
+        jLabel10 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        getContentPane().add(txtId, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 100, 370, -1));
+        getContentPane().add(txtId, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 80, 370, -1));
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 45, -1, -1));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel2.setText("Tambah Data Mahasiswa Baru:");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, -1, -1));
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 73, -1, -1));
         getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 564, -1, -1));
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 592, -1, -1));
         getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 623, -1, -1));
         getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 654, -1, -1));
-        getContentPane().add(txtNama, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 150, 370, -1));
-        getContentPane().add(txtAngkatan, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 300, 370, -1));
-        getContentPane().add(txtPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 350, 370, -1));
+        getContentPane().add(txtNama, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 130, 370, -1));
+        getContentPane().add(txtAngkatan, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 280, 370, -1));
 
         btnBatal.setText("Back");
         btnBatal.addActionListener(this::btnBatalActionPerformed);
-        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 490, -1, -1));
+        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 480, -1, -1));
 
         btnSimpan.setText("Save");
         btnSimpan.addActionListener(this::btnSimpanActionPerformed);
-        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 490, -1, -1));
-        getContentPane().add(cbProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 200, 370, -1));
-        getContentPane().add(cbDosen, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 250, 370, -1));
+        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 480, -1, -1));
+        getContentPane().add(cbProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 180, 370, -1));
+        getContentPane().add(cbDosen, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 230, 370, -1));
         getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 691, -1, -1));
-        getContentPane().add(txtConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 400, 370, -1));
+        getContentPane().add(txtSemester, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 330, 370, -1));
 
-        jLabel10.setText("Semester");
-        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, -1, -1));
-        getContentPane().add(txtSemester, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 440, 370, -1));
+        txtPass.addActionListener(this::txtPassActionPerformed);
+        getContentPane().add(txtPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 380, 370, -1));
+        getContentPane().add(txtConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 430, 370, -1));
 
-        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Mahasiswa.png"))); // NOI18N
-        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Mahasiswa.png"))); // NOI18N
+        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 600, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -109,8 +111,9 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
     
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
      // 1. Validasi Password
-    String pass = txtPass.getText();
-    String confirmPass = txtConfirmPass.getText();
+ 
+    String pass = new String(txtPass.getPassword());
+    String confirmPass = new String(txtConfirmPass.getPassword());
     
     if (!pass.equals(confirmPass)) {
         JOptionPane.showMessageDialog(this, "Password dan Confirm Password tidak cocok!");
@@ -190,6 +193,10 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
          this.dispose(); // Menutup popup tanpa simpan
     }//GEN-LAST:event_btnBatalActionPerformed
 
+    private void txtPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPassActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPassActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -264,12 +271,11 @@ public FormTambahMahasiswa(java.awt.Frame parent, boolean modal, String[] data) 
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JTextField txtAngkatan;
-    private javax.swing.JTextField txtConfirmPass;
+    private javax.swing.JPasswordField txtConfirmPass;
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtNama;
-    private javax.swing.JTextField txtPass;
+    private javax.swing.JPasswordField txtPass;
     private javax.swing.JTextField txtSemester;
     // End of variables declaration//GEN-END:variables
 }

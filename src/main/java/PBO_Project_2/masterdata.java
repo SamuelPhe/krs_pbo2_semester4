@@ -14,6 +14,7 @@ public class masterdata extends javax.swing.JFrame {
     public masterdata() {
         initComponents();
         this.setLocationRelativeTo(null);
+        this.setSize(600, 635);
     }
     
 
@@ -49,12 +50,12 @@ public class masterdata extends javax.swing.JFrame {
         btnMatkul.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnMatkul.setText("Data Matkul");
         btnMatkul.addActionListener(this::btnMatkulActionPerformed);
-        getContentPane().add(btnMatkul, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 280, -1));
+        getContentPane().add(btnMatkul, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 210, 280, -1));
 
         btnJadwal.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnJadwal.setText("Data Jadwal");
         btnJadwal.addActionListener(this::btnJadwalActionPerformed);
-        getContentPane().add(btnJadwal, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, 280, -1));
+        getContentPane().add(btnJadwal, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 280, 280, -1));
 
         back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         back.setText("Back");
@@ -65,15 +66,15 @@ public class masterdata extends javax.swing.JFrame {
         btnRuang.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnRuang.setText("Data Ruang");
         btnRuang.addActionListener(this::btnRuangActionPerformed);
-        getContentPane().add(btnRuang, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 370, 280, -1));
+        getContentPane().add(btnRuang, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 350, 280, -1));
 
         btnKelas.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnKelas.setText("Data Kelas");
         btnKelas.addActionListener(this::btnKelasActionPerformed);
-        getContentPane().add(btnKelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 440, 280, -1));
+        getContentPane().add(btnKelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 420, 280, -1));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Master Data.png"))); // NOI18N
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 610, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 600, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

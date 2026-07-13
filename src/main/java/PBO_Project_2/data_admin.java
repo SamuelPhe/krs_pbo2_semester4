@@ -10,6 +10,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
+import javax.swing.table.TableColumn;
+import java.awt.Component;
+import javax.swing.table.TableCellRenderer;
 
 public class data_admin extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(data_admin.class.getName());
@@ -39,10 +42,32 @@ public class data_admin extends javax.swing.JFrame {
                 });
             }
             tabelAdmin.setModel(model);
+            aturLebarKolom();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Gagal load data: " + e.getMessage());
         }
     }
+    
+    private void aturLebarKolom() {
+    for (int column = 0; column < tabelAdmin.getColumnCount(); column++) {
+        TableColumn tableColumn = tabelAdmin.getColumnModel().getColumn(column);
+        int preferredWidth = tableColumn.getMinWidth();
+        
+        for (int row = 0; row < tabelAdmin.getRowCount(); row++) {
+            TableCellRenderer cellRenderer = tabelAdmin.getCellRenderer(row, column);
+            Component c = tabelAdmin.prepareRenderer(cellRenderer, row, column);
+            int width = c.getPreferredSize().width + tabelAdmin.getIntercellSpacing().width;
+            preferredWidth = Math.max(preferredWidth, width);
+
+            // Batasi agar tidak terlalu lebar
+            if (preferredWidth >= 300) {
+                preferredWidth = 300;
+                break;
+            }
+        }
+        tableColumn.setPreferredWidth(preferredWidth);
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -77,30 +102,30 @@ public class data_admin extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tabelAdmin);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 640, 290));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 640, 490));
 
         bthAdd.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         bthAdd.setText("Add");
         bthAdd.addActionListener(this::bthAddActionPerformed);
-        getContentPane().add(bthAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 140, 190, -1));
+        getContentPane().add(bthAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 190, 190, -1));
 
         btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnEdit.setText("Edit");
         btnEdit.addActionListener(this::btnEditActionPerformed);
-        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 230, 190, -1));
+        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 330, 190, -1));
 
         btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.addActionListener(this::btnDeleteActionPerformed);
-        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 320, 190, -1));
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 470, 190, -1));
 
-        back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        back.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         back.setText("Back");
         back.addActionListener(this::backActionPerformed);
-        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 460, 150, 40));
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 620, 150, 40));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Dosen (1).png"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -135,29 +160,46 @@ public class data_admin extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-       int baris = tabelAdmin.getSelectedRow();
-    if (baris != -1) {
-        String id = tabelAdmin.getValueAt(baris, 0).toString();
-        int konfirmasi = JOptionPane.showConfirmDialog(this, "Hapus Admin dengan ID " + id + "?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
-        
-        if (konfirmasi == JOptionPane.YES_OPTION) {
-            try {
-                database db = new database();
-                Connection conn = db.getConnection();
-                String sql = "DELETE FROM admin WHERE id_admin = ?";
-                PreparedStatement pst = conn.prepareStatement(sql);
-                pst.setString(1, id);
-                pst.execute();
-                
-                JOptionPane.showMessageDialog(this, "Data Berhasil Dihapus!");
-                tampilkan_data(); // Refresh tabel
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Gagal Hapus: " + e.getMessage());
+      int baris = tabelAdmin.getSelectedRow();
+        if (baris != -1) {
+            // ID Admin yang dipilih di tabel untuk dihapus
+            String idTarget = tabelAdmin.getValueAt(baris, 0).toString();
+            
+            // Mengambil ID Admin yang saat ini sedang login dari Session
+            // Catatan: Sesuaikan pemanggilan method getId() ini dengan nama method di class Session Anda
+            // (misalnya Session.getId(), Session.getIdAdmin(), atau Session.getUsername())
+            String idLogin = Session.getId(); 
+            
+            // VALIDASI: Cek apakah ID yang mau dihapus sama dengan ID yang sedang login
+            if (idTarget.equals(idLogin)) {
+                JOptionPane.showMessageDialog(this, 
+                    "Aksi ditolak! Anda tidak dapat menghapus akun Anda sendiri saat sedang login.", 
+                    "Peringatan", 
+                    JOptionPane.WARNING_MESSAGE);
+                return; // Hentikan proses, jangan lanjutkan ke penghapusan
             }
+
+            // Jika bukan diri sendiri, lanjutkan ke konfirmasi penghapusan
+            int konfirmasi = JOptionPane.showConfirmDialog(this, "Hapus Admin dengan ID " + idTarget + "?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+            
+            if (konfirmasi == JOptionPane.YES_OPTION) {
+                try {
+                    database db = new database();
+                    Connection conn = db.getConnection();
+                    String sql = "DELETE FROM admin WHERE id_admin = ?";
+                    PreparedStatement pst = conn.prepareStatement(sql);
+                    pst.setString(1, idTarget);
+                    pst.execute();
+                    
+                    JOptionPane.showMessageDialog(this, "Data Berhasil Dihapus!");
+                    tampilkan_data(); // Refresh tabel
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Gagal Hapus: " + e.getMessage());
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih baris yang ingin dihapus!");
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Pilih baris yang ingin dihapus!");
-    }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     /**

@@ -47,8 +47,8 @@ public class FormTambahAdmin extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         txtNamaAdmin = new javax.swing.JTextField();
-        txtPass = new javax.swing.JTextField();
-        txtConfirmPass = new javax.swing.JTextField();
+        txtPass = new javax.swing.JPasswordField();
+        txtConfirmPass = new javax.swing.JPasswordField();
         jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -56,7 +56,7 @@ public class FormTambahAdmin extends javax.swing.JDialog {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setText("Tambah Data Admin Baru:");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, -1, -1));
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(16, 37, -1, -1));
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(16, 68, -1, -1));
 
@@ -71,11 +71,13 @@ public class FormTambahAdmin extends javax.swing.JDialog {
         getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(16, 105, -1, -1));
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(16, 139, -1, -1));
         getContentPane().add(txtNamaAdmin, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 150, 350, -1));
+
+        txtPass.addActionListener(this::txtPassActionPerformed);
         getContentPane().add(txtPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 200, 350, -1));
         getContentPane().add(txtConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 250, 350, -1));
 
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Admin.png"))); // NOI18N
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -83,15 +85,16 @@ public class FormTambahAdmin extends javax.swing.JDialog {
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
        String id = txtIdAdmin.getText();
     String nama = txtNamaAdmin.getText();
-    String pass = txtPass.getText();
-    String confirm = txtConfirmPass.getText();
+    // KODE BARU
+    String pass = new String(txtPass.getPassword());
+    String confirmPass = new String(txtConfirmPass.getPassword());
 
     if (id.isEmpty() || nama.isEmpty() || pass.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Semua kolom harus diisi!");
         return;
     }
 
-    if (!pass.equals(confirm)) {
+    if (!pass.equals(confirmPass)) {
         JOptionPane.showMessageDialog(this, "Password tidak cocok!");
         return;
     }
@@ -124,6 +127,10 @@ public class FormTambahAdmin extends javax.swing.JDialog {
        
         this.dispose();
     }//GEN-LAST:event_btnBatalActionPerformed
+
+    private void txtPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPassActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPassActionPerformed
 
     /**
      * @param args the command line arguments
@@ -171,9 +178,9 @@ public class FormTambahAdmin extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JTextField txtConfirmPass;
+    private javax.swing.JPasswordField txtConfirmPass;
     private javax.swing.JTextField txtIdAdmin;
     private javax.swing.JTextField txtNamaAdmin;
-    private javax.swing.JTextField txtPass;
+    private javax.swing.JPasswordField txtPass;
     // End of variables declaration//GEN-END:variables
 }

@@ -79,33 +79,31 @@ class Item {
         txtNamaProdi = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         cmbKaprodi = new javax.swing.JComboBox<>();
-        jLabel4 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel2.setText("Tambah Data Prodi Baru:");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, -1, -1));
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(612, 45, -1, -1));
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(612, 79, -1, -1));
 
         btnBatal.setText("Back");
         btnBatal.addActionListener(this::btnBatalActionPerformed);
-        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 210, -1, -1));
+        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, -1, -1));
 
         btnSimpan.setText("Save");
         btnSimpan.addActionListener(this::btnSimpanActionPerformed);
-        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 210, -1, -1));
-        getContentPane().add(txtIdProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 100, 410, -1));
-        getContentPane().add(txtNamaProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 150, 410, -1));
-
-        jLabel5.setText("Kaprodi");
+        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 240, -1, -1));
+        getContentPane().add(txtIdProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 100, 430, -1));
+        getContentPane().add(txtNamaProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, 430, -1));
         getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 180, -1, -1));
-        getContentPane().add(cmbKaprodi, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 180, 410, -1));
+        getContentPane().add(cmbKaprodi, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 180, 430, -1));
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Prodi.png"))); // NOI18N
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Prodi.png"))); // NOI18N
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -197,8 +195,8 @@ class Item {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JTextField txtIdProdi;
     private javax.swing.JTextField txtNamaProdi;
     // End of variables declaration//GEN-END:variables

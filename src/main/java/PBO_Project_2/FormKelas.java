@@ -7,6 +7,10 @@ package PBO_Project_2;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
+import javax.swing.table.TableColumn;
+import java.awt.Component;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 public class FormKelas extends javax.swing.JFrame {
 
@@ -16,6 +20,7 @@ public class FormKelas extends javax.swing.JFrame {
         initComponents();
         loadData();
         setLocationRelativeTo(null);
+        
     }
 
     public void loadData() {
@@ -32,8 +37,23 @@ public class FormKelas extends javax.swing.JFrame {
                     rs.getString("nama_kelas")
                 });
             }
+            aturLebarKolom(tblKelas);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Gagal memuat data kelas: " + e.getMessage());
+        }
+    }
+    
+    private void aturLebarKolom(javax.swing.JTable tabel) {
+        TableColumnModel columnModel = tabel.getColumnModel();
+        for (int col = 0; col < tabel.getColumnCount(); col++) {
+            int width = 50; // Lebar minimal
+            for (int row = 0; row < tabel.getRowCount(); row++) {
+                TableCellRenderer renderer = tabel.getCellRenderer(row, col);
+                Component comp = tabel.prepareRenderer(renderer, row, col);
+                width = Math.max(comp.getPreferredSize().width + 10, width);
+            }
+            // Batasi maksimal agar tidak terlalu lebar
+            columnModel.getColumn(col).setPreferredWidth(Math.min(width, 300));
         }
     }
     
@@ -50,16 +70,19 @@ public class FormKelas extends javax.swing.JFrame {
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel2.setText("Tambah Jadwal Baru:");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        jLabel3.setText("Nama Kelas");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 9, -1, -1));
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 268, -1, -1));
 
         tblKelas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -74,64 +97,30 @@ public class FormKelas extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tblKelas);
 
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, 610, 480));
+
+        btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnAdd.setText("Add");
         btnAdd.addActionListener(this::btnAddActionPerformed);
+        getContentPane().add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 170, 240, -1));
 
+        btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnEdit.setText("Edit");
         btnEdit.addActionListener(this::btnEditActionPerformed);
+        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 290, 240, -1));
 
+        btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.addActionListener(this::btnDeleteActionPerformed);
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 420, 240, -1));
 
+        btnBack.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnBack.setText("Back");
         btnBack.addActionListener(this::btnBackActionPerformed);
+        getContentPane().add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 620, 130, 40));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnBack)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(47, 47, 47)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnAdd)
-                            .addComponent(btnEdit)
-                            .addComponent(btnDelete)))
-                    .addComponent(jLabel3))
-                .addContainerGap(29, Short.MAX_VALUE))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 310, Short.MAX_VALUE)
-                    .addComponent(jLabel4)
-                    .addGap(0, 310, Short.MAX_VALUE)))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(9, 9, 9)
-                .addComponent(jLabel3)
-                .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnAdd)
-                        .addGap(33, 33, 33)
-                        .addComponent(btnEdit)
-                        .addGap(36, 36, 36)
-                        .addComponent(btnDelete))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
-                .addComponent(btnBack)
-                .addGap(41, 41, 41))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 268, Short.MAX_VALUE)
-                    .addComponent(jLabel4)
-                    .addGap(0, 269, Short.MAX_VALUE)))
-        );
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Kelas.png"))); // NOI18N
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -208,6 +197,7 @@ public class FormKelas extends javax.swing.JFrame {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

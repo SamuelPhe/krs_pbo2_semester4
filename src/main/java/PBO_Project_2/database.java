@@ -165,6 +165,18 @@ public class database {
             return false;
         }
     }
+    
+  public boolean updateDosenPAMahasiswa(int idMahasiswa, int idDosenPA) {
+    String sql = "UPDATE mahasiswa SET id_dosen_pa = ? WHERE id_mahasiswa = ?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, idDosenPA);
+        ps.setInt(2, idMahasiswa);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
 
     public boolean deleteDosen(int idDosen) {
         String sql = "DELETE FROM dosen WHERE id_dosen = ?";
@@ -183,26 +195,27 @@ public class database {
     // ══════════════════════════════════════════════════════════════════════════
     
     // PERHATIKAN PARAMETERNYA SEKARANG ADA TAMBAHAN 'int semester'
-    public boolean tambahMahasiswa(int idProdi, int idDosen, String nama, int angkatan, int semester, String password) {
-        // Jangan lupa tambahkan kolom 'semester' di query INSERT
-        String sql = "INSERT INTO mahasiswa (id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, semester, password) VALUES (?, ?, ?, ?, ?, ?)";
+ public boolean tambahMahasiswa(int idProdi, int idDosenPA, String nama, int angkatan, int semester, String password) {
+    String sql = "INSERT INTO mahasiswa (id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, semester, password) VALUES (?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, idProdi);
         
-        try {
-            PreparedStatement pst = conn.prepareStatement(sql);
-            pst.setInt(1, idProdi);
-            pst.setInt(2, idDosen);
-            pst.setString(3, nama);
-            pst.setInt(4, angkatan);
-            pst.setInt(5, semester); // <-- MASUKKAN DATA SEMESTER KE DATABASE
-            pst.setString(6, password);
-            
-            pst.executeUpdate();
-            return true;
-        } catch (Exception e) {
-            System.out.println("Gagal menambahkan mahasiswa: " + e.getMessage());
-            return false;
+        // Jika idDosenPA adalah 0, masukkan null ke database
+        if (idDosenPA == 0) {
+            ps.setNull(2, java.sql.Types.INTEGER);
+        } else {
+            ps.setInt(2, idDosenPA);
         }
+        
+        ps.setString(3, nama);
+        ps.setInt(4, angkatan);
+        ps.setInt(5, semester);
+        ps.setString(6, password);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        return false;
     }
+}
     
     public ResultSet getAllMahasiswa() {
         String sql = "SELECT m.*, p.nama_prodi, d.nama_dosen AS nama_dosen_pa " +
@@ -298,6 +311,21 @@ public class database {
         }
     }
 
+    public int getIdDosenPAMahasiswa(int idMahasiswa) {
+    int idDosen = 0;
+    String sql = "SELECT id_dosen_pa FROM mahasiswa WHERE id_mahasiswa = ?";
+    try {
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setInt(1, idMahasiswa);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            idDosen = rs.getInt("id_dosen_pa");
+        }
+    } catch (SQLException e) {
+        System.out.println("Error cek dosen PA: " + e.getMessage());
+    }
+    return idDosen; // Akan mengembalikan 0 jika belum ada dosen PA (NULL)
+}
 
     // ══════════════════════════════════════════════════════════════════════════
     //  CRUD - MATKUL

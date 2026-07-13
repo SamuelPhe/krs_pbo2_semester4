@@ -7,7 +7,7 @@
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>25</maven.compiler.release>
+        <maven.compiler.release>8</maven.compiler.release>
         <exec.mainClass>com.mycompany.pbo_project_2.PBO_Project_2</exec.mainClass>
     </properties>
 <dependencies>
@@ -20,6 +20,12 @@
         <groupId>org.netbeans.external</groupId>
         <artifactId>AbsoluteLayout</artifactId>
       <version>RELEASE280</version>
+    </dependency>
+    <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>7.0.3</version>
+      <type>jar</type>
     </dependency>
 </dependencies>
 </project>

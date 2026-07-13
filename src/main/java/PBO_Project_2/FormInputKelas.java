@@ -24,6 +24,7 @@ public class FormInputKelas extends javax.swing.JDialog {
     public FormInputKelas(java.awt.Frame parent, boolean modal, int id, String nama) {
         super(parent, modal);
         initComponents();
+        jLabel3.setText("Edit Data Kelas");
         setLocationRelativeTo(parent);
         this.parentForm = (FormKelas) parent;
         this.idKelasEdit = id;
@@ -44,55 +45,29 @@ public class FormInputKelas extends javax.swing.JDialog {
         txtNamaKelas = new javax.swing.JTextField();
         btnBatal = new javax.swing.JButton();
         btnSimpan = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel3.setText("Tambah Kelas Baru:");
-
-        Teks.setText("Nama Kelas:");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, -1, -1));
+        getContentPane().add(Teks, new org.netbeans.lib.awtextra.AbsoluteConstraints(22, 75, 82, -1));
 
         txtNamaKelas.addActionListener(this::txtNamaKelasActionPerformed);
+        getContentPane().add(txtNamaKelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 90, 420, -1));
 
         btnBatal.setText("Back");
         btnBatal.addActionListener(this::btnBatalActionPerformed);
+        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 190, -1, -1));
 
         btnSimpan.setText("Save");
         btnSimpan.addActionListener(this::btnSimpanActionPerformed);
+        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 190, -1, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnBatal)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnSimpan))
-                    .addComponent(jLabel3)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(Teks, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtNamaKelas)))
-                .addContainerGap(48, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel3)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Teks)
-                    .addComponent(txtNamaKelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(52, 52, 52)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnBatal)
-                    .addComponent(btnSimpan))
-                .addContainerGap(31, Short.MAX_VALUE))
-        );
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Kelas.png"))); // NOI18N
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -165,6 +140,7 @@ public class FormInputKelas extends javax.swing.JDialog {
     private javax.swing.JLabel Teks;
     private javax.swing.JButton btnBatal;
     private javax.swing.JButton btnSimpan;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField txtNamaKelas;
     // End of variables declaration//GEN-END:variables

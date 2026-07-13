@@ -7,6 +7,9 @@ package PBO_Project_2;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import java.sql.*;
+import javax.swing.table.TableColumn;
+import java.awt.Component;
+import javax.swing.table.TableCellRenderer;
 
 public class data_mahasiswa extends javax.swing.JFrame {
     
@@ -55,8 +58,8 @@ public class data_mahasiswa extends javax.swing.JFrame {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("ID Mahasiswa");
         model.addColumn("Nama");
-        model.addColumn("ID Prodi");
-        model.addColumn("ID Dosen PA");
+        model.addColumn("Prodi");
+        model.addColumn("Dosen PA");
         model.addColumn("Angkatan");
         model.addColumn("Semester");
 
@@ -93,10 +96,32 @@ public class data_mahasiswa extends javax.swing.JFrame {
                 });
             }
             tabelMhs.setModel(model);
+            aturLebarKolom();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Gagal load: " + e.getMessage());
         }
     }  
+    
+    private void aturLebarKolom() {
+    for (int column = 0; column < tabelMhs.getColumnCount(); column++) {
+        TableColumn tableColumn = tabelMhs.getColumnModel().getColumn(column);
+        int preferredWidth = tableColumn.getMinWidth();
+        
+        for (int row = 0; row < tabelMhs.getRowCount(); row++) {
+            TableCellRenderer cellRenderer = tabelMhs.getCellRenderer(row, column);
+            Component c = tabelMhs.prepareRenderer(cellRenderer, row, column);
+            int width = c.getPreferredSize().width + tabelMhs.getIntercellSpacing().width;
+            preferredWidth = Math.max(preferredWidth, width);
+
+            // Batasi agar tidak terlalu lebar (misal 300px)
+            if (preferredWidth >= 300) {
+                preferredWidth = 300;
+                break;
+            }
+        }
+        tableColumn.setPreferredWidth(preferredWidth);
+    }
+}
     /**
      * Creates new form data_mahasiswa
      */
@@ -141,30 +166,30 @@ public class data_mahasiswa extends javax.swing.JFrame {
         });
         tableMhs.setViewportView(tabelMhs);
 
-        getContentPane().add(tableMhs, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, 670, 350));
+        getContentPane().add(tableMhs, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 710, 500));
 
         btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnAdd.setText("Add");
         btnAdd.addActionListener(this::btnAddActionPerformed);
-        getContentPane().add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 200, 220, -1));
+        getContentPane().add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 190, 220, -1));
 
         btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnEdit.setText("Edit");
         btnEdit.addActionListener(this::btnEditActionPerformed);
-        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 280, 220, -1));
+        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 320, 220, -1));
 
         btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.addActionListener(this::btnDeleteActionPerformed);
-        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 360, 220, -1));
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 450, 220, -1));
 
-        back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        back.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         back.setText("Back");
         back.addActionListener(this::backActionPerformed);
-        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 500, 120, 40));
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 620, 120, 40));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Mahasiswa.png"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, 1000, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -207,39 +232,52 @@ public class data_mahasiswa extends javax.swing.JFrame {
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
 int baris = tabelMhs.getSelectedRow();
     if (baris != -1) {
-        // Ambil semua data dari baris yang dipilih
-        String[] data = {
-          tabelMhs.getValueAt(baris, 0).toString(), // 0. id_mhs
-                tabelMhs.getValueAt(baris, 1).toString(), // 1. nama
-                tabelMhs.getValueAt(baris, 2).toString(), // 2. prodi
-                tabelMhs.getValueAt(baris, 3).toString(), // 3. dosen
-                tabelMhs.getValueAt(baris, 4).toString(), // 4. angkatan
-                tabelMhs.getValueAt(baris, 5).toString()  // 5. semester <-- INI YANG TADI KETINGGALAN
-        };
+        // Gunakan fungsi bantu untuk mengambil nilai dengan aman
+        String idMhs = getSafeValue(tabelMhs, baris, 0);
+        String nama = getSafeValue(tabelMhs, baris, 1);
+        String prodi = getSafeValue(tabelMhs, baris, 2);
+        String dosen = getSafeValue(tabelMhs, baris, 3);
+        String angkatan = getSafeValue(tabelMhs, baris, 4);
+        String semester = getSafeValue(tabelMhs, baris, 5);
 
-        // Panggil popup dengan membawa array data
+        String[] data = {idMhs, nama, prodi, dosen, angkatan, semester};
+
         FormTambahMahasiswa popup = new FormTambahMahasiswa(this, true, data);
         popup.setVisible(true);
-        tampilkan_data(); // Refresh tabel setelah popup tutup
+        tampilkan_data(); 
     } else {
         JOptionPane.showMessageDialog(this, "Pilih dulu mahasiswa yang mau diedit!");
     }
+}
+
+// Fungsi BANTU untuk menghindari NullPointerException
+private String getSafeValue(javax.swing.JTable table, int row, int col) {
+    Object value = table.getValueAt(row, col);
+    return (value == null) ? "" : value.toString();
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void tabelMhsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelMhsMouseClicked
-    int baris = tabelMhs.getSelectedRow();
+   int baris = tabelMhs.getSelectedRow();
     if (baris == -1) return;
 
-    String idBarisTerpilih = tabelMhs.getValueAt(baris, 0).toString();
-
-    // Jika Role adalah Mahasiswa, cek apakah ID yang diklik adalah milik dia sendiri
-    if ("Mahasiswa".equalsIgnoreCase(Session.getRole())) {
-        // Kita bandingkan dengan idMhsFilter yang sudah di-set di constructor
+    String role = Session.getRole();
+    
+    // Jika Admin, selalu aktifkan tombol Edit
+    if (role != null && role.equalsIgnoreCase("Admin")) {
+        btnEdit.setEnabled(true);
+    } 
+    // Jika Mahasiswa, hanya aktifkan jika data yang diklik adalah milik dia sendiri
+    else if (role != null && role.equalsIgnoreCase("Mahasiswa")) {
+        String idBarisTerpilih = tabelMhs.getValueAt(baris, 0).toString();
         if (idBarisTerpilih.equals(idMhsFilter)) {
             btnEdit.setEnabled(true);
         } else {
             btnEdit.setEnabled(false);
         }
+    }
+    // Jika Dosen, biasanya tidak boleh edit, jadi biarkan disable
+    else {
+        btnEdit.setEnabled(false);
     }
     }//GEN-LAST:event_tabelMhsMouseClicked
 

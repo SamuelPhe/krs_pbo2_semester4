@@ -7,12 +7,17 @@ package PBO_Project_2;
 import java.sql.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import java.awt.Component;
+import javax.swing.JTable;
+import javax.swing.table.TableCellRenderer;
 
 public class jadwal_ajar extends javax.swing.JFrame {
 
     public jadwal_ajar() {
         initComponents();
         this.setLocationRelativeTo(null);
+        this.setSize(1000, 635);
         tampilkanJadwalSaya(); 
     }
 
@@ -62,6 +67,8 @@ public class jadwal_ajar extends javax.swing.JFrame {
             });
         }
         tabelJadwalAjar.setModel(model);
+        // Tambahkan ini:
+          aturLebarKolom();
         db.disconnect();
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Gagal memuat jadwal: " + e.getMessage());
@@ -69,6 +76,27 @@ public class jadwal_ajar extends javax.swing.JFrame {
     }
 }
  
+ private void aturLebarKolom() {
+    for (int column = 0; column < tabelJadwalAjar.getColumnCount(); column++) {
+        TableColumn tableColumn = tabelJadwalAjar.getColumnModel().getColumn(column);
+        int preferredWidth = tableColumn.getMinWidth();
+        int maxWidth = tableColumn.getMaxWidth();
+
+        for (int row = 0; row < tabelJadwalAjar.getRowCount(); row++) {
+            TableCellRenderer cellRenderer = tabelJadwalAjar.getCellRenderer(row, column);
+            Component c = tabelJadwalAjar.prepareRenderer(cellRenderer, row, column);
+            int width = c.getPreferredSize().width + tabelJadwalAjar.getIntercellSpacing().width;
+            preferredWidth = Math.max(preferredWidth, width);
+
+            // Batasi agar tidak terlalu lebar (misal max 300px)
+            if (preferredWidth >= 300) {
+                preferredWidth = 300;
+                break;
+            }
+        }
+        tableColumn.setPreferredWidth(preferredWidth);
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -83,10 +111,14 @@ public class jadwal_ajar extends javax.swing.JFrame {
         tabelJadwalAjar = new javax.swing.JTable();
         btnLihatMahasiswa = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("Halaman Jadwal Mengajar Dosen");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 70, -1, -1));
 
         tabelJadwalAjar.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -101,41 +133,20 @@ public class jadwal_ajar extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tabelJadwalAjar);
 
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 120, 820, 310));
+
+        btnLihatMahasiswa.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnLihatMahasiswa.setText("Lihat Daftar Mahasiswa");
         btnLihatMahasiswa.addActionListener(this::btnLihatMahasiswaActionPerformed);
+        getContentPane().add(btnLihatMahasiswa, new org.netbeans.lib.awtextra.AbsoluteConstraints(681, 472, 240, 40));
 
+        btnBack.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnBack.setText("Back");
         btnBack.addActionListener(this::btnBackActionPerformed);
+        getContentPane().add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 480, 140, 40));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnBack)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnLihatMahasiswa))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel1)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 553, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(30, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnLihatMahasiswa)
-                    .addComponent(btnBack))
-                .addContainerGap(20, Short.MAX_VALUE))
-        );
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Rectangle (right).png"))); // NOI18N
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1050, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -188,6 +199,7 @@ public class jadwal_ajar extends javax.swing.JFrame {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnLihatMahasiswa;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tabelJadwalAjar;
     // End of variables declaration//GEN-END:variables

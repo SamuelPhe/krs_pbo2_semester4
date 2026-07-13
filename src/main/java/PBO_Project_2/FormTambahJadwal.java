@@ -20,6 +20,7 @@ public class FormTambahJadwal extends javax.swing.JDialog {
     public FormTambahJadwal(java.awt.Frame parent, boolean modal, String[] data) {
         super(parent, modal);
         initComponents();
+          this.setSize(610, 436); // Ganti angka ini sesuai ukuran desain aslimu
         
         // --- 1. MEMAKSA FORMAT JAM PADA JSPINNER ---
         javax.swing.JSpinner.DateEditor editorMulai = new javax.swing.JSpinner.DateEditor(spinJamMulai, "HH:mm:ss");
@@ -139,7 +140,7 @@ public class FormTambahJadwal extends javax.swing.JDialog {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel2.setText("Tambah Jadwal Baru:");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 10, -1, -1));
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 53, -1, -1));
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 87, -1, -1));
         getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 127, -1, -1));
@@ -172,7 +173,7 @@ public class FormTambahJadwal extends javax.swing.JDialog {
         getContentPane().add(spinJamSelesai, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 300, 160, -1));
 
         jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Jadwal.png"))); // NOI18N
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

@@ -18,6 +18,7 @@ public class dashboard extends javax.swing.JFrame {
 
     public dashboard() {
         initComponents();
+        this.setSize(1000, 635);
         this.setLocationRelativeTo(null);
         
         tampilkanJumlahBimbingan();
@@ -34,12 +35,12 @@ public class dashboard extends javax.swing.JFrame {
             user.setText("Selamat Datang, " + role + " " + nama + "!");
         }
         
-        // --- ATURAN VISIBILITAS TOMBOL ---
-        
-       // --- ATURAN VISIBILITAS TOMBOL ---
-        
-        // Cek apakah yang login adalah Admin
+        // Definisikan variabel boolean untuk kemudahan logika
         boolean isAdmin = role.equalsIgnoreCase("Admin");
+        boolean isMahasiswa = role.equalsIgnoreCase("Mahasiswa");
+        boolean isDosen = role.equalsIgnoreCase("Dosen");
+        boolean isKaprodi = (isDosen && posisi.equalsIgnoreCase("Kaprodi"));
+        boolean isDosenPA = (isDosen && posisi.equalsIgnoreCase("Dosen PA"));
         
         // 1. Master User HANYA untuk Admin
         Master.setVisible(isAdmin);
@@ -48,11 +49,22 @@ public class dashboard extends javax.swing.JFrame {
         btnMaster.setVisible(isAdmin);
         
         // 3. Jadwal Ajar HANYA untuk Dosen
-        btnJadwalAjar.setVisible(role.equalsIgnoreCase("Dosen"));
+        btnJadwalAjar.setVisible(isDosen);
         
-        // 4. Finalisasi KRS HANYA untuk Kaprodi (Hilang samsek untuk user lain)
-        boolean isKaprodi = (role.equalsIgnoreCase("Dosen") && posisi.equalsIgnoreCase("Kaprodi"));
+        // 4. Finalisasi KRS HANYA untuk Kaprodi
         btnFinalisasiKRS.setVisible(isKaprodi);
+        
+        // 5. Mahasiswa PA HANYA untuk Dosen PA dan Kaprodi
+        btnMahasiswaPA.setVisible(isDosenPA || isKaprodi);
+        
+        // 6. Riwayat KRS HANYA untuk Admin
+        btnRiwayatKRS.setVisible(isAdmin);
+        
+        // 7. Data KRS: HANYA untuk Admin, Mahasiswa, Dosen PA, dan Kaprodi
+        KRSButton.setVisible(isAdmin || isMahasiswa || isDosenPA || isKaprodi);
+        
+        // Edit Profile bisa diakses semua
+        btnEditProfile.setVisible(true);
     }
     
     private void tampilkanJumlahBimbingan() {
@@ -84,6 +96,9 @@ public class dashboard extends javax.swing.JFrame {
         KRSButton = new javax.swing.JButton();
         btnJadwalAjar = new javax.swing.JButton();
         btnFinalisasiKRS = new javax.swing.JButton();
+        btnEditProfile = new javax.swing.JButton();
+        btnMahasiswaPA = new javax.swing.JButton();
+        btnRiwayatKRS = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -92,7 +107,7 @@ public class dashboard extends javax.swing.JFrame {
         Master.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         Master.setText("Master User");
         Master.addActionListener(this::MasterActionPerformed);
-        getContentPane().add(Master, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 190, -1));
+        getContentPane().add(Master, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 390, 190, 40));
 
         user.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         user.setText("Selamat Datang di Dashboard, ...");
@@ -102,7 +117,7 @@ public class dashboard extends javax.swing.JFrame {
         Logout.setText("Log Out");
         Logout.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         Logout.addActionListener(this::LogoutActionPerformed);
-        getContentPane().add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 540, -1, -1));
+        getContentPane().add(Logout, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 550, -1, -1));
         Logout.getAccessibleContext().setAccessibleDescription("");
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -112,25 +127,40 @@ public class dashboard extends javax.swing.JFrame {
         btnMaster.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnMaster.setText("Master Data");
         btnMaster.addActionListener(this::btnMasterActionPerformed);
-        getContentPane().add(btnMaster, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 220, 190, -1));
+        getContentPane().add(btnMaster, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 450, 190, -1));
 
         KRSButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         KRSButton.setText("Data KRS");
         KRSButton.addActionListener(this::KRSButtonActionPerformed);
-        getContentPane().add(KRSButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 280, 190, -1));
+        getContentPane().add(KRSButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 190, -1));
 
         btnJadwalAjar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnJadwalAjar.setText("Jadwal Ajar");
         btnJadwalAjar.addActionListener(this::btnJadwalAjarActionPerformed);
-        getContentPane().add(btnJadwalAjar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 340, 190, -1));
+        getContentPane().add(btnJadwalAjar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, 190, -1));
 
         btnFinalisasiKRS.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnFinalisasiKRS.setText("Finalisasi KRS");
         btnFinalisasiKRS.addActionListener(this::btnFinalisasiKRSActionPerformed);
-        getContentPane().add(btnFinalisasiKRS, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 400, 190, -1));
+        getContentPane().add(btnFinalisasiKRS, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 190, -1));
+
+        btnEditProfile.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnEditProfile.setText("Edit Profile");
+        btnEditProfile.addActionListener(this::btnEditProfileActionPerformed);
+        getContentPane().add(btnEditProfile, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 190, -1));
+
+        btnMahasiswaPA.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnMahasiswaPA.setText("Mahasiswa PA");
+        btnMahasiswaPA.addActionListener(this::btnMahasiswaPAActionPerformed);
+        getContentPane().add(btnMahasiswaPA, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 250, 190, -1));
+
+        btnRiwayatKRS.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnRiwayatKRS.setText("Riwayat KRS");
+        btnRiwayatKRS.addActionListener(this::btnRiwayatKRSActionPerformed);
+        getContentPane().add(btnRiwayatKRS, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, 190, -1));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/home page (2).png"))); // NOI18N
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -164,26 +194,36 @@ public class dashboard extends javax.swing.JFrame {
 
     private void KRSButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KRSButtonActionPerformed
   String role = (Session.getRole() != null) ? Session.getRole().trim() : "";
-        String posisi = (Session.getPosisi() != null) ? Session.getPosisi().trim() : ""; 
+    String posisi = (Session.getPosisi() != null) ? Session.getPosisi().trim() : ""; 
 
-        if (role.equalsIgnoreCase("admin")) {
-            new data_krs().setVisible(true);
-        } 
-        else if (role.equalsIgnoreCase("mahasiswa")) {
-            new Pengajuan_KRS().setVisible(true);
-        } 
-        else if (role.equalsIgnoreCase("dosen") && posisi.equalsIgnoreCase("Dosen PA")) {
-            new Acc_KRS_DosenPA().setVisible(true); 
-        } 
-        else if (role.equalsIgnoreCase("dosen") && posisi.equalsIgnoreCase("Kaprodi")) {
-            new Acc_KRS_DosenPA().setVisible(true); 
-        }
-        else {
-            JOptionPane.showMessageDialog(this, "Role atau Posisi Anda tidak memiliki akses ke halaman KRS.");
-            return;
-        }
-        
+    if (role.equalsIgnoreCase("admin")) {
+        new data_krs().setVisible(true);
         this.dispose();
+    } 
+    else if (role.equalsIgnoreCase("mahasiswa")) {
+        // --- TAMBAHAN LOGIKA CEK DOSEN PA ---
+        database db = new database();
+        int idMhs = Integer.parseInt(Session.getId());
+        
+        // Panggil fungsi untuk cek apakah dosen_pa masih null/0
+        if (db.getIdDosenPAMahasiswa(idMhs) == 0) {
+            JOptionPane.showMessageDialog(this, 
+                "Akses Ditolak! Dosen Pembimbing Akademik Anda belum ditentukan oleh Admin.\n" +
+                "Silakan hubungi Admin untuk proses penugasan.", 
+                "Peringatan", JOptionPane.WARNING_MESSAGE);
+            return; // Berhenti, form Pengajuan_KRS tidak terbuka
+        }
+        // Jika sudah ada Dosen PA, baru boleh lanjut
+        new Pengajuan_KRS().setVisible(true);
+        this.dispose();
+    } 
+    else if (role.equalsIgnoreCase("dosen") && (posisi.equalsIgnoreCase("Dosen PA") || posisi.equalsIgnoreCase("Kaprodi"))) {
+        new Acc_KRS_DosenPA().setVisible(true); 
+        this.dispose();
+    }
+    else {
+        JOptionPane.showMessageDialog(this, "Role atau Posisi Anda tidak memiliki akses ke halaman KRS.");
+    }
     }//GEN-LAST:event_KRSButtonActionPerformed
 
     private void btnJadwalAjarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJadwalAjarActionPerformed
@@ -192,11 +232,39 @@ public class dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_btnJadwalAjarActionPerformed
 
     private void btnFinalisasiKRSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalisasiKRSActionPerformed
-     // Karena tombol sudah di-set visible(false) untuk non-Kaprodi, 
-    // di sini cukup panggil formnya langsung
+    // Buka Form Edit Profile
     new Finalisasi_KRS().setVisible(true);
+    // Tutup Dashboard (karena nanti setelah save akan diarahkan ke login)
     this.dispose();
     }//GEN-LAST:event_btnFinalisasiKRSActionPerformed
+
+    private void btnEditProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditProfileActionPerformed
+    // Buka Form Edit Profile yang baru saja kita buat
+        new FormEditProfile().setVisible(true);
+        
+        // Tutup Dashboard (karena nanti setelah save akan diarahkan otomatis ke login)
+        this.dispose();
+    }//GEN-LAST:event_btnEditProfileActionPerformed
+
+    private void btnMahasiswaPAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMahasiswaPAActionPerformed
+      String role = (Session.getRole() != null) ? Session.getRole().trim() : "";
+        String posisi = (Session.getPosisi() != null) ? Session.getPosisi().trim() : "";
+
+        // Double check keamanan
+        if (role.equalsIgnoreCase("Dosen") && (posisi.equalsIgnoreCase("Dosen PA") || posisi.equalsIgnoreCase("Kaprodi"))) {
+            new DataMahasiswaBimbingan().setVisible(true);
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Akses ditolak! Anda tidak memiliki hak akses ke menu Mahasiswa Bimbingan.");
+        }
+    }//GEN-LAST:event_btnMahasiswaPAActionPerformed
+
+    private void btnRiwayatKRSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRiwayatKRSActionPerformed
+    ArsipKRS_Admin arsipForm = new ArsipKRS_Admin();
+    
+    // Menampilkan form Arsip
+    arsipForm.setVisible(true);
+    }//GEN-LAST:event_btnRiwayatKRSActionPerformed
 
     /**
      * @param args the command line arguments
@@ -220,9 +288,12 @@ public class dashboard extends javax.swing.JFrame {
     private javax.swing.JButton KRSButton;
     private javax.swing.JButton Logout;
     private javax.swing.JButton Master;
+    private javax.swing.JButton btnEditProfile;
     private javax.swing.JButton btnFinalisasiKRS;
     private javax.swing.JButton btnJadwalAjar;
+    private javax.swing.JButton btnMahasiswaPA;
     private javax.swing.JButton btnMaster;
+    private javax.swing.JButton btnRiwayatKRS;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel user;

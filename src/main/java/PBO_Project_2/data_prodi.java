@@ -6,6 +6,9 @@ package PBO_Project_2;
 import java.sql.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import java.awt.Component;
+import javax.swing.table.TableCellRenderer;
 
 /**
  *
@@ -24,21 +27,53 @@ private void tampilkan_data() {
     DefaultTableModel model = new DefaultTableModel();
     model.addColumn("ID Prodi");
     model.addColumn("Nama Program Studi");
-    model.addColumn("ID Kaprodi"); // Tambahkan kolom baru
+    model.addColumn("Nama Kaprodi"); // Ganti judul kolom
 
     try {
         Connection conn = new database().getConnection();
-        ResultSet res = conn.createStatement().executeQuery("SELECT * FROM prodi");
+        // SQL baru dengan JOIN untuk mengambil nama dosen berdasarkan id_kaprodi
+        String sql = "SELECT p.id_prodi, p.nama_prodi, d.nama_dosen " +
+                     "FROM prodi p " +
+                     "LEFT JOIN dosen d ON p.id_kaprodi = d.id_dosen";
+        
+        ResultSet res = conn.createStatement().executeQuery(sql);
         while (res.next()) {
             model.addRow(new Object[]{
                 res.getString("id_prodi"), 
                 res.getString("nama_prodi"), 
-                res.getString("id_kaprodi") // Ambil dari database
+                // Jika null (belum ada kaprodi), tampilkan "-"
+                res.getString("nama_dosen") != null ? res.getString("nama_dosen") : "-"
             });
         }
         tabelProdi.setModel(model);
+        
+        // Panggil auto-adjust
+        aturLebarKolom();
+        
     } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, e.getMessage());
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+}
+
+private void aturLebarKolom() {
+    for (int column = 0; column < tabelProdi.getColumnCount(); column++) {
+        TableColumn tableColumn = tabelProdi.getColumnModel().getColumn(column);
+        int preferredWidth = tableColumn.getMinWidth();
+        int maxWidth = tableColumn.getMaxWidth();
+
+        for (int row = 0; row < tabelProdi.getRowCount(); row++) {
+            TableCellRenderer cellRenderer = tabelProdi.getCellRenderer(row, column);
+            Component c = tabelProdi.prepareRenderer(cellRenderer, row, column);
+            int width = c.getPreferredSize().width + tabelProdi.getIntercellSpacing().width;
+            preferredWidth = Math.max(preferredWidth, width);
+
+            // Batasi agar tidak terlalu lebar (misal 300px)
+            if (preferredWidth >= 300) {
+                preferredWidth = 300;
+                break;
+            }
+        }
+        tableColumn.setPreferredWidth(preferredWidth);
     }
 }
     /**
@@ -74,30 +109,30 @@ private void tampilkan_data() {
         ));
         jScrollPane1.setViewportView(tabelProdi);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, 660, 300));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, 670, 500));
 
         btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnAdd.setText("Add");
         btnAdd.addActionListener(this::btnAddActionPerformed);
-        getContentPane().add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 160, 220, -1));
+        getContentPane().add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 190, 220, -1));
 
         btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnEdit.setText("Edit");
         btnEdit.addActionListener(this::btnEditActionPerformed);
-        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 240, 220, -1));
+        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 310, 220, -1));
 
         btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.addActionListener(this::btnDeleteActionPerformed);
-        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 310, 220, -1));
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 430, 220, -1));
 
-        back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        back.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         back.setText("Back");
         back.addActionListener(this::backActionPerformed);
-        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 450, 160, 50));
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 640, 160, 50));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Prodi.png"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 800));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -151,6 +186,9 @@ private void tampilkan_data() {
                 
                 JOptionPane.showMessageDialog(this, "Data Berhasil Dihapus");
                 tampilkan_data(); // Refresh tabel biar datanya hilang
+                
+                // PANGGIL DI SINI:
+                aturLebarKolom();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Gagal Hapus: " + e.getMessage());
             }

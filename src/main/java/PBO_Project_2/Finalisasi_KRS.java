@@ -10,6 +10,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.sql.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import java.awt.Component;
 
 public class Finalisasi_KRS extends javax.swing.JFrame {
 
@@ -19,9 +23,10 @@ public class Finalisasi_KRS extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         tampilkanKRSMenungguFinalisasi();
+        cekKunciAkses();
     }
 
-  private void tampilkanKRSMenungguFinalisasi() {
+  public void tampilkanKRSMenungguFinalisasi() {
     DefaultTableModel model = new DefaultTableModel();
     model.addColumn("ID Pengajuan");      // Index 0
     model.addColumn("Nama Mahasiswa");   // Index 1
@@ -39,12 +44,15 @@ public class Finalisasi_KRS extends javax.swing.JFrame {
         }
 
         // Query join ke tabel mahasiswa untuk filter id_prodi
+       // Ubah query di dalam method tampilkanKRSMenungguFinalisasi()
         String sql = "SELECT pk.id_pengajuan, m.nama_mahasiswa, k.semester, d.nama_dosen " +
-                     "FROM pengajuan_krs pk " +
-                     "JOIN mahasiswa m ON pk.id_mahasiswa = m.id_mahasiswa " +
-                     "JOIN krs k ON pk.id_krs = k.id_krs " +
-                     "LEFT JOIN dosen d ON m.id_dosen_pa = d.id_dosen " +
-                     "WHERE pk.status_acc = 'AccDosenPA' AND m.id_prodi = ?";
+             "FROM pengajuan_krs pk " +
+             "JOIN mahasiswa m ON pk.id_mahasiswa = m.id_mahasiswa " +
+             "JOIN krs k ON pk.id_krs = k.id_krs " +
+             "LEFT JOIN dosen d ON m.id_dosen_pa = d.id_dosen " +
+             "WHERE pk.status_acc = 'AccDosenPA' " +
+             "AND m.id_prodi = ? " +
+             "AND k.status_krs = 'terbuka'"; // KUNCI UTAMA: Hanya periode yang aktif saat ini
                      
         PreparedStatement ps = db.getConnection().prepareStatement(sql);
         ps.setInt(1, idProdi); // Filter berdasarkan prodi Kaprodi
@@ -59,12 +67,43 @@ public class Finalisasi_KRS extends javax.swing.JFrame {
             });
         }
         tabelFinalisasi.setModel(model);
+        aturLebarKolom(tabelFinalisasi);
         
     } catch (Exception e) {
         JOptionPane.showMessageDialog(this, "Error load data: " + e.getMessage());
     }
 }
-    
+  
+private void cekKunciAkses() {
+    try {
+        Connection conn = new database().getConnection();
+        String sql = "SELECT id_krs FROM krs WHERE status_krs = 'terbuka' AND CURRENT_DATE BETWEEN tanggal_mulai AND tanggal_selesai";
+        Statement st = conn.createStatement();
+        ResultSet rs = st.executeQuery(sql);
+        
+        if (!rs.next()) {
+            jLabel1.setText("Finalisasi (KRS DITUTUP - Mode Baca Saja)");
+        } else {
+            jLabel1.setText("Daftar KRS Mahasiswa yang Perlu Difinalisasi");
+        }
+    } catch (Exception e) {
+        System.out.println("Error cek akses: " + e.getMessage());
+    }
+}
+
+private void aturLebarKolom(javax.swing.JTable tabel) {
+    TableColumnModel columnModel = tabel.getColumnModel();
+    for (int col = 0; col < tabel.getColumnCount(); col++) {
+        int width = 80; // Lebar minimal
+        for (int row = 0; row < tabel.getRowCount(); row++) {
+            TableCellRenderer renderer = tabel.getCellRenderer(row, col);
+            Component comp = tabel.prepareRenderer(renderer, row, col);
+            width = Math.max(comp.getPreferredSize().width + 15, width);
+        }
+        columnModel.getColumn(col).setPreferredWidth(Math.min(width, 300));
+    }
+}
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -77,14 +116,16 @@ public class Finalisasi_KRS extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelFinalisasi = new javax.swing.JTable();
-        btnSetujui = new javax.swing.JButton();
-        btnTolak = new javax.swing.JButton();
         btnDetail = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setText("Daftar KRS Mahasiswa yang Perlu Difinalisasi");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 80, -1, -1));
 
         tabelFinalisasi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -99,121 +140,38 @@ public class Finalisasi_KRS extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tabelFinalisasi);
 
-        btnSetujui.setText("Setujui");
-        btnSetujui.addActionListener(this::btnSetujuiActionPerformed);
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 150, 800, 280));
 
-        btnTolak.setText("Revisi");
-        btnTolak.addActionListener(this::btnTolakActionPerformed);
-
+        btnDetail.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnDetail.setText("Lihat Detail");
         btnDetail.addActionListener(this::btnDetailActionPerformed);
+        getContentPane().add(btnDetail, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 460, 170, 40));
 
+        btnBack.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnBack.setText("Back");
         btnBack.addActionListener(this::btnBackActionPerformed);
+        getContentPane().add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 460, 110, 40));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnBack)
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(34, 34, 34)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnSetujui)
-                            .addComponent(btnTolak)
-                            .addComponent(btnDetail))))
-                .addContainerGap(41, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(jLabel1)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(46, 46, 46)
-                        .addComponent(btnSetujui)
-                        .addGap(55, 55, 55)
-                        .addComponent(btnTolak)
-                        .addGap(59, 59, 59)
-                        .addComponent(btnDetail)))
-                .addGap(18, 18, 18)
-                .addComponent(btnBack)
-                .addContainerGap(26, Short.MAX_VALUE))
-        );
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Rectangle (right).png"))); // NOI18N
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnSetujuiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSetujuiActionPerformed
-      int baris = tabelFinalisasi.getSelectedRow();
-        if (baris == -1) {
-            JOptionPane.showMessageDialog(this, "Pilih KRS mahasiswa yang ingin difinalisasi!");
-            return;
-        }
-        
-        String idPengajuan = tabelFinalisasi.getValueAt(baris, 0).toString();
-        String namaMhs = tabelFinalisasi.getValueAt(baris, 1).toString();
-        
-        int konfirmasi = JOptionPane.showConfirmDialog(this, 
-                "Yakin ingin memfinalisasi KRS atas nama " + namaMhs + "?", 
-                "Konfirmasi Finalisasi", JOptionPane.YES_NO_OPTION);
-                
-        if (konfirmasi == JOptionPane.YES_OPTION) {
-            try {
-                Connection conn = new database().getConnection();
-                String sqlUpdate = "UPDATE pengajuan_krs SET status_acc = 'Disetujui' WHERE id_pengajuan = ?";
-                PreparedStatement ps = conn.prepareStatement(sqlUpdate);
-                ps.setString(1, idPengajuan);
-                ps.executeUpdate();
-                
-                JOptionPane.showMessageDialog(this, "KRS berhasil difinalisasi!");
-                tampilkanKRSMenungguFinalisasi();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Gagal: " + e.getMessage());
-            }
-            
-        }
-    }//GEN-LAST:event_btnSetujuiActionPerformed
-
-    private void btnTolakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTolakActionPerformed
-       int baris = tabelFinalisasi.getSelectedRow();
-        if (baris == -1) {
-            JOptionPane.showMessageDialog(this, "Pilih KRS yang ingin ditolak!");
-            return;
-        }
-        
-        String idPengajuan = tabelFinalisasi.getValueAt(baris, 0).toString();
-        String catatan = JOptionPane.showInputDialog(this, "Masukkan alasan revisi:");
-        
-        if (catatan != null && !catatan.trim().isEmpty()) {
-            try {
-                Connection conn = new database().getConnection();
-                String sqlUpdate = "UPDATE pengajuan_krs SET status_acc = 'Ditolak', catatan_revisi = ? WHERE id_pengajuan = ?";
-                PreparedStatement ps = conn.prepareStatement(sqlUpdate);
-                ps.setString(1, catatan);
-                ps.setString(2, idPengajuan);
-                ps.executeUpdate();
-                tampilkanKRSMenungguFinalisasi();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Gagal: " + e.getMessage());
-            }
-        }
-    }//GEN-LAST:event_btnTolakActionPerformed
-
     private void btnDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetailActionPerformed
-       int baris = tabelFinalisasi.getSelectedRow();
-        if (baris == -1) return;
-        String idPengajuan = tabelFinalisasi.getValueAt(baris, 0).toString();
-        new Detail_KRS(this, true, idPengajuan).setVisible(true);
+      // 1. Ambil baris yang dipilih
+    int baris = tabelFinalisasi.getSelectedRow();
+    
+    // 2. Cek apakah ada baris yang dipilih
+    if (baris == -1) {
+        // Jika tidak ada, munculkan pesan popup
+        JOptionPane.showMessageDialog(this, "Silakan pilih salah satu data KRS dari tabel terlebih dahulu!");
+        return; // Hentikan eksekusi method
+    }
+    
+    // 3. Jika sudah memilih, ambil data dan buka form detail
+    String idPengajuan = tabelFinalisasi.getValueAt(baris, 0).toString();
+    new Detail_KRS(this, true, idPengajuan).setVisible(true);
     }//GEN-LAST:event_btnDetailActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
@@ -249,9 +207,8 @@ public class Finalisasi_KRS extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnDetail;
-    private javax.swing.JButton btnSetujui;
-    private javax.swing.JButton btnTolak;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tabelFinalisasi;
     // End of variables declaration//GEN-END:variables

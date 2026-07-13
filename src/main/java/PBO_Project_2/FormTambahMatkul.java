@@ -16,6 +16,7 @@ public class FormTambahMatkul extends javax.swing.JDialog {
     public FormTambahMatkul(java.awt.Frame parent, boolean modal, String[] data) {
         super(parent, modal);
         initComponents();
+        this.setSize(600, 420);
         isiComboProdi(); // Load prodi otomatis
         
         if (data != null) {
@@ -82,11 +83,11 @@ public class FormTambahMatkul extends javax.swing.JDialog {
 
         btnBatal.setText("Back");
         btnBatal.addActionListener(this::btnBatalActionPerformed);
-        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 360, -1, -1));
+        getContentPane().add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 340, -1, -1));
 
         btnSimpan.setText("Save");
         btnSimpan.addActionListener(this::btnSimpanActionPerformed);
-        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 360, -1, -1));
+        getContentPane().add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 340, -1, -1));
         getContentPane().add(txtIdMK, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 100, 400, -1));
         getContentPane().add(txtNamaMK, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 150, 400, -1));
         getContentPane().add(txtSks, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 200, 400, -1));
@@ -98,7 +99,7 @@ public class FormTambahMatkul extends javax.swing.JDialog {
         getContentPane().add(cbProdi, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 300, 400, -1));
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add Matkul.png"))); // NOI18N
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

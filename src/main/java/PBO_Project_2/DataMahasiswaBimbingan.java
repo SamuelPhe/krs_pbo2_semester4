@@ -4,85 +4,81 @@
  */
 package PBO_Project_2;
 
-import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.swing.JOptionPane;
-import java.sql.*;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
 
-public class Acc_KRS_DosenPA extends javax.swing.JFrame {
+public class DataMahasiswaBimbingan extends javax.swing.JFrame {
 
-    private static final Logger LOGGER = Logger.getLogger(Acc_KRS_DosenPA.class.getName());
+    private DefaultTableModel modelMhs;
 
-    public Acc_KRS_DosenPA() {
+   public DataMahasiswaBimbingan() {
         initComponents();
         this.setLocationRelativeTo(null);
-        tampilkanData();
-        cekKunciAkses();
+        
+        // 1. Kolom disederhanakan: Hanya identitas mahasiswa
+        modelMhs = new DefaultTableModel(new String[]{"ID Mhs", "Nama", "Prodi", "Angkatan"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; 
+            }
+        };
+        tabelMhs.setModel(modelMhs);
+        aturLebarKolom(tabelMhs);
+        loadDataBimbingan();
     }
 
-    public void tampilkanData() {
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID Pengajuan");
-        model.addColumn("Nama Mahasiswa");
-        model.addColumn("Semester");
-        model.addColumn("Tahun Ajaran");
-
+    public void loadDataBimbingan() {
+        modelMhs.setRowCount(0); 
         try {
             Connection conn = new database().getConnection();
-            
-            // PERBAIKAN DI SINI: ganti k.id_dosen_pa menjadi m.id_dosen_pa
-           // Ubah query di dalam method tampilkanData()
-            String sql = "SELECT p.id_pengajuan, m.nama_mahasiswa, k.semester, k.tahun_ajaran " +
-             "FROM pengajuan_krs p " +
-             "JOIN mahasiswa m ON p.id_mahasiswa = m.id_mahasiswa " +
-             "JOIN krs k ON p.id_krs = k.id_krs " +
-             "WHERE p.status_acc = 'Ditinjau' " +
-             "AND m.id_dosen_pa = ? " +
-             "AND k.status_krs = 'terbuka'"; // KUNCI UTAMA: Hanya periode yang aktif saat ini  
+            // 2. Query murni mengambil data mahasiswa saja (tanpa embel-embel KRS terbuka)
+            String sql = "SELECT m.id_mahasiswa, m.nama_mahasiswa, pr.nama_prodi, m.angkatan " +
+                         "FROM mahasiswa m " +
+                         "LEFT JOIN prodi pr ON m.id_prodi = pr.id_prodi " + 
+                         "WHERE m.id_dosen_pa = ?";
 
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, Session.getId()); // Pastikan Session.getId() adalah ID Dosen yang login
+            ps.setString(1, Session.getId()); 
             ResultSet rs = ps.executeQuery();
-
+            
             while (rs.next()) {
-                model.addRow(new Object[]{
-                    rs.getString("id_pengajuan"),
+                modelMhs.addRow(new Object[]{
+                    rs.getString("id_mahasiswa"), // Kolom 0 sekarang adalah ID Mhs
                     rs.getString("nama_mahasiswa"),
-                    rs.getString("semester"),
-                    rs.getString("tahun_ajaran")
+                    rs.getString("nama_prodi"),
+                    rs.getString("angkatan")
                 });
             }
-            tabelAcc.setModel(model);
-            aturLebarKolom(tabelAcc);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Gagal memuat data: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+    
+ private void lihatDetailKRS(java.awt.event.ActionEvent evt) {
+    int baris = tabelMhs.getSelectedRow();
+    if (baris == -1) {
+        JOptionPane.showMessageDialog(this, "Pilih mahasiswa dulu!");
+        return;
     }
 
-   private void cekKunciAkses() {
-    try {
-        Connection conn = new database().getConnection();
-        // Cek apakah ada jadwal KRS yang sedang 'terbuka' dan masuk dalam rentang tanggal
-        String sql = "SELECT id_krs FROM krs WHERE status_krs = 'terbuka' AND CURRENT_DATE BETWEEN tanggal_mulai AND tanggal_selesai";
-        Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery(sql);
-        
-        if (!rs.next()) {
-            jLabel1.setText("Daftar Pengajuan (KRS DITUTUP - Mode Baca Saja)");
-        } else {
-            // Jika ada jadwal aktif, kembalikan ke teks normal
-            jLabel1.setText("Daftar Pengajuan KRS Mahasiswa Bimbingan");
-        }
-    } catch (Exception e) {
-        System.out.println("Error cek akses: " + e.getMessage());
-    }
+    String idPengajuan = tabelMhs.getValueAt(baris, 0).toString();
+
+    // Panggil Detail_KRS
+    Detail_KRS dialog = new Detail_KRS(this, true, idPengajuan);
+    dialog.setVisible(true);
+
+    // Refresh tabel
+    loadDataBimbingan();
 }
-   
-   private void aturLebarKolom(javax.swing.JTable tabel) {
+ 
+ private void aturLebarKolom(javax.swing.JTable tabel) {
     TableColumnModel columnModel = tabel.getColumnModel();
     for (int col = 0; col < tabel.getColumnCount(); col++) {
         int width = 80; // Lebar minimal
@@ -95,7 +91,6 @@ public class Acc_KRS_DosenPA extends javax.swing.JFrame {
         columnModel.getColumn(col).setPreferredWidth(Math.min(width, 300));
     }
 }
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -107,19 +102,19 @@ public class Acc_KRS_DosenPA extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tabelAcc = new javax.swing.JTable();
-        btnDetail = new javax.swing.JButton();
+        tabelMhs = new javax.swing.JTable();
         btnBack = new javax.swing.JButton();
+        btnDetail = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel1.setText("Daftar Pengajuan KRS Mahasiswa Bimbingan");
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        jLabel1.setText("Daftar Mahasiswa Bimbingan");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 70, -1, -1));
 
-        tabelAcc.setModel(new javax.swing.table.DefaultTableModel(
+        tabelMhs.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -130,19 +125,19 @@ public class Acc_KRS_DosenPA extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(tabelAcc);
+        jScrollPane1.setViewportView(tabelMhs);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 118, 800, 310));
-
-        btnDetail.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        btnDetail.setText("Lihat Detail");
-        btnDetail.addActionListener(this::btnDetailActionPerformed);
-        getContentPane().add(btnDetail, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 460, 160, 40));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 140, 800, 275));
 
         btnBack.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnBack.setText("Back");
         btnBack.addActionListener(this::btnBackActionPerformed);
-        getContentPane().add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 460, 120, 40));
+        getContentPane().add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 462, 150, 40));
+
+        btnDetail.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        btnDetail.setText("Lihat Detail");
+        btnDetail.addActionListener(this::btnDetailActionPerformed);
+        getContentPane().add(btnDetail, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 460, 150, 40));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Rectangle (right).png"))); // NOI18N
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -151,17 +146,25 @@ public class Acc_KRS_DosenPA extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetailActionPerformed
-        int baris = tabelAcc.getSelectedRow();
-        if (baris == -1) { JOptionPane.showMessageDialog(this, "Pilih mahasiswa!"); return; }
+      int baris = tabelMhs.getSelectedRow();
+        if (baris == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih mahasiswa terlebih dahulu!");
+            return;
+        }
+
+        // Ambil ID Mhs (sekarang ada di kolom 0)
+        String idMhs = tabelMhs.getValueAt(baris, 0).toString();
+        String namaMhs = tabelMhs.getValueAt(baris, 1).toString();
         
-        String idPengajuan = tabelAcc.getValueAt(baris, 0).toString();
-        // Panggil Detail_KRS yang sudah kamu buat
-        new Detail_KRS(this, true, idPengajuan).setVisible(true);
+        // Panggil ArsipKRS_Admin dengan Constructor khusus
+        ArsipKRS_Admin formArsip = new ArsipKRS_Admin(idMhs, namaMhs);
+        formArsip.setVisible(true);
     }//GEN-LAST:event_btnDetailActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        new dashboard().setVisible(true);
-        this.dispose();
+        // Kembali ke dashboard (sesuaikan dengan nama class dashboard kamu)
+    new dashboard().setVisible(true);
+    this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed
 
     /**
@@ -180,14 +183,13 @@ public class Acc_KRS_DosenPA extends javax.swing.JFrame {
                     break;
                 }
             }
-       } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-    // Ubah 'logger' menjadi 'LOGGER' (huruf besar semua)
-    LOGGER.log(java.util.logging.Level.SEVERE, null, ex); 
-}
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(FormEditProfile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new Acc_KRS_DosenPA().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new DataMahasiswaBimbingan().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -196,6 +198,6 @@ public class Acc_KRS_DosenPA extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tabelAcc;
+    private javax.swing.JTable tabelMhs;
     // End of variables declaration//GEN-END:variables
 }

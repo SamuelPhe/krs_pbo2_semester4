@@ -17,6 +17,7 @@ public class FormTambahDosen extends javax.swing.JDialog {
     public FormTambahDosen(java.awt.Frame parent, boolean modal, String[] data) {
         super(parent, modal);
         initComponents();
+        this.setSize(600, 435);
         
         if (data != null) {
             isEdit = true;
@@ -48,8 +49,8 @@ public class FormTambahDosen extends javax.swing.JDialog {
         txtIdDosen = new javax.swing.JTextField();
         txtNamaDosen = new javax.swing.JTextField();
         cbRole = new javax.swing.JComboBox<>();
-        txtPass = new javax.swing.JTextField();
-        txtConfirmPass = new javax.swing.JTextField();
+        txtPass = new javax.swing.JPasswordField();
+        txtconfirmPass = new javax.swing.JPasswordField();
         jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -57,7 +58,7 @@ public class FormTambahDosen extends javax.swing.JDialog {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setText("Tambah Data Dosen Baru:");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, -1, -1));
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 37, -1, -1));
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 71, -1, -1));
         getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(653, 105, -1, -1));
@@ -76,11 +77,11 @@ public class FormTambahDosen extends javax.swing.JDialog {
 
         cbRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "dosen", "dosen pa", "kaprodi", " " }));
         getContentPane().add(cbRole, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 200, 360, -1));
-        getContentPane().add(txtPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 250, 360, -1));
-        getContentPane().add(txtConfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 300, 360, -1));
+        getContentPane().add(txtPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 240, 360, -1));
+        getContentPane().add(txtconfirmPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 290, 360, -1));
 
         jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Add dosen.png"))); // NOI18N
-        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -90,10 +91,11 @@ public class FormTambahDosen extends javax.swing.JDialog {
     }//GEN-LAST:event_btnBatalActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-     String pass = txtPass.getText();
-        String confirm = txtConfirmPass.getText();
+  // KODE BARU
+    String pass = new String(txtPass.getPassword());
+    String confirmPass = new String(txtconfirmPass.getPassword());
 
-        if (!pass.equals(confirm)) {
+        if (!pass.equals(confirmPass)) {
             JOptionPane.showMessageDialog(this, "Password dan Confirm Password tidak cocok!");
             return;
         }
@@ -222,9 +224,9 @@ public class FormTambahDosen extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JTextField txtConfirmPass;
     private javax.swing.JTextField txtIdDosen;
     private javax.swing.JTextField txtNamaDosen;
-    private javax.swing.JTextField txtPass;
+    private javax.swing.JPasswordField txtPass;
+    private javax.swing.JPasswordField txtconfirmPass;
     // End of variables declaration//GEN-END:variables
 }

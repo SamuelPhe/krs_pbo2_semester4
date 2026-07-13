@@ -7,6 +7,9 @@ package PBO_Project_2;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import java.sql.*;
+import javax.swing.table.TableColumn;
+import java.awt.Component;
+import javax.swing.table.TableCellRenderer;
 
 public class data_dosen extends javax.swing.JFrame {
     // Variabel penampung ID jika dipanggil untuk edit profil sendiri
@@ -59,13 +62,36 @@ public class data_dosen extends javax.swing.JFrame {
                 });
             }
             tabelDosen.setModel(model);
+            aturLebarKolom();
+            // Tambahkan ini di bawah aturLebarKolom() jika ingin ID selalu ramping
+            tabelDosen.getColumnModel().getColumn(0).setPreferredWidth(80);
+            tabelDosen.getColumnModel().getColumn(0).setMaxWidth(100);
             db.disconnect();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Gagal load data: " + e.getMessage());
         }
     }
 
-   
+   private void aturLebarKolom() {
+    for (int column = 0; column < tabelDosen.getColumnCount(); column++) {
+        TableColumn tableColumn = tabelDosen.getColumnModel().getColumn(column);
+        int preferredWidth = tableColumn.getMinWidth();
+        
+        for (int row = 0; row < tabelDosen.getRowCount(); row++) {
+            TableCellRenderer cellRenderer = tabelDosen.getCellRenderer(row, column);
+            Component c = tabelDosen.prepareRenderer(cellRenderer, row, column);
+            int width = c.getPreferredSize().width + tabelDosen.getIntercellSpacing().width;
+            preferredWidth = Math.max(preferredWidth, width);
+
+            // Batasi maksimal agar tidak terlalu lebar
+            if (preferredWidth >= 300) {
+                preferredWidth = 300;
+                break;
+            }
+        }
+        tableColumn.setPreferredWidth(preferredWidth);
+    }
+}
 
     /*
      * This method is called from within the constructor to initialize the form.
@@ -108,7 +134,7 @@ public class data_dosen extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(tabelDosen);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 630, 320));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 100, 630, 480));
 
         btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnAdd.setText("Add");
@@ -118,20 +144,20 @@ public class data_dosen extends javax.swing.JFrame {
         btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnEdit.setText("Edit");
         btnEdit.addActionListener(this::btnEditActionPerformed);
-        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 270, 230, -1));
+        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 330, 230, -1));
 
         btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.addActionListener(this::btnDeleteActionPerformed);
-        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 350, 230, -1));
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 450, 230, -1));
 
-        back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        back.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         back.setText("Back");
         back.addActionListener(this::backActionPerformed);
-        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 490, 170, -1));
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 620, 170, 50));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Dosen.png"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

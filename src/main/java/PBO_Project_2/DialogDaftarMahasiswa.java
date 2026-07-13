@@ -7,6 +7,9 @@ package PBO_Project_2;
 import java.sql.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableCellRenderer;
+import java.awt.Component;
 
 public class DialogDaftarMahasiswa extends javax.swing.JDialog {
 
@@ -31,19 +34,20 @@ private void tampilkanData(int idJadwal) {
     model.addColumn("Nama Mahasiswa");
     model.addColumn("Program Studi");
     model.addColumn("Angkatan");
-    model.addColumn("Status KRS");
+    model.addColumn("Semester"); // Data Semester
     tabelMahasiswa.setModel(model); 
-
+    
     try {
         database db = new database();
         Connection conn = db.getConnection();
         
-        // PERBAIKAN: Hubungkan mahasiswa ke tabel pengajuan_krs (pk), bukan ke krs (k)
-        String sql = "SELECT m.id_mahasiswa AS nim, m.nama_mahasiswa AS nama, p.nama_prodi AS prodi, m.angkatan AS angk, k.status_krs AS status " +
+        // Perbaikan: Ambil k.semester (dari tabel krs), bukan pk.semester
+        String sql = "SELECT m.id_mahasiswa AS nim, m.nama_mahasiswa AS nama, " +
+                     "p.nama_prodi AS prodi, m.angkatan AS angk, k.semester AS sem " +
                      "FROM krs_detail kd " +
                      "JOIN pengajuan_krs pk ON kd.id_pengajuan = pk.id_pengajuan " +
-                     "JOIN krs k ON pk.id_krs = k.id_krs " +
-                     "JOIN mahasiswa m ON pk.id_mahasiswa = m.id_mahasiswa " + // <-- PERBAIKANNYA DI SINI
+                     "JOIN krs k ON pk.id_krs = k.id_krs " + // Join ke krs untuk ambil semester
+                     "JOIN mahasiswa m ON pk.id_mahasiswa = m.id_mahasiswa " +
                      "JOIN prodi p ON m.id_prodi = p.id_prodi " +
                      "WHERE kd.id_jadwal = ?";
         
@@ -57,17 +61,32 @@ private void tampilkanData(int idJadwal) {
                 res.getString("nama"),
                 res.getString("prodi"),
                 res.getString("angk"), 
-                res.getString("status")
+                res.getString("sem") // Menampilkan semester dari alias 'sem'
             });
         }
+        
+        aturLebarKolom(tabelMahasiswa);
         db.disconnect();
         
     } catch (Exception e) {
-        System.out.println("Error di DialogDaftarMahasiswa: " + e.getMessage());
-        e.printStackTrace(); 
+        JOptionPane.showMessageDialog(this, "Error load data: " + e.getMessage());
+        e.printStackTrace();
     }
 }
    
+private void aturLebarKolom(javax.swing.JTable tabel) {
+    TableColumnModel columnModel = tabel.getColumnModel();
+    for (int col = 0; col < tabel.getColumnCount(); col++) {
+        int width = 80; // Lebar minimal
+        for (int row = 0; row < tabel.getRowCount(); row++) {
+            TableCellRenderer renderer = tabel.getCellRenderer(row, col);
+            Component comp = tabel.prepareRenderer(renderer, row, col);
+            width = Math.max(comp.getPreferredSize().width + 15, width);
+        }
+        // Batasi maksimal agar tabel tidak terlalu lebar (misal 300px)
+        columnModel.getColumn(col).setPreferredWidth(Math.min(width, 300));
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -81,10 +100,14 @@ private void tampilkanData(int idJadwal) {
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelMahasiswa = new javax.swing.JTable();
         btnBack = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        lblJudulMatkul.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblJudulMatkul.setText("Daftar Mahasiswa");
+        getContentPane().add(lblJudulMatkul, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 90, -1, -1));
 
         tabelMahasiswa.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -99,32 +122,15 @@ private void tampilkanData(int idJadwal) {
         ));
         jScrollPane1.setViewportView(tabelMahasiswa);
 
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 140, 820, 300));
+
+        btnBack.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnBack.setText("Back");
         btnBack.addActionListener(this::btnBackActionPerformed);
+        getContentPane().add(btnBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 460, 120, 40));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnBack)
-                    .addComponent(lblJudulMatkul)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 666, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(lblJudulMatkul)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21)
-                .addComponent(btnBack)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Rectangle (right).png"))); // NOI18N
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -172,6 +178,7 @@ private void tampilkanData(int idJadwal) {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblJudulMatkul;
     private javax.swing.JTable tabelMahasiswa;

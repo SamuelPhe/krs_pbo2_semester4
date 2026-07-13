@@ -9,12 +9,15 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableCellRenderer;
 
 public class data_krs extends javax.swing.JFrame {
     // Variabel namaSesi dan roleSesi dihapus
 
     public data_krs() {
         initComponents();
+        updateStatusOtomatis(); // <--- Tambahkan ini di sini
         tampilkan_data();
         this.setLocationRelativeTo(null); 
         cekHakAkses(); 
@@ -33,6 +36,33 @@ public class data_krs extends javax.swing.JFrame {
         }
     }
 
+ private void updateStatusOtomatis() {
+    try {
+        Connection conn = new database().getConnection();
+        
+        // 1. OTOMATIS TUTUP: Jika tanggal selesai sudah lewat dari hari ini
+        String sqlTutup = "UPDATE krs SET status_krs = 'tertutup' " +
+                          "WHERE tanggal_selesai < CURRENT_DATE AND status_krs = 'terbuka'";
+        
+        // 2. OTOMATIS BUKA: Jika hari ini berada dalam rentang tanggal mulai & selesai
+        String sqlBuka = "UPDATE krs SET status_krs = 'terbuka' " +
+                         "WHERE CURRENT_DATE BETWEEN tanggal_mulai AND tanggal_selesai AND status_krs = 'tertutup'";
+        
+        PreparedStatement psTutup = conn.prepareStatement(sqlTutup);
+        psTutup.executeUpdate();
+        
+        PreparedStatement psBuka = conn.prepareStatement(sqlBuka);
+        psBuka.executeUpdate();
+        
+        // Opsional: Log ke console agar tahu sistem bekerja
+        System.out.println("Status KRS berhasil disinkronisasi dengan tanggal.");
+        
+    } catch (Exception e) {
+        System.out.println("Error auto-update status: " + e.getMessage());
+    }
+}
+   
+   
     // ================= REVISI UTAMA: TAMPILAN TABEL SESI KRS =================
     private void tampilkan_data() {
         DefaultTableModel model = new DefaultTableModel();
@@ -68,11 +98,34 @@ public class data_krs extends javax.swing.JFrame {
                 });
             }
             tabelKRS.setModel(model);
-            
+            aturLebarKolom();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Gagal memuat data Sesi KRS: " + e.getMessage());
         }
+        
     }
+    
+    private void aturLebarKolom() {
+    for (int column = 0; column < tabelKRS.getColumnCount(); column++) {
+        TableColumn tableColumn = tabelKRS.getColumnModel().getColumn(column);
+        int preferredWidth = tableColumn.getMinWidth();
+        
+        for (int row = 0; row < tabelKRS.getRowCount(); row++) {
+            TableCellRenderer cellRenderer = tabelKRS.getCellRenderer(row, column);
+            Component c = tabelKRS.prepareRenderer(cellRenderer, row, column);
+            int width = c.getPreferredSize().width + tabelKRS.getIntercellSpacing().width;
+            preferredWidth = Math.max(preferredWidth, width);
+
+            // Batasi agar tidak terlalu lebar (misal 300px)
+            if (preferredWidth >= 300) {
+                preferredWidth = 300;
+                break;
+            }
+        }
+        tableColumn.setPreferredWidth(preferredWidth);
+    }
+}
+    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -111,12 +164,12 @@ public class data_krs extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(tabelKRS);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 970, 370));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 970, 520));
 
         back.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         back.setText("Back");
         back.addActionListener(this::backActionPerformed);
-        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 530, 140, -1));
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 650, 140, -1));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 812, 269, 39));
@@ -124,20 +177,20 @@ public class data_krs extends javax.swing.JFrame {
         btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnAdd.setText("Add");
         btnAdd.addActionListener(this::btnAddActionPerformed);
-        getContentPane().add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 530, 240, -1));
+        getContentPane().add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 650, 240, -1));
 
         btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnEdit.setText("Edit");
         btnEdit.addActionListener(this::btnEditActionPerformed);
-        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 530, 230, -1));
+        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 650, 230, -1));
 
         btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.addActionListener(this::btnDeleteActionPerformed);
-        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 530, 230, -1));
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 650, 230, -1));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Manajemen data.png"))); // NOI18N
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, -40, -1, 900));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -365,6 +418,8 @@ public class data_krs extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Gagal melakukan pembaruan data: " + e.getMessage());
             }
         }
+        
+        
     
     }//GEN-LAST:event_btnEditActionPerformed
 

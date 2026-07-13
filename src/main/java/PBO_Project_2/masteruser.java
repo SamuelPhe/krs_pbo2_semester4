@@ -73,7 +73,7 @@ public class masteruser extends javax.swing.JFrame {
         getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 520, -1, -1));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Master User.png"))); // NOI18N
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 600));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

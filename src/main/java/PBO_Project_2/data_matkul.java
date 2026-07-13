@@ -6,6 +6,9 @@ package PBO_Project_2;
 import java.sql.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import java.awt.Component;
+import javax.swing.table.TableCellRenderer;
 
 /**
  *
@@ -20,35 +23,59 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
         this.setLocationRelativeTo(null);
     }
 
-    private void tampilkan_data() {
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("ID MK");
-        model.addColumn("Nama MK");
-        model.addColumn("SKS");
-        model.addColumn("Semester");
-        model.addColumn("Prodi");
+   private void tampilkan_data() {
+    DefaultTableModel model = new DefaultTableModel();
+    model.addColumn("ID MK");
+    model.addColumn("Nama MK");
+    model.addColumn("SKS");
+    model.addColumn("Semester");
+    model.addColumn("Prodi");
 
-        try {
-            Connection conn = new database().getConnection();
-            // GANTI 'mata_kuliah' MENJADI 'matkul'
-            String sql = "SELECT matkul.*, prodi.nama_prodi FROM matkul "
-                       + "JOIN prodi ON matkul.id_prodi = prodi.id_prodi";
-            ResultSet res = conn.createStatement().executeQuery(sql);
-            
-            while (res.next()) {
-                model.addRow(new Object[]{
-                    res.getString("id_matkul"), // pastikan kolomnya id_matkul
-                    res.getString("nama_matkul"),
-                    res.getString("sks"),
-                    res.getString("semester"),
-                    res.getString("nama_prodi")
-                });
-            }
-            tabelMatkul.setModel(model);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    try {
+        Connection conn = new database().getConnection();
+        String sql = "SELECT matkul.*, prodi.nama_prodi FROM matkul "
+                   + "JOIN prodi ON matkul.id_prodi = prodi.id_prodi";
+        ResultSet res = conn.createStatement().executeQuery(sql);
+        
+        while (res.next()) {
+            model.addRow(new Object[]{
+                res.getString("id_matkul"), 
+                res.getString("nama_matkul"),
+                res.getString("sks"),
+                res.getString("semester"),
+                res.getString("nama_prodi")
+            });
         }
+        tabelMatkul.setModel(model);
+        
+        // PANGGIL DI SINI:
+        aturLebarKolom(); 
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
     }
+}
+    
+    private void aturLebarKolom() {
+    for (int column = 0; column < tabelMatkul.getColumnCount(); column++) {
+        TableColumn tableColumn = tabelMatkul.getColumnModel().getColumn(column);
+        int preferredWidth = tableColumn.getMinWidth();
+        
+        for (int row = 0; row < tabelMatkul.getRowCount(); row++) {
+            TableCellRenderer cellRenderer = tabelMatkul.getCellRenderer(row, column);
+            Component c = tabelMatkul.prepareRenderer(cellRenderer, row, column);
+            int width = c.getPreferredSize().width + tabelMatkul.getIntercellSpacing().width;
+            preferredWidth = Math.max(preferredWidth, width);
+
+            // Batasi maksimal agar tidak terlalu lebar
+            if (preferredWidth >= 300) {
+                preferredWidth = 300;
+                break;
+            }
+        }
+        tableColumn.setPreferredWidth(preferredWidth);
+    }
+}
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -83,31 +110,31 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
         ));
         jScrollPane1.setViewportView(tabelMatkul);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, 680, 290));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 80, 670, 490));
 
         btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnAdd.setText("Add");
         btnAdd.addActionListener(this::btnAddActionPerformed);
-        getContentPane().add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 140, 230, -1));
+        getContentPane().add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 190, 230, -1));
 
         btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnEdit.setText("Edit");
         btnEdit.addActionListener(this::btnEditActionPerformed);
-        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 220, 230, -1));
+        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 330, 230, -1));
 
         btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.setToolTipText("");
         btnDelete.addActionListener(this::btnDeleteActionPerformed);
-        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 300, 230, -1));
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 460, 230, -1));
 
-        back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        back.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         back.setText("Back");
         back.addActionListener(this::backActionPerformed);
-        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 440, 140, 50));
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 640, 140, 50));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Matkul.png"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

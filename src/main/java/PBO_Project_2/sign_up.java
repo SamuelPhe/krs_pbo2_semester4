@@ -38,15 +38,7 @@ public class sign_up extends javax.swing.JFrame {
                 prodiMap.put(nama, id);
             }
 
-            // Mengisi kotak dosen pa (jComboBox2)
-            ResultSet rsDosen = db.getDaftarDosen();
-            jComboBox2.removeAllItems();
-            while (rsDosen != null && rsDosen.next()) {
-                String nama = rsDosen.getString("nama_dosen");
-                int id = rsDosen.getInt("id_dosen");
-                jComboBox2.addItem(nama);
-                dosenMap.put(nama, id);
-            }
+           
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Gagal memuat data dari database: " + e.getMessage());
         }
@@ -68,11 +60,13 @@ public class sign_up extends javax.swing.JFrame {
         jPasswordField2 = new javax.swing.JPasswordField();
         jTextField2 = new javax.swing.JTextField();
         jComboBox1 = new javax.swing.JComboBox<>();
-        jComboBox2 = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
         txtSemesterMhs = new javax.swing.JTextField();
+        btnShowPassword = new javax.swing.JCheckBox();
+        btnShowPassword1 = new javax.swing.JCheckBox();
+        btnShowPassword2 = new javax.swing.JCheckBox();
+        btnShowPassword3 = new javax.swing.JCheckBox();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -80,11 +74,8 @@ public class sign_up extends javax.swing.JFrame {
         getContentPane().add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 220, 340, 40));
         getContentPane().add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 290, 340, 40));
         getContentPane().add(jPasswordField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 360, 340, 40));
-        getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 220, 350, 40));
-        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 290, 350, 40));
-
-        jComboBox2.addActionListener(this::jComboBox2ActionPerformed);
-        getContentPane().add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 360, 350, 40));
+        getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 220, 350, 40));
+        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 360, 350, 40));
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jButton1.setText("Sign Up");
@@ -94,10 +85,47 @@ public class sign_up extends javax.swing.JFrame {
         jButton2.setText("Login");
         jButton2.addActionListener(this::jButton2ActionPerformed);
         getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 490, 90, 30));
+        getContentPane().add(txtSemesterMhs, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 290, 350, 40));
 
-        jLabel1.setText("Semester");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 420, -1, -1));
-        getContentPane().add(txtSemesterMhs, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 440, 130, -1));
+        btnShowPassword.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnShowPassword.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/mata_tertutup.png"))); // NOI18N
+        btnShowPassword.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnShowPasswordMouseClicked(evt);
+            }
+        });
+        btnShowPassword.addActionListener(this::btnShowPasswordActionPerformed);
+        getContentPane().add(btnShowPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 300, -1, -1));
+
+        btnShowPassword1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnShowPassword1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/mata_tertutup.png"))); // NOI18N
+        btnShowPassword1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnShowPassword1MouseClicked(evt);
+            }
+        });
+        btnShowPassword1.addActionListener(this::btnShowPassword1ActionPerformed);
+        getContentPane().add(btnShowPassword1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 300, -1, -1));
+
+        btnShowPassword2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnShowPassword2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/mata_tertutup.png"))); // NOI18N
+        btnShowPassword2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnShowPassword2MouseClicked(evt);
+            }
+        });
+        btnShowPassword2.addActionListener(this::btnShowPassword2ActionPerformed);
+        getContentPane().add(btnShowPassword2, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 300, -1, -1));
+
+        btnShowPassword3.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        btnShowPassword3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/mata_tertutup.png"))); // NOI18N
+        btnShowPassword3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnShowPassword3MouseClicked(evt);
+            }
+        });
+        btnShowPassword3.addActionListener(this::btnShowPassword3ActionPerformed);
+        getContentPane().add(btnShowPassword3, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 300, -1, -1));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/sign up.png"))); // NOI18N
         jLabel2.setText("jLabel2");
@@ -105,10 +133,6 @@ public class sign_up extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        // 1. Ambil teks (Tambahkan input semester)
@@ -133,19 +157,19 @@ public class sign_up extends javax.swing.JFrame {
             
             // --- KODINGAN YANG HILANG (MENGAMBIL ID DARI DROPDOWN) ---
             String prodiTerpilih = jComboBox1.getSelectedItem() != null ? jComboBox1.getSelectedItem().toString() : "";
-            String dosenTerpilih = jComboBox2.getSelectedItem() != null ? jComboBox2.getSelectedItem().toString() : "";
+           
             
-            if (prodiTerpilih.isEmpty() || dosenTerpilih.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Data Prodi atau Dosen PA belum tersedia!", "Error", JOptionPane.ERROR_MESSAGE);
+            if (prodiTerpilih.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Data Prodi belum tersedia!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             int idProdi = prodiMap.get(prodiTerpilih);
-            int idDosenPA = dosenMap.get(dosenTerpilih);
+           
             // ---------------------------------------------------------
 
             // Panggil method tambahMahasiswa dengan variabel yang benar
-            boolean sukses = db.tambahMahasiswa(idProdi, idDosenPA, nama, angkatan, semesterAktif, password);
+            boolean sukses = db.tambahMahasiswa(idProdi, 0, nama, angkatan, semesterAktif, password);
             
             if (sukses) {
                 JOptionPane.showMessageDialog(this, "Pendaftaran Berhasil! Silakan Login.");
@@ -165,6 +189,50 @@ public class sign_up extends javax.swing.JFrame {
         new login_form().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void btnShowPasswordMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnShowPasswordMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnShowPasswordMouseClicked
+
+    private void btnShowPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowPasswordActionPerformed
+        if (btnShowPassword.isSelected()) {
+            // Logika tampilkan password
+            jPasswordField1.setEchoChar((char) 0);
+            jPasswordField2.setEchoChar((char) 0);
+            // Ganti ikon jadi mata terbuka
+            btnShowPassword.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/mata_terbuka.png")));
+        } else {
+            // Logika sembunyikan password
+            jPasswordField1.setEchoChar('*');
+            jPasswordField2.setEchoChar('*');
+            // Ganti ikon jadi mata tertutup
+            btnShowPassword.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/mata_tertutup.png")));
+        }
+    }//GEN-LAST:event_btnShowPasswordActionPerformed
+
+    private void btnShowPassword1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnShowPassword1MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnShowPassword1MouseClicked
+
+    private void btnShowPassword1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowPassword1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnShowPassword1ActionPerformed
+
+    private void btnShowPassword2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnShowPassword2MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnShowPassword2MouseClicked
+
+    private void btnShowPassword2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowPassword2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnShowPassword2ActionPerformed
+
+    private void btnShowPassword3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnShowPassword3MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnShowPassword3MouseClicked
+
+    private void btnShowPassword3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowPassword3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnShowPassword3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -191,11 +259,13 @@ public class sign_up extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox btnShowPassword;
+    private javax.swing.JCheckBox btnShowPassword1;
+    private javax.swing.JCheckBox btnShowPassword2;
+    private javax.swing.JCheckBox btnShowPassword3;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JPasswordField jPasswordField2;

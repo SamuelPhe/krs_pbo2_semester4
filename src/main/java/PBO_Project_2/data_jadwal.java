@@ -7,6 +7,9 @@ package PBO_Project_2;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import java.sql.*;
+import javax.swing.table.TableColumn;
+import java.awt.Component;
+import javax.swing.table.TableCellRenderer;
 
    public class data_jadwal extends javax.swing.JFrame {
     // Variabel namaSesi dan roleSesi dihapus
@@ -50,11 +53,32 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
                 });
             }
             tabelJadwal.setModel(model);
+            aturLebarKolom();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error load jadwal: " + e.getMessage());
         }
     }
     
+    private void aturLebarKolom() {
+    for (int column = 0; column < tabelJadwal.getColumnCount(); column++) {
+        TableColumn tableColumn = tabelJadwal.getColumnModel().getColumn(column);
+        int preferredWidth = tableColumn.getMinWidth();
+        
+        for (int row = 0; row < tabelJadwal.getRowCount(); row++) {
+            TableCellRenderer cellRenderer = tabelJadwal.getCellRenderer(row, column);
+            Component c = tabelJadwal.prepareRenderer(cellRenderer, row, column);
+            int width = c.getPreferredSize().width + tabelJadwal.getIntercellSpacing().width;
+            preferredWidth = Math.max(preferredWidth, width);
+
+            // Batasi agar tidak terlalu lebar (maksimal 300px)
+            if (preferredWidth >= 300) {
+                preferredWidth = 300;
+                break;
+            }
+        }
+        tableColumn.setPreferredWidth(preferredWidth);
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -88,7 +112,7 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
         ));
         jScrollPane1.setViewportView(tabelJadwal);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 80, 710, 300));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 80, 720, 480));
 
         btnAdd.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnAdd.setText("Add");
@@ -98,20 +122,20 @@ private static final java.util.logging.Logger logger = java.util.logging.Logger.
         btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnEdit.setText("Edit");
         btnEdit.addActionListener(this::btnEditActionPerformed);
-        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 230, 170, -1));
+        getContentPane().add(btnEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 280, 170, -1));
 
         btnDelete.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         btnDelete.setText("Delete");
         btnDelete.addActionListener(this::btnDeleteActionPerformed);
-        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 310, 170, -1));
+        getContentPane().add(btnDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 420, 170, -1));
 
-        back.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        back.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         back.setText("Back");
         back.addActionListener(this::backActionPerformed);
-        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 440, 160, 50));
+        getContentPane().add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 600, 160, 50));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/desain/Jadwal.png"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 6, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
