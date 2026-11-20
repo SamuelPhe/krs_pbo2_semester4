@@ -14,12 +14,19 @@ Aplikasi desktop untuk membantu pengelolaan Kartu Rencana Studi (KRS) sebagai pr
 ## Teknologi
 Java 8, Java Swing, MySQL/JDBC, Maven, JasperReports, AbsoluteLayout, dan NetBeans GUI Builder.
 
-## Tampilan aplikasi
-Beberapa rancangan antarmuka tersedia di folder `src/main/resources/desain`.
+## Preview antarmuka
 
-- [Halaman utama](src/main/resources/desain/home%20page%20%282%29.png)
-- [Halaman login](src/main/resources/desain/Login%20%282%29.png)
-- [Detail KRS](src/main/resources/desain/Detail%20KRS.png)
+**Halaman utama**
+
+![Preview halaman utama](src/main/resources/desain/home%20page%20%282%29.png)
+
+**Halaman login**
+
+![Preview halaman login](src/main/resources/desain/Login%20%282%29.png)
+
+**Detail KRS**
+
+![Preview detail KRS](src/main/resources/desain/Detail%20KRS.png)
 
 ## Menjalankan proyek
 1. Instal JDK 8, Maven, dan MySQL/MariaDB.
