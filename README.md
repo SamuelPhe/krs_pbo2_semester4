@@ -29,7 +29,7 @@ Java 8, Java Swing, MySQL/JDBC, Maven, JasperReports, AbsoluteLayout, dan NetBea
 ![Preview detail KRS](src/main/resources/desain/Detail%20KRS.png)
 
 ## Menjalankan proyek
-1. Instal JDK 8, Maven, dan MySQL/MariaDB.
+1. Instal JDK 17 (disarankan untuk build), Maven, dan MySQL/MariaDB. Konfigurasi compiler pada `pom.xml` tetap menargetkan kompatibilitas bytecode Java 8.
 2. Siapkan database `krs_db` beserta tabel sesuai skema database proyek.
 3. Atur environment variable:
    - `DB_URL` (opsional; default `jdbc:mysql://127.0.0.1:3306/krs_db?serverTimezone=UTC`)
