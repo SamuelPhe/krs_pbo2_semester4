@@ -99,3 +99,20 @@ Original project code, documentation, and assets authored for the KRS Academic M
 ---
 
 This is an academic portfolio project, not a production-ready university information system. Validate the database schema and test the application using a disposable database copy before any demonstration.
+
+
+## Project team and credits
+
+This academic project was developed collaboratively by the following team members:
+
+- Davent Gravando
+- Marsha Marthalina
+- Samuel
+- Wendy Lo
+
+The names above acknowledge the project team as a whole. Individual module-level responsibilities are not assigned here because a verified task-allocation record was not provided. This credit does not imply that every member authored every file or that each contribution was identical.
+
+
+## Copyright and licensing
+
+This is a collaborative academic project credited to the team members listed above. This notice does not assign or transfer copyright and does not make a legal determination about ownership of jointly created work. Rights in individual contributions remain with their respective authors or rightsholders, subject to any applicable team, course, institutional, or other agreements. No open-source license is granted by this repository. Permission to reuse team-created materials should be obtained from the relevant rightsholders. Third-party libraries and assets remain subject to their own licenses and notices. See [LICENSE](LICENSE).
