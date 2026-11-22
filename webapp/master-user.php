@@ -279,7 +279,8 @@ button.primary{background:#0b7068;color:white;border-color:#0b7068}.danger{color
 input,select{min-height:39px;padding:8px 10px;border:1px solid #aebfba;background:white;color:#283a36;font:14px "Segoe UI",Arial,sans-serif}
 .hint{font-size:11px;color:#73817d;margin:0}.actions{display:flex;gap:9px;justify-content:flex-end;margin-top:16px}
 @media(max-width:720px){body{padding:0}.canvas{min-height:100vh}.content{padding:22px 14px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}h1{font-size:23px}}
-</style></head><body>
+</style><link rel="stylesheet" href="ui.css?v=20261122">
+</head><body>
 <main class="canvas">
 <img class="bg" src="https://raw.githubusercontent.com/SamuelPhe/krs_pbo2_semester4/master/src/main/resources/desain/Master%20User.png" alt="">
 <div class="content">
