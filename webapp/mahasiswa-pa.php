@@ -9,6 +9,7 @@ $pdo=krs_db();$dosenId=(int)($account['id']??0);
 $check=$pdo->prepare('SELECT id_dosen,nama_dosen,posisi FROM dosen WHERE id_dosen=?');$check->execute([$dosenId]);$advisor=$check->fetch();
 if(!$advisor||strtolower((string)$advisor['posisi'])!==$expected[$role]){http_response_code(403);exit('Akun pembimbing tidak valid.');}
 $studentId=filter_input(INPUT_GET,'student',FILTER_VALIDATE_INT)?:0;
+$students=[];
 $detailId=filter_input(INPUT_GET,'detail',FILTER_VALIDATE_INT)?:0;
 $error='';$student=null;$history=[];$detail=null;$detailRows=[];
 if($studentId>0){
