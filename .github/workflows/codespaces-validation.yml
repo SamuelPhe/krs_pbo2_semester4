@@ -50,6 +50,8 @@ jobs:
           bash -n tests/krs-period-smoke.sh
           bash -n tests/student-krs-smoke.sh
           bash -n tests/advisor-review-smoke.sh
+          bash -n tests/admin-master-smoke.sh
+          bash -n tests/remaining-role-modules-smoke.sh
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml config -q
           test -f .devcontainer/php/Dockerfile
 
@@ -73,6 +75,12 @@ jobs:
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/krs.php
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/pengajuan.php
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/review.php
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/master-user.php
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/master-data.php
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/finalisasi.php
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/riwayat.php
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/jadwal-ajar.php
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/mahasiswa-pa.php
           web_page=$(curl --fail --silent --show-error http://127.0.0.1:8081/)
           printf '%s' "$web_page" | grep -q 'KRS — Sistem Informasi Akademik'
           db_counts=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -r '$pdo = new PDO("mysql:host=".getenv("DB_HOST").";dbname=".getenv("DB_DATABASE"), getenv("DB_USER"), getenv("DB_PASSWORD")); echo $pdo->query("SELECT COUNT(*) FROM mahasiswa")->fetchColumn();')
@@ -174,6 +182,41 @@ jobs:
             if (!str_contains((string)$data[1][1][2], "Ganti jadwal kuliah")) exit(1);
             echo "PASS: Dosen PA status transitions and revision persistence verified.\n";
           '
+
+      - name: Verify Admin CRUD, reports, Kaprodi, Jadwal Ajar, and Mahasiswa PA
+        run: |
+          remaining_password="$(openssl rand -hex 20)"
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T -e KRS_REMAINING_PASSWORD="$remaining_password" web php -r '
+            require "/var/www/html/config.php";
+            $pdo = krs_db();
+            $hash = krs_password_hash((string)getenv("KRS_REMAINING_PASSWORD"));
+            $dosen = $pdo->prepare("INSERT INTO dosen (id_dosen, nama_dosen, posisi, password) VALUES (?, ?, ?, ?)");
+            $dosen->execute([995001, "KRS Remaining Kaprodi", "kaprodi", $hash]);
+            $dosen->execute([995002, "KRS Remaining Advisor", "dosen pa", $hash]);
+            $dosen->execute([995003, "KRS Remaining Lecturer", "dosen", $hash]);
+            $dosen->execute([995004, "KRS Other Kaprodi", "kaprodi", $hash]);
+            $dosen->execute([995005, "KRS Other Advisor", "dosen pa", $hash]);
+            $pdo->prepare("INSERT INTO admin (id_admin, nama_admin, password) VALUES (?, ?, ?)")->execute([995001, "KRS Remaining Admin", $hash]);
+            $pdo->exec("UPDATE prodi SET id_kaprodi = 995001 WHERE id_prodi = 122");
+            $pdo->exec("UPDATE prodi SET id_kaprodi = 995004 WHERE id_prodi = 133");
+            $student = $pdo->prepare("INSERT INTO mahasiswa (id_mahasiswa, id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, password, semester) VALUES (?, ?, ?, ?, 2025, ?, 3)");
+            $student->execute([995001, 122, 995002, "KRS Remaining Student", $hash]);
+            $student->execute([995002, 122, 995002, "KRS Remaining Second Student", $hash]);
+            $student->execute([995003, 133, 995005, "KRS Other Assigned Student", $hash]);
+            $pdo->exec("INSERT INTO matkul (id_matkul, id_prodi, nama_matkul, sks, semester) VALUES (995001, 122, '\''KRS Remaining Course'\'', 3, 3)");
+            $pdo->exec("INSERT INTO jadwal (id_jadwal, id_matkul, id_dosen, hari, kelas, jam_mulai, jam_selesai, ruang) VALUES (995001, 995001, 995003, '\''jumat'\'', '\''1'\'', '\''18:00:00'\'', '\''19:00:00'\'', '\''5'\'')");
+            $session = $pdo->prepare("INSERT INTO krs (id_prodi, id_dosen_pa, semester, tahun_ajaran, status_krs, tanggal_mulai, tanggal_selesai) VALUES (122, 995002, 3, YEAR(CURRENT_DATE), '\''terbuka'\'', CURRENT_DATE, DATE_ADD(CURRENT_DATE, INTERVAL 30 DAY))");
+            $session->execute();
+            $sessionId = (int)$pdo->lastInsertId();
+            $application = $pdo->prepare("INSERT INTO pengajuan_krs (id_pengajuan, id_krs, id_mahasiswa, tanggal_pengajuan, status_acc) VALUES (?, ?, ?, CURRENT_DATE, '\''AccDosenPA'\'')");
+            $application->execute([995001, $sessionId, 995001]);
+            $application->execute([995002, $sessionId, 995002]);
+            $detail = $pdo->prepare("INSERT INTO krs_detail (id_detail, id_pengajuan, id_jadwal, status_acc) VALUES (?, ?, 995001, '\''Disetujui'\'')");
+            $detail->execute([995001, 995001]);
+            $detail->execute([995002, 995002]);
+          '
+          KRS_REMAINING_PASSWORD="$remaining_password" bash tests/admin-master-smoke.sh http://127.0.0.1:8081
+          KRS_REMAINING_PASSWORD="$remaining_password" bash tests/remaining-role-modules-smoke.sh http://127.0.0.1:8081
 
       - name: Stop local services
         if: always()
