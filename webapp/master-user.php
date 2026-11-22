@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $advisorId = $values['advisor'] === '' ? null : filter_var($values['advisor'], FILTER_VALIDATE_INT);
                 $cohort = filter_var($values['cohort'], FILTER_VALIDATE_INT);
                 $semester = filter_var($values['semester'], FILTER_VALIDATE_INT);
-                if (mb_strlen($values['name'], 'UTF-8') < 2 || mb_strlen($values['name'], 'UTF-8') > 50) {
+                if (strlen($values['name']) < 2 || strlen($values['name']) > 200) {
                     $error = 'Nama harus terdiri dari 2 sampai 50 karakter.';
                 } elseif ($idValue === false || ($idValue !== null && $idValue < 1)) {
                     $error = 'ID akun harus berupa bilangan bulat positif.';
