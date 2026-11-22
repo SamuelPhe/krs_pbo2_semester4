@@ -25,7 +25,8 @@ $type = (string)($_GET['type'] ?? $_POST['type'] ?? 'prodi');
 if (!isset($entities[$type])) $type = 'prodi';
 $meta = $entities[$type];
 $editId = filter_input(INPUT_GET, 'edit', FILTER_VALIDATE_INT) ?: 0;
-$showForm = isset($_GET['new']) || $editId > 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save') { $postedEditId = filter_var($_POST['edit_id'] ?? '', FILTER_VALIDATE_INT); if ($postedEditId !== false && $postedEditId !== null && $postedEditId > 0) $editId = (int)$postedEditId; }
+$showForm = isset($_GET['new']) || $editId > 0 || ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save');
 $error = '';
 $success = (string)($_SESSION['master_data_flash'] ?? '');
 unset($_SESSION['master_data_flash']);
@@ -124,7 +125,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
                 }
 
                 if($error===''&&in_array($type,['prodi','matkul','kelas','ruang'],true)){
-                    if($values['name']===''||strlen($values['name'])>100)$error='Nama wajib diisi dan maksimal 100 karakter.';
+                    $nameLimit = in_array($type, ['prodi', 'matkul'], true) ? 50 : 20;
+                    if($values['name']===''||strlen($values['name'])>$nameLimit)$error='Nama wajib diisi dan melebihi batas kolom database.';
                 }
                 if($error===''&&$type==='prodi'){
                     $kaprodiId=$values['kaprodi']===''?null:filter_var($values['kaprodi'],FILTER_VALIDATE_INT);
@@ -184,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
                     $_SESSION['master_data_flash']=$editId>0?'Data berhasil diperbarui.':'Data berhasil ditambahkan.';
                     header('Location: master-data.php?type='.$type,true,303);exit;
                 }
-                $editId=(int)($idValue?:0);$showForm=true;
+                $editId=(int)($_POST['edit_id']??0);$showForm=true;
             } else {$error='Aksi Master Data tidak dikenal.';}
         }catch(Throwable $exception){
             if($pdo->inTransaction())$pdo->rollBack();
@@ -242,7 +244,7 @@ label{font-size:13px;font-weight:700;color:#38534c}input,select{min-height:39px;
 <form method="post" action="master-data.php?type=<?=krs_e($type)?>" onsubmit="return confirm('Hapus data ini?')"><input type="hidden" name="csrf_token" value="<?=krs_e((string)($_SESSION['csrf_token']??''))?>"><input type="hidden" name="type" value="<?=krs_e($type)?>"><input type="hidden" name="id" value="<?=krs_e((string)$row[$meta['id']])?>"><button class="danger" type="submit" name="action" value="delete">Delete</button></form></div></td>
 </tr><?php endforeach; endif; ?></tbody></table></div></section>
 <?php if($showForm): ?><section class="panel"><h2 style="margin:0 0 14px;color:#20675f"><?=($editId>0?'Edit ':'Tambah ')?><?=krs_e($meta['label'])?></h2>
-<form method="post" action="master-data.php?type=<?=krs_e($type)?>"><input type="hidden" name="csrf_token" value="<?=krs_e((string)($_SESSION['csrf_token']??''))?>"><input type="hidden" name="type" value="<?=krs_e($type)?>"><input type="hidden" name="action" value="save">
+<form method="post" action="master-data.php?type=<?=krs_e($type)?>"><input type="hidden" name="csrf_token" value="<?=krs_e((string)($_SESSION['csrf_token']??''))?>"><input type="hidden" name="type" value="<?=krs_e($type)?>"><input type="hidden" name="edit_id" value="<?=krs_e((string)$editId)?>"><input type="hidden" name="action" value="save">
 <div class="form-grid">
 <div class="field"><label for="id">ID (opsional)</label><input id="id" name="id" type="number" min="1" value="<?=krs_e((string)$values['id'])?>" <?=($editId>0?'readonly':'')?> placeholder="Kosongkan untuk ID otomatis"></div>
 <?php if(in_array($type,['prodi','matkul','kelas','ruang'],true)): ?>
