@@ -34,7 +34,7 @@ The PHP web app and Java desktop app both use database `krs_db`. The database po
 
 ## Current web scope
 
-The PHP web version currently supports role-based login, a dashboard with database row counts, and Edit Profile. The other academic modules are not yet ported to the browser; they remain available in the original Swing app. The GitHub Pages demo is a separate static simulation and does not connect to MariaDB.
+The PHP web version currently supports role-based login, a dashboard with database row counts, Edit Profile, and Admin management of KRS sessions. Admins can list, create, edit, validate overlapping dates, and delete sessions that have no linked submissions. Student course selection, Dosen PA review, Kaprodi finalization, and the remaining academic modules are not yet ported to the browser; they remain available in the original Swing app. The GitHub Pages demo is a separate static simulation and does not connect to MariaDB.
 
 ## Stop and resume
 
