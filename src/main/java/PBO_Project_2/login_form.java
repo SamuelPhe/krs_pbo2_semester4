@@ -38,16 +38,23 @@ private void loginSebagaiMahasiswa(String nama, String password) throws SQLExcep
     } else { JOptionPane.showMessageDialog(this, "Login Gagal!"); }
 }
 
-private void loginSebagaiDosen(String nama, String password) throws SQLException {
+private void loginSebagaiDosen(String nama, String password, String expectedPosition) throws SQLException {
     ResultSet rs = db.loginDosen(nama, password);
     if (rs != null && rs.next()) {
-        String idDsn = rs.getString("id_dosen"); // Ambil ID dari database
-        String namaDsn = rs.getString("nama_dosen");
         String posisi = rs.getString("posisi");
+        if (!expectedPosition.equalsIgnoreCase(posisi.trim())) {
+            JOptionPane.showMessageDialog(this, "Jenis akun tidak sesuai dengan pilihan.",
+                    "Login Gagal", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String idDsn = rs.getString("id_dosen");
+        String namaDsn = rs.getString("nama_dosen");
         Session.setSession(idDsn, namaDsn, "Dosen", posisi);
         new dashboard().setVisible(true);
         this.dispose();
-    } else { JOptionPane.showMessageDialog(this, "Login Gagal!"); }
+    } else {
+        JOptionPane.showMessageDialog(this, "Login Gagal!");
+    }
 }
 
 private void loginSebagaiAdmin(String nama, String password) throws SQLException {
@@ -360,7 +367,7 @@ private void loginSebagaiAdmin(String nama, String password) throws SQLException
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-         String role = jComboBox1.getSelectedItem().toString();
+         String role = jComboBox1.getSelectedItem().toString().trim();
         String username = jTextField2.getText().trim();
         String password = String.valueOf(jPasswordField1.getPassword());
 
@@ -371,12 +378,26 @@ private void loginSebagaiAdmin(String nama, String password) throws SQLException
 
         try {
             switch (role) {
-                case "Mahasiswa": loginSebagaiMahasiswa(username, password); break;
-                case "Dosen":     loginSebagaiDosen(username, password); break;
-                case "Admin":     loginSebagaiAdmin(username, password); break;
+                case "Mahasiswa":
+                    loginSebagaiMahasiswa(username, password);
+                    break;
+                case "Dosen":
+                    loginSebagaiDosen(username, password, "dosen");
+                    break;
+                case "Dosen PA":
+                    loginSebagaiDosen(username, password, "dosen pa");
+                    break;
+                case "Kaprodi":
+                    loginSebagaiDosen(username, password, "kaprodi");
+                    break;
+                case "Admin":
+                    loginSebagaiAdmin(username, password);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(this, "Jenis akun tidak valid.");
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error database: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan saat login. Periksa koneksi database.");
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
