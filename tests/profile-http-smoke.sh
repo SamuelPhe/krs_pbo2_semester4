@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-set -euo pipefail
-: "\${KRS_PROFILE_PASSWORD:?CI must provide a temporary profile-test password}"
-: "\${KRS_PROFILE_NEXT_PASSWORD:?CI must provide a temporary replacement password}"
-BASE_URL="\${1:-http://127.0.0.1:8081}"
+set -eo pipefail
+if [ -z "$KRS_PROFILE_PASSWORD" ]; then echo "Missing profile test password" >&2; exit 1; fi
+if [ -z "$KRS_PROFILE_NEXT_PASSWORD" ]; then echo "Missing replacement profile test password" >&2; exit 1; fi
+BASE_URL="http://127.0.0.1:8081"
+if [ "$#" -gt 0 ]; then BASE_URL="$1"; fi
 WORK_DIR="$(mktemp -d)"
 trap 'rm -rf "$WORK_DIR"' EXIT
 
@@ -28,7 +29,7 @@ PY
 login_account() {
   local role="$1" username="$2" jar="$3"
   local page="$WORK_DIR/login.html" token status
-  curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" "$BASE_URL/" -o "$page"
+  curl --silent --show-error --cookie-jar "$jar" "$BASE_URL/" -o "$page"
   token="$(csrf_from_file "$page")"
   status="$(curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" \
     --output "$WORK_DIR/login-response.html" --write-out '%{http_code}' \
