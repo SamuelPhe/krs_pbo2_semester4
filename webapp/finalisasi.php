@@ -62,7 +62,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
       else{
         $approve=$pdo->prepare("UPDATE krs_detail kd JOIN pengajuan_krs pk ON pk.id_pengajuan=kd.id_pengajuan
           JOIN mahasiswa m ON m.id_mahasiswa=pk.id_mahasiswa JOIN prodi p ON p.id_prodi=m.id_prodi
-          SET kd.status_acc='Disetujui',kd.catatan_revisi=''
+          SET kd.status_acc='AccDosenPA',kd.catatan_revisi=''
           WHERE kd.id_detail=? AND kd.id_pengajuan=? AND p.id_kaprodi=? AND pk.status_acc='AccDosenPA' AND kd.status_acc='Disetujui'");
         $reject=$pdo->prepare("UPDATE krs_detail kd JOIN pengajuan_krs pk ON pk.id_pengajuan=kd.id_pengajuan
           JOIN mahasiswa m ON m.id_mahasiswa=pk.id_mahasiswa JOIN prodi p ON p.id_prodi=m.id_prodi
@@ -80,7 +80,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
       $q=$pdo->prepare("SELECT kd.status_acc,kd.catatan_revisi,m.nama_matkul FROM krs_detail kd
         JOIN jadwal j ON j.id_jadwal=kd.id_jadwal JOIN matkul m ON m.id_matkul=j.id_matkul
         WHERE kd.id_pengajuan=? FOR UPDATE");$q->execute([$appId]);$details=$q->fetchAll();
-      $pending=array_filter($details,static fn(array $d):bool=>!in_array($d['status_acc'],['Disetujui','Ditolak'],true));
+      $pending=array_filter($details,static fn(array $d):bool=>!in_array($d['status_acc'],['AccDosenPA','Ditolak'],true));
       if(!$details||$pending){$pdo->rollBack();$error=!$details?'Pengajuan belum memiliki mata kuliah.':'Semua mata kuliah harus diberi keputusan sebelum finalisasi selesai.';}
       else{
         $rejected=array_filter($details,static fn(array $d):bool=>$d['status_acc']==='Ditolak');
@@ -110,7 +110,7 @@ if($detailId>0){
     LEFT JOIN ruang r ON r.id_ruang=j.ruang WHERE kd.id_pengajuan=?
     ORDER BY FIELD(LOWER(j.hari),'senin','selasa','rabu','kamis','jumat','sabtu','minggu'),j.jam_mulai");
   $q->execute([$detailId]);$details=$q->fetchAll();
-  foreach($details as $d){if(!in_array($d['status_acc'],['Disetujui','Ditolak'],true))$pendingCount++;if($d['status_acc']==='Ditolak')$rejectedCount++;}
+  foreach($details as $d){if(!in_array($d['status_acc'],['AccDosenPA','Ditolak'],true))$pendingCount++;if($d['status_acc']==='Ditolak')$rejectedCount++;}
  }
 }
 
