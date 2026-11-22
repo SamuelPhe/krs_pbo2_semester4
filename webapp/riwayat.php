@@ -54,11 +54,17 @@ $totalQuery=$pdo->prepare("SELECT COUNT(*) {$baseSql}");$totalQuery->execute($pa
 $countsQuery=$pdo->prepare("SELECT pk.status_acc,COUNT(*) AS jumlah {$baseSql} GROUP BY pk.status_acc ORDER BY pk.status_acc");$countsQuery->execute($params);$statusCounts=$countsQuery->fetchAll();
 $detail=null;$detailRows=[];
 if($detailId>0){
+ $detailWhere=$where ? $whereSql.' AND pk.id_pengajuan=?' : 'WHERE pk.id_pengajuan=?';
  $q=$pdo->prepare("SELECT pk.id_pengajuan,pk.id_krs,pk.tanggal_pengajuan,pk.status_acc,pk.catatan_revisi,
    m.id_mahasiswa,m.nama_mahasiswa,m.angkatan,m.semester AS semester_mhs,p.nama_prodi,
    k.semester,k.tahun_ajaran,k.status_krs,k.tanggal_mulai,k.tanggal_selesai,
    d.nama_dosen AS nama_dosen_pa,approver.nama_dosen AS nama_pemeriksa
-   {$baseSql} AND pk.id_pengajuan=? LIMIT 1");
+   FROM pengajuan_krs pk JOIN krs k ON k.id_krs=pk.id_krs
+   JOIN mahasiswa m ON m.id_mahasiswa=pk.id_mahasiswa
+   LEFT JOIN prodi p ON p.id_prodi=m.id_prodi
+   LEFT JOIN dosen d ON d.id_dosen=m.id_dosen_pa
+   LEFT JOIN dosen approver ON approver.id_dosen=pk.id_dosen_acc
+   {$detailWhere} LIMIT 1");
  $detailParams=$params;$detailParams[]=$detailId;$q->execute($detailParams);$detail=$q->fetch();
  if(!$detail){http_response_code(404);$error='Pengajuan tidak ditemukan pada filter yang dipilih.';}
  else{
