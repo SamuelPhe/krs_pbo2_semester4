@@ -132,7 +132,7 @@ button,input,select{font:inherit}.screen{width:min(1024px,100%);height:min(600px
 </head><body>
 <div class="screen">
 <?php if (!$account): ?>
-<img class="login-bg" src="../src/main/resources/desain/Login%20(2).png" alt="">
+<img class="login-bg" src="https://raw.githubusercontent.com/SamuelPhe/krs_pbo2_semester4/master/src/main/resources/desain/Login%20(2).png" alt="">
 <?php if ($error !== ''): ?><div class="error"><?=krs_e($error)?></div><?php endif; ?>
 <form class="login-form" method="post" autocomplete="on">
 <input type="hidden" name="csrf_token" value="<?=krs_e($_SESSION['csrf_token'])?>">
