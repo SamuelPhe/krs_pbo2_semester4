@@ -1,6 +1,6 @@
 # KRS Nostalgia — GitHub Codespaces
 
-This configuration runs the original Java Swing KRS application and a separate PHP web login/dashboard in one private Codespace. Both connect to the same MariaDB database restored from `krs_db.sql`.
+This configuration runs the original Java Swing KRS application and a separate PHP web application in one private Codespace. The web app provides login, a database-backed dashboard, and Edit Profile. Both connect to the same MariaDB database restored from `krs_db.sql`.
 
 ## Open the browser-based web version
 
@@ -10,7 +10,7 @@ This configuration runs the original Java Swing KRS application and a separate P
 4. Open the **Ports** tab in the Codespaces editor.
 5. Find **KRS web (private)**, port `8081`, and choose **Open in Browser**.
 
-The browser should display the KRS login page. After login, the current web version displays database-backed counts on a dashboard.
+The browser should display the KRS login page. After login, the dashboard displays database-backed counts and an **Edit Profile** menu. The profile form supports all five roles, name changes, and optional password changes.
 
 ## Open the original Java Swing application
 
@@ -34,7 +34,7 @@ The PHP web app and Java desktop app both use database `krs_db`. The database po
 
 ## Current web scope
 
-The PHP web version currently supports role-based login and a dashboard with database row counts. It is not yet a complete web port of the original Swing CRUD, KRS submission, academic-advisor approval, finalization, or reporting modules. The GitHub Pages demo is a separate static simulation and does not connect to MariaDB.
+The PHP web version currently supports role-based login, a dashboard with database row counts, and Edit Profile. The other academic modules are not yet ported to the browser; they remain available in the original Swing app. The GitHub Pages demo is a separate static simulation and does not connect to MariaDB.
 
 ## Stop and resume
 
