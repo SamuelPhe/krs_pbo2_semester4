@@ -25,7 +25,11 @@ if (!isset($types[$type])) {
 }
 $meta = $types[$type];
 $editId = filter_input(INPUT_GET, 'edit', FILTER_VALIDATE_INT) ?: 0;
-$showForm = isset($_GET['new']) || $editId > 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save') {
+    $postedEditId = filter_var($_POST['edit_id'] ?? '', FILTER_VALIDATE_INT);
+    if ($postedEditId !== false && $postedEditId !== null && $postedEditId > 0) $editId = (int)$postedEditId;
+}
+$showForm = isset($_GET['new']) || $editId > 0 || ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save');
 $error = '';
 $success = (string)($_SESSION['master_user_flash'] ?? '');
 unset($_SESSION['master_user_flash']);
@@ -132,7 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $advisorId = $values['advisor'] === '' ? null : filter_var($values['advisor'], FILTER_VALIDATE_INT);
                 $cohort = filter_var($values['cohort'], FILTER_VALIDATE_INT);
                 $semester = filter_var($values['semester'], FILTER_VALIDATE_INT);
-                if (strlen($values['name']) < 2 || strlen($values['name']) > 200) {
+                $nameChars = preg_match_all('/./us', $values['name']);
+                if ($nameChars === false || $nameChars < 2 || $nameChars > 50) {
                     $error = 'Nama harus terdiri dari 2 sampai 50 karakter.';
                 } elseif ($idValue === false || ($idValue !== null && $idValue < 1)) {
                     $error = 'ID akun harus berupa bilangan bulat positif.';
@@ -220,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header('Location: master-user.php?type=' . rawurlencode($type), true, 303);
                     exit;
                 }
-                $editId = (int)($idValue ?: 0);
+                $editId = (int)($_POST['edit_id'] ?? 0);
                 $showForm = true;
             } else {
                 $error = 'Aksi Master User tidak dikenal.';
@@ -309,7 +314,7 @@ input,select{min-height:39px;padding:8px 10px;border:1px solid #aebfba;backgroun
 <h2 style="margin:0 0 14px;color:#20675f"><?=krs_e($editLabel)?> <?=krs_e($meta['label'])?></h2>
 <form method="post" action="master-user.php?type=<?=krs_e($type)?>">
 <input type="hidden" name="csrf_token" value="<?=krs_e((string)($_SESSION['csrf_token'] ?? ''))?>">
-<input type="hidden" name="type" value="<?=krs_e($type)?>"><input type="hidden" name="action" value="save">
+<input type="hidden" name="type" value="<?=krs_e($type)?>"><input type="hidden" name="edit_id" value="<?=krs_e((string)$editId)?>"><input type="hidden" name="action" value="save">
 <div class="form-grid">
 <div class="field"><label for="id">ID Akun (opsional)</label><input id="id" name="id" type="number" min="1" value="<?=krs_e((string)$values['id'])?>" <?=($editId > 0 ? 'readonly' : '')?> placeholder="Kosongkan untuk ID otomatis"><p class="hint">ID utama dapat dibuat otomatis oleh database.</p></div>
 <div class="field"><label for="name">Nama / Username</label><input id="name" name="name" maxlength="50" required value="<?=krs_e((string)$values['name'])?>"></div>
