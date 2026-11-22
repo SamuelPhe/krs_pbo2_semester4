@@ -171,4 +171,4 @@ status="$(curl --silent --show-error --cookie "$second_jar" --cookie-jar "$secon
   --data-urlencode "id_pengajuan=$other_id" "$BASE_URL/pengajuan.php")"
 [[ "$status" == "303" ]]
 
-echo "PASS: student application creation, course selection, duplicate and conflict rejection, 24-SKS limit page, locking, IDOR protection, and Draft deletion."
+echo "PASS: student application creation, course selection, duplicate and conflict rejection, SKS summary, locking, IDOR protection, and Draft deletion."
