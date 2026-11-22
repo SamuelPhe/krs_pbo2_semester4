@@ -48,6 +48,7 @@ jobs:
           bash -n tests/profile-guard.sh
           bash -n tests/profile-http-smoke.sh
           bash -n tests/krs-period-smoke.sh
+          bash -n tests/student-krs-smoke.sh
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml config -q
           test -f .devcontainer/php/Dockerfile
 
@@ -69,6 +70,7 @@ jobs:
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/index.php
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/profile.php
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/krs.php
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/pengajuan.php
           web_page=$(curl --fail --silent --show-error http://127.0.0.1:8081/)
           printf '%s' "$web_page" | grep -q 'KRS — Sistem Informasi Akademik'
           db_counts=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -r '$pdo = new PDO("mysql:host=".getenv("DB_HOST").";dbname=".getenv("DB_DATABASE"), getenv("DB_USER"), getenv("DB_PASSWORD")); echo $pdo->query("SELECT COUNT(*) FROM mahasiswa")->fetchColumn();')
@@ -110,6 +112,24 @@ jobs:
             $pdo->prepare("INSERT INTO mahasiswa (id_mahasiswa, id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, password, semester) VALUES (?, ?, ?, ?, ?, ?, ?)")->execute([991001, 111, 10002, "KRS Period Student", 2025, $hash, 4]);
           '
           KRS_PERIOD_TEST_PASSWORD="$period_password" bash tests/krs-period-smoke.sh http://127.0.0.1:8081
+
+      - name: Verify student KRS submission and course selection
+        run: |
+          application_password="$(openssl rand -hex 20)"
+          application_session_id=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T -e KRS_APPLICATION_TEST_PASSWORD="$application_password" web php -r '
+            require "/var/www/html/config.php";
+            $pdo = krs_db();
+            $hash = krs_password_hash((string)getenv("KRS_APPLICATION_TEST_PASSWORD"));
+            $student = $pdo->prepare("INSERT INTO mahasiswa (id_mahasiswa, id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, password, semester) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $student->execute([992001, 111, 10002, "KRS Application Student", 2025, $hash, 2]);
+            $student->execute([992002, 111, 10002, "KRS Application Other Student", 2025, $hash, 2]);
+            $pdo->exec("INSERT INTO krs (id_prodi, semester, tahun_ajaran, status_krs, tanggal_mulai, tanggal_selesai) VALUES (111, 2, YEAR(CURRENT_DATE), '\''terbuka'\'', CURRENT_DATE, DATE_ADD(CURRENT_DATE, INTERVAL 30 DAY))");
+            $sessionId = (int)$pdo->lastInsertId();
+            $pdo->exec("DELETE FROM jadwal WHERE id_jadwal = 99");
+            $pdo->exec("INSERT INTO jadwal (id_jadwal, id_matkul, id_dosen, hari, kelas, jam_mulai, jam_selesai, ruang) VALUES (99, 1002, 10001, '\''senin'\'', '\''4'\'', '\''16:30:00'\'', '\''18:00:00'\'', '\''5'\'')");
+            echo $sessionId;
+          ')
+          KRS_APPLICATION_TEST_PASSWORD="$application_password" KRS_APPLICATION_SESSION_ID="$application_session_id" bash tests/student-krs-smoke.sh http://127.0.0.1:8081
 
       - name: Stop local services
         if: always()
