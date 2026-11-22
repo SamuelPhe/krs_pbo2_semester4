@@ -27,19 +27,20 @@ if($semester!==''){$where[]='k.semester=?';$params[]=(int)$semester;}
 if($studentId!==''){$where[]='m.id_mahasiswa=?';$params[]=(int)$studentId;}
 $whereSql=$where?'WHERE '.implode(' AND ',$where):'';
 
-$baseSql=" FROM pengajuan_krs pk JOIN krs k ON k.id_krs=pk.id_krs
+$baseFrom=" FROM pengajuan_krs pk JOIN krs k ON k.id_krs=pk.id_krs
  JOIN mahasiswa m ON m.id_mahasiswa=pk.id_mahasiswa
  LEFT JOIN prodi p ON p.id_prodi=m.id_prodi
  LEFT JOIN dosen d ON d.id_dosen=m.id_dosen_pa
- LEFT JOIN dosen approver ON approver.id_dosen=pk.id_dosen_acc {$whereSql}";
+ LEFT JOIN dosen approver ON approver.id_dosen=pk.id_dosen_acc";
+$baseSql=$baseFrom.' '.$whereSql;
 
 if($csv){
  $q=$pdo->prepare("SELECT pk.id_pengajuan,k.id_krs,m.id_mahasiswa,m.nama_mahasiswa,p.nama_prodi,
    k.semester,k.tahun_ajaran,pk.tanggal_pengajuan,pk.status_acc,d.nama_dosen AS dosen_pa,
    approver.nama_dosen AS pemeriksa,mc.nama_matkul,mc.sks,kd.status_acc AS status_matkul,kd.catatan_revisi
-   {$baseSql} LEFT JOIN krs_detail kd ON kd.id_pengajuan=pk.id_pengajuan
+   {$baseFrom} LEFT JOIN krs_detail kd ON kd.id_pengajuan=pk.id_pengajuan
    LEFT JOIN jadwal j ON j.id_jadwal=kd.id_jadwal
-   LEFT JOIN matkul mc ON mc.id_matkul=j.id_matkul
+   LEFT JOIN matkul mc ON mc.id_matkul=j.id_matkul {$whereSql}
    ORDER BY k.tahun_ajaran DESC,k.semester,m.nama_mahasiswa,pk.id_pengajuan");
  $q->execute($params);
  header('Content-Type: text/csv; charset=utf-8');
