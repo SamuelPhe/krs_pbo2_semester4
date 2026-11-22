@@ -35,7 +35,7 @@ services:
       DB_USER: krs_local
       DB_PASSWORD: krs_codespace_only
     healthcheck:
-      test: ["CMD", "php", "-r", "$body = @file_get_contents('http://127.0.0.1/'); exit($body === false ? 1 : 0);"]
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/') === false ? 1 : 0);"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -54,7 +54,7 @@ services:
       - "../krs_db.sql:/docker-entrypoint-initdb.d/01-krs-dump.sql:ro"
       - "../database/web_auth_password_migration.sql:/docker-entrypoint-initdb.d/02-password-columns.sql:ro"
     healthcheck:
-      test: ["CMD-SHELL", "mariadb-admin ping --protocol=tcp -h 127.0.0.1 -uroot -p${MARIADB_ROOT_PASSWORD} --silent"]
+      test: ["CMD-SHELL", "mariadb-admin ping --protocol=tcp -h 127.0.0.1 -uroot -pkrs_root_codespace_only --silent"]
       start_period: 45s
       interval: 5s
       timeout: 5s
