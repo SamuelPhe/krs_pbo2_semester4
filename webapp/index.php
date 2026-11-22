@@ -167,6 +167,18 @@ button,input,select{font:inherit}.screen{width:min(1024px,100%);height:min(600px
         <a class="feature-link" href="pengajuan.php"><?=krs_e($feature)?></a>
     <?php elseif ($feature === 'Data KRS' && in_array(($account['role'] ?? ''), ['Dosen PA', 'Kaprodi'], true)): ?>
         <a class="feature-link" href="review.php"><?=krs_e($feature)?></a>
+    <?php elseif ($feature === 'Jadwal Ajar' && in_array(($account['role'] ?? ''), ['Dosen', 'Dosen PA', 'Kaprodi'], true)): ?>
+        <a class="feature-link" href="jadwal-ajar.php"><?=krs_e($feature)?></a>
+    <?php elseif ($feature === 'Mahasiswa PA' && in_array(($account['role'] ?? ''), ['Dosen PA', 'Kaprodi'], true)): ?>
+        <a class="feature-link" href="mahasiswa-pa.php"><?=krs_e($feature)?></a>
+    <?php elseif ($feature === 'Finalisasi KRS' && ($account['role'] ?? '') === 'Kaprodi'): ?>
+        <a class="feature-link" href="finalisasi.php"><?=krs_e($feature)?></a>
+    <?php elseif ($feature === 'Master User' && ($account['role'] ?? '') === 'Admin'): ?>
+        <a class="feature-link" href="master-user.php"><?=krs_e($feature)?></a>
+    <?php elseif ($feature === 'Master Data' && ($account['role'] ?? '') === 'Admin'): ?>
+        <a class="feature-link" href="master-data.php"><?=krs_e($feature)?></a>
+    <?php elseif ($feature === 'Riwayat KRS' && ($account['role'] ?? '') === 'Admin'): ?>
+        <a class="feature-link" href="riwayat.php"><?=krs_e($feature)?></a>
     <?php else: ?>
         <div class="feature-disabled" aria-disabled="true">
             <span><?=krs_e($feature)?></span>
@@ -175,7 +187,7 @@ button,input,select{font:inherit}.screen{width:min(1024px,100%);height:min(600px
     <?php endif; ?>
 <?php endforeach; ?>
 </div>
-<p class="footnote">Edit Profile, manajemen sesi Admin, pengajuan Mahasiswa, dan review KRS Dosen PA sudah tersedia. Finalisasi Kaprodi dan laporan masih dalam tahap pemindahan.</p>
+<p class="footnote">Fitur web aktif: Master User, Master Data, pengajuan dan review KRS, finalisasi, riwayat, Jadwal Ajar, serta Mahasiswa PA. Tampilan web menggunakan aset asli Swing dengan susunan responsif untuk browser.</p>
 </div>
 <?php endif; ?>
 </div></body></html>
