@@ -55,7 +55,8 @@ function mpa_status_class(string $s):string{return match($s){'Disetujui'=>'appro
 .status{display:inline-block;padding:4px 8px;border-radius:14px;font-size:11px;font-weight:700}.approved{background:#d8f0e4;color:#216b48}.rejected{background:#fde5e2;color:#a03229}.review{background:#fff0c8;color:#86580b}.draft{background:#e9eef0;color:#435a61}.neutral{background:#e5eae8;color:#53645e}
 .meta{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:14px}.meta div{background:#fff;border:1px solid #b1c3bc;padding:9px}.meta small{display:block;color:#71807a;font-size:11px}.meta strong{display:block;color:#2d4d44;font-size:13px;margin-top:3px}.alert{background:#fff0ed;border:1px solid #dfb8ae;padding:10px;color:#8c3428}
 @media(max-width:720px){body{padding:0}.content{padding:22px 13px}.heading{align-items:flex-start}.meta{grid-template-columns:1fr 1fr}.table-wrap table{min-width:760px}}
-</style></head><body><main class="canvas"><img class="bg" src="https://raw.githubusercontent.com/SamuelPhe/krs_pbo2_semester4/master/src/main/resources/desain/Rectangle%20(right).png" alt=""><div class="content">
+</style><link rel="stylesheet" href="ui.css?v=20261122">
+</head><body><main class="canvas"><img class="bg" src="https://raw.githubusercontent.com/SamuelPhe/krs_pbo2_semester4/master/src/main/resources/desain/Rectangle%20(right).png" alt=""><div class="content">
 <header class="heading"><div><h1><?=($detailId>0?'Detail Riwayat KRS Mahasiswa':($studentId>0?'Riwayat KRS Mahasiswa Bimbingan':'Daftar Mahasiswa Bimbingan'))?></h1><p><?=krs_e((string)$advisor['nama_dosen'])?> · <?=krs_e($role)?></p></div><a class="back" href="<?=($detailId>0?'mahasiswa-pa.php?student='.$studentId:($studentId>0?'mahasiswa-pa.php':'index.php'))?>">Back</a></header>
 <?php if($error!==''): ?><div class="alert"><?=krs_e($error)?></div><?php endif; ?>
 <?php if($student): ?>
