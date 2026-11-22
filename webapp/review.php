@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $error = 'Pilih satu sampai 40 mata kuliah yang masih menunggu tinjauan.';
                     } else {
                         $reason = trim((string)($_POST['catatan_revisi'] ?? ''));
-                        if ($action === 'reject_selected' && ($reason === '' || mb_strlen($reason, 'UTF-8') > 1000)) {
+                        if ($action === 'reject_selected' && ($reason === '' || strlen($reason) > 1000)) {
                             $pdo->rollBack();
                             $error = 'Catatan revisi wajib diisi dan maksimal 1.000 karakter.';
                         } else {
@@ -148,10 +148,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             foreach ($detailIds as $detailId) {
                                 if ($action === 'approve_selected') {
                                     $approve->execute([$detailId, $postedId, $advisorId]);
+                                    $updated += $approve->rowCount();
                                 } else {
                                     $reject->execute([$reason, $detailId, $postedId, $advisorId]);
+                                    $updated += $reject->rowCount();
                                 }
-                                $updated += $approve->rowCount() + $reject->rowCount();
                             }
                             if ($updated < 1) {
                                 $pdo->rollBack();
