@@ -142,23 +142,12 @@ status="$(curl --silent --show-error --cookie "$admin_jar" --cookie-jar "$admin_
 [[ "$status" == "200" ]]
 grep -Fq 'Tanggal sesi beririsan' "$WORK_DIR/overlap.html"
 
-# A period with an existing submission must not be deleted.
-php -r '
-$pdo = new PDO(
-    "mysql:host=" . getenv("DB_HOST") . ";dbname=" . getenv("DB_DATABASE"),
-    getenv("DB_USER"),
-    getenv("DB_PASSWORD"),
-    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-);
-$pdo->prepare("INSERT INTO pengajuan_krs (id_pengajuan, id_krs, id_mahasiswa, tanggal_pengajuan, status_acc) VALUES (?, ?, ?, CURRENT_DATE, ?)")
-    ->execute([991001, (int)$argv[1], 991001, "Draft"]);
-' "$period_id"
-
+# The historical SQL dump has two submissions linked to KRS session 11.
 status="$(curl --silent --show-error --cookie "$admin_jar" --cookie-jar "$admin_jar" \
   --output "$WORK_DIR/delete-guard.html" --write-out '%{http_code}' \
   --data-urlencode "csrf_token=$token" \
   --data-urlencode 'action=delete' \
-  --data-urlencode "id_krs=$period_id" "$BASE_URL/krs.php")"
+  --data-urlencode 'id_krs=11' "$BASE_URL/krs.php")"
 [[ "$status" == "200" ]]
 grep -Fq 'Sesi tidak dapat dihapus' "$WORK_DIR/delete-guard.html"
 
