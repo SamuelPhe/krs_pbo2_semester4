@@ -53,7 +53,7 @@ jobs:
         run: |
           export localWorkspaceFolderBasename=krs
           if ! docker compose -f .devcontainer/docker-compose.yml up -d --build --wait --wait-timeout 240; then
-            docker compose -f .devcontainer/docker-compose.yml logs database
+            docker compose -f .devcontainer/docker-compose.yml logs
             exit 1
           fi
           tables=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T database mariadb -uroot -pkrs_root_codespace_only -N -D krs_db -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='krs_db'")
@@ -64,7 +64,7 @@ jobs:
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/index.php
           web_page=$(curl --fail --silent --show-error http://127.0.0.1:8081/)
           printf '%s' "$web_page" | grep -q 'KRS — Sistem Informasi Akademik'
-          db_counts=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -r '$pdo = new PDO("mysql:host=".$_ENV["DB_HOST"].";dbname=".$_ENV["DB_DATABASE"], $_ENV["DB_USER"], $_ENV["DB_PASSWORD"]); echo $pdo->query("SELECT COUNT(*) FROM mahasiswa")->fetchColumn();')
+          db_counts=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -r '$pdo = new PDO("mysql:host=".getenv("DB_HOST").";dbname=".getenv("DB_DATABASE"), getenv("DB_USER"), getenv("DB_PASSWORD")); echo $pdo->query("SELECT COUNT(*) FROM mahasiswa")->fetchColumn();')
           test "$db_counts" -gt 0
 
       - name: Stop local services

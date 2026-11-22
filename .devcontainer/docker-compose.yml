@@ -35,7 +35,7 @@ services:
       DB_USER: krs_local
       DB_PASSWORD: krs_codespace_only
     healthcheck:
-      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/') === false ? 1 : 0);"]
+      test: ["CMD", "php", "-l", "/var/www/html/index.php"]
       interval: 10s
       timeout: 5s
       retries: 12
