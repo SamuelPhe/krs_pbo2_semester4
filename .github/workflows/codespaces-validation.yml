@@ -48,16 +48,11 @@ jobs:
 
       - name: Restore and check original MariaDB snapshot
         run: |
-          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml up -d database
-          ready=0
-          for attempt in $(seq 1 60); do
-            if localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T database healthcheck.sh --connect --innodb_initialized; then
-              ready=1
-              break
-            fi
-            sleep 2
-          done
-          test "$ready" -eq 1
+          export localWorkspaceFolderBasename=krs
+          if ! docker compose -f .devcontainer/docker-compose.yml up -d --wait --wait-timeout 180 database; then
+            docker compose -f .devcontainer/docker-compose.yml logs database
+            exit 1
+          fi
           tables=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T database mariadb -uroot -pkrs_root_codespace_only -N -D krs_db -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='krs_db'")
           test "$tables" -eq 11
           password_columns=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T database mariadb -uroot -pkrs_root_codespace_only -N -D krs_db -e "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema='krs_db' AND column_name='password' AND character_maximum_length=255")
