@@ -4,7 +4,6 @@ The KRS Academic Management System is a Java desktop application developed as an
 
 > **Project type:** Desktop application  
 > **Project context:** Academic project — Semester 4  
-> **Public showcase:** [KRS-Academic-Management-Showcase](https://github.com/SamuelPhe/KRS-Academic-Management-Showcase)
 
 ## 1. Application preview
 
