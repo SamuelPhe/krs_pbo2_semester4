@@ -75,7 +75,7 @@ The repository can run both interfaces in the same private GitHub Codespace. The
 4. Open the **Ports** tab at the bottom of the Codespaces editor.
 5. Find **KRS web (private)** on port `8081`, then select **Open in Browser**.
 
-The web page shows the KRS login screen and a dashboard with counts read from the Codespaces database. The **Edit Profile** menu opens a working browser form for all five account roles. Other academic menu items are clearly marked as not yet available in the web version.
+The web page shows the KRS login screen and a dashboard with counts read from the Codespaces database. The **Edit Profile** menu is available for all five account roles. The **Data KRS** menu opens the appropriate module for Admin (session management), Mahasiswa (submission and course selection), and Dosen PA/Kaprodi (advisor review). Finalisasi Kaprodi and other remaining academic modules are still marked as not yet available in the web version.
 
 **Open the original Java Swing desktop version:**
 
@@ -85,7 +85,7 @@ The web page shows the KRS login screen and a dashboard with counts read from th
 
 Both ports must remain **Private**. Do not change either port to Public. If a Codespace was created before the PHP web service was added and port `8081` does not appear, run **Codespaces: Rebuild Container** from the VS Code Command Palette, then check the Ports tab again.
 
-The PHP web version currently provides role-based login, a database-summary dashboard, **Edit Profile** for all five account roles, **Admin KRS session management** (list, create, edit, overlap validation, and guarded deletion), and **student KRS submission** (draft creation, course selection, duplicate and timetable-conflict checks, a 24-SKS cap, and submission locking). These screens reuse the original Swing background assets. The web version is **not yet a complete web port** of Dosen PA review/approval, Kaprodi finalization, and reporting. The separate GitHub Pages demo remains a static browser simulation and does not connect to this database.
+The PHP web version currently provides role-based login, a database-summary dashboard, **Edit Profile** for all five account roles, **Admin KRS session management** (list, create, edit, overlap validation, and guarded deletion), **student KRS submission** (draft creation, course selection, duplicate and timetable-conflict checks, a 24-SKS cap, and submission locking), and **Dosen PA review** (per-course approval/revision notes, advisor ownership checks, and sending completed approvals to the Kaprodi queue). These screens reuse the original Swing background assets and table concepts, but the browser layout is responsive HTML rather than a pixel-for-pixel copy of Swing. Kaprodi finalization, reporting, and other academic modules remain incomplete. The separate GitHub Pages demo remains a static browser simulation and does not connect to this database.
 
 The original Java application can still be run locally:
 
