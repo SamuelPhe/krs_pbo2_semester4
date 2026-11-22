@@ -1,51 +1,101 @@
 # KRS Academic Management System
 
-Aplikasi desktop untuk membantu pengelolaan Kartu Rencana Studi (KRS) sebagai proyek perkuliahan Pemrograman Berorientasi Objek Semester 4.
+The KRS Academic Management System is a Java desktop application developed as an **Object-Oriented Programming (PBO), Semester 4** course project. It supports a course-registration workflow involving students, academic advisors, and administrators.
 
-## Fitur proyek
-- Login dengan peran Mahasiswa, Dosen, dan Admin.
-- Pengelolaan data program studi, mahasiswa, dosen, mata kuliah, kelas, ruang, dan jadwal.
-- Pengajuan KRS dan pemilihan mata kuliah.
-- Pemeriksaan mata kuliah ganda dan bentrok jadwal.
-- Peninjauan/persetujuan KRS oleh Dosen PA.
-- Finalisasi KRS oleh Kaprodi.
-- Arsip KRS dan pencetakan laporan menggunakan JasperReports.
+> **Project type:** Desktop application  
+> **Project context:** Academic project — Semester 4  
+> **Public showcase:** [KRS-Academic-Management-Showcase](https://github.com/SamuelPhe/KRS-Academic-Management-Showcase)
 
-## Teknologi
-Java 8, Java Swing, MySQL/JDBC, Maven, JasperReports, AbsoluteLayout, dan NetBeans GUI Builder.
+## 1. Application preview
 
-## Preview antarmuka
+The repository includes UI design and application preview images.
 
-**Halaman utama**
+### Home page
+![KRS home page](src/main/resources/desain/home%20page%20%282%29.png)
 
-![Preview halaman utama](src/main/resources/desain/home%20page%20%282%29.png)
+### Login page
+![KRS login page](src/main/resources/desain/Login%20%282%29.png)
 
-**Halaman login**
+### KRS detail
+![KRS detail](src/main/resources/desain/Detail%20KRS.png)
 
-![Preview halaman login](src/main/resources/desain/Login%20%282%29.png)
+### Schedule management
+![Schedule management](src/main/resources/desain/Jadwal.png)
 
-**Detail KRS**
+## 2. Main features
 
-![Preview detail KRS](src/main/resources/desain/Detail%20KRS.png)
+- Role-based login for **students, lecturers, and administrators**
+- Management of study programs, students, lecturers, courses, classes, rooms, and schedules
+- Student course-registration submission and course selection
+- Duplicate-course and timetable-conflict checks
+- Academic-advisor (Dosen PA) review and approval
+- Study-program coordinator (Kaprodi) finalization
+- KRS archiving and report printing with JasperReports
 
-## Menjalankan proyek
-1. Instal JDK 17 (disarankan untuk build), Maven, dan MySQL/MariaDB. Konfigurasi compiler pada `pom.xml` tetap menargetkan kompatibilitas bytecode Java 8.
-2. Siapkan database `krs_db` beserta tabel sesuai skema database proyek.
-3. Atur environment variable:
-   - `DB_URL` (opsional; default `jdbc:mysql://127.0.0.1:3306/krs_db?serverTimezone=UTC`)
-   - `DB_USER` (wajib)
-   - `DB_PASSWORD` (wajib)
-4. Jalankan `mvn clean compile`.
-5. Jalankan `mvn exec:java` untuk membuka halaman login.
+## 3. Technology stack
 
-**Catatan:** repository belum menyertakan dump SQL database. Skema perlu disiapkan dari salinan database perkuliahan sebelum aplikasi dapat dijalankan.
+- Java (Maven compiler release 8; JDK 17 is recommended for the current build environment)
+- Java Swing
+- MySQL and JDBC
+- MySQL Connector/J 8.3.0
+- JasperReports 7.0.3
+- NetBeans AbsoluteLayout
+- NetBeans GUI Builder
 
-## Keamanan
-- Koneksi database menggunakan environment variable dan tidak lagi menyimpan password database di source.
-- Password baru disimpan dengan PBKDF2-HMAC-SHA256 dan salt acak.
-- Password lama berbentuk teks biasa akan diverifikasi saat login pertama, lalu otomatis ditingkatkan menjadi hash.
-- Sebelum menggunakan versi ini, jalankan `database/password_hash_migration.sql` pada salinan database agar kolom password mendukung hash hingga 255 karakter.
-- Ini proyek akademik dan belum dinyatakan siap produksi; lakukan pengujian pada database salinan.
+## 4. Architecture overview
 
-## Konteks pengerjaan
-Proyek dikerjakan sebagai tugas perkuliahan dengan panduan pembelajaran dan bantuan AI. Deskripsi fitur merangkum fungsi yang tampak pada kode dan struktur proyek.
+The application is structured as a Java Swing desktop program. UI forms support role-specific workflows and call the database access class for authentication and data operations. The database layer uses JDBC and prepared statements for parameterized queries. JasperReports is used for report generation.
+
+```mermaid
+flowchart TD
+    U[Student, Lecturer, or Admin] --> UI[Java Swing Forms]
+    UI --> FLOW[Course Registration and Academic Workflow]
+    FLOW --> AUTH[Role Authentication and Session]
+    FLOW --> DAL[Database Access Class]
+    DAL --> JDBC[JDBC / MySQL Connector]
+    JDBC --> DB[(MySQL Database)]
+    FLOW --> REPORT[JasperReports]
+    REPORT --> PDF[Printable KRS Reports]
+```
+
+## 5. Demo and local setup
+
+There is **no publicly hosted demo** because this is a desktop application. To run it locally:
+
+1. Install JDK 17 and Maven.
+2. Prepare a MySQL or MariaDB database named `krs_db`. The repository does not include a complete database dump or schema.
+3. Restore the schema from a trusted local coursework backup.
+4. Set the database environment variables:
+   - `DB_URL` (optional; default: `jdbc:mysql://127.0.0.1:3306/krs_db?serverTimezone=UTC`)
+   - `DB_USER`
+   - `DB_PASSWORD`
+5. Build the application:
+
+   ```bash
+   mvn clean compile
+   ```
+
+6. Run the application:
+
+   ```bash
+   mvn exec:java
+   ```
+
+The provided migration script `database/password_hash_migration.sql` should only be applied to a backed-up database copy after reviewing its effect. No demo account or real student data is provided.
+
+## 6. Project structure
+
+- `src/main/java/PBO_Project_2/` — Swing forms, academic workflows, session, password, and database classes
+- `src/main/resources/desain/` — UI design and preview images
+- `pom.xml` — Maven compiler and dependency configuration
+- `database/` — database migration note
+
+## 7. Copyright and license
+
+Copyright (c) 2026 Samuel Phe. All rights reserved.
+
+Original project code, documentation, and assets authored for the KRS Academic Management System are proprietary. No permission is granted to copy, modify, redistribute, sublicense, or reuse these materials without prior written permission. Java, MySQL Connector/J, JasperReports, NetBeans components, and other third-party libraries remain subject to their own licenses and notices. See the [LICENSE](LICENSE) file.
+
+---
+
+This is an academic portfolio project, not a production-ready university information system. Validate the database schema and test the application using a disposable database copy before any demonstration.
