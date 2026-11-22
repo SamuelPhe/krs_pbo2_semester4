@@ -165,6 +165,8 @@ button,input,select{font:inherit}.screen{width:min(1024px,100%);height:min(600px
         <a class="feature-link" href="krs.php"><?=krs_e($feature)?></a>
     <?php elseif ($feature === 'Data KRS' && ($account['role'] ?? '') === 'Mahasiswa'): ?>
         <a class="feature-link" href="pengajuan.php"><?=krs_e($feature)?></a>
+    <?php elseif ($feature === 'Data KRS' && in_array(($account['role'] ?? ''), ['Dosen PA', 'Kaprodi'], true)): ?>
+        <a class="feature-link" href="review.php"><?=krs_e($feature)?></a>
     <?php else: ?>
         <div class="feature-disabled" aria-disabled="true">
             <span><?=krs_e($feature)?></span>
@@ -173,7 +175,7 @@ button,input,select{font:inherit}.screen{width:min(1024px,100%);height:min(600px
     <?php endif; ?>
 <?php endforeach; ?>
 </div>
-<p class="footnote">Edit Profile, manajemen sesi KRS Admin, dan pengajuan KRS Mahasiswa sudah tersedia. Modul Dosen PA dan Kaprodi masih dalam tahap pemindahan dari Java Swing.</p>
+<p class="footnote">Edit Profile, manajemen sesi Admin, pengajuan Mahasiswa, dan review KRS Dosen PA sudah tersedia. Finalisasi Kaprodi dan laporan masih dalam tahap pemindahan.</p>
 </div>
 <?php endif; ?>
 </div></body></html>
