@@ -15,7 +15,7 @@ public class database {
     }
 
     private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME
-            + "?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+            + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     
     private Connection conn;
 
