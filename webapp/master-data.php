@@ -231,7 +231,8 @@ button,.button{display:inline-block;border:1px solid #6a817a;background:#f7f8f4;
 label{font-size:13px;font-weight:700;color:#38534c}input,select{min-height:39px;padding:8px 10px;border:1px solid #aebfba;background:white;color:#283a36;font:14px "Segoe UI",Arial,sans-serif}
 .actions{display:flex;gap:9px;justify-content:flex-end;margin-top:16px}.hint{font-size:11px;color:#71817d}
 @media(max-width:720px){body{padding:0}.canvas{min-height:100vh}.content{padding:22px 14px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}h1{font-size:23px}}
-</style></head><body>
+</style><link rel="stylesheet" href="ui.css?v=20261122">
+</head><body>
 <main class="canvas"><img class="bg" src="https://raw.githubusercontent.com/SamuelPhe/krs_pbo2_semester4/master/src/main/resources/desain/Master%20Data.png" alt="">
 <div class="content"><h1>Master Data</h1>
 <nav class="nav"><?php foreach($entities as $key=>$item): ?><a class="<?=($type===$key?'active':'')?>" href="master-data.php?type=<?=krs_e($key)?>"><?=krs_e($item['label'])?></a><?php endforeach; ?><a class="back" href="index.php">Back</a></nav>
