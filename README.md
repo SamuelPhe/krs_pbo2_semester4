@@ -63,11 +63,35 @@ A **browser-based simulation** of the academic workflows is available in [`demo/
 
 To publish the demo, enable GitHub Pages at **Settings → Pages → Build and deployment → Source: GitHub Actions**, then run **Deploy browser demo** from the Actions tab. After deployment, the public URL will be: https://samuelphe.github.io/krs_pbo2_semester4/.
 
+### Run the original desktop app and the web login in Codespaces
+
+The repository can run both interfaces in the same private GitHub Codespace. They use the same local MariaDB database named `krs_db`.
+
+**Open the browser-based web version:**
+
+1. Open this repository on GitHub and select **Code → Codespaces**.
+2. Select **Create codespace on master** (or resume the existing KRS Codespace).
+3. Wait for the Codespace setup to finish. The MariaDB and PHP/Apache web services start automatically.
+4. Open the **Ports** tab at the bottom of the Codespaces editor.
+5. Find **KRS web (private)** on port `8081`, then select **Open in Browser**.
+
+The web page should show the KRS login screen. After a successful login it shows a dashboard with counts read from the Codespaces database.
+
+**Open the original Java Swing desktop version:**
+
+1. In the same Codespace, open the **Ports** tab.
+2. Find **KRS desktop (private)** on port `6080`.
+3. Select **Open in Browser** to open the virtual desktop containing the original Java Swing login window.
+
+Both ports must remain **Private**. Do not change either port to Public. If a Codespace was created before the PHP web service was added and port `8081` does not appear, run **Codespaces: Rebuild Container** from the VS Code Command Palette, then check the Ports tab again.
+
+The PHP web version is currently a browser-based login and database-summary dashboard. It is **not yet a complete web port** of the Java Swing CRUD, KRS submission, approval, and reporting modules. The separate GitHub Pages demo remains a static browser simulation and does not connect to this database.
+
 The original Java application can still be run locally:
 
 1. Install JDK 17 and Maven.
-2. Prepare a MySQL or MariaDB database named `krs_db`. The repository does not include a complete database dump or schema.
-3. Restore the schema from a trusted local coursework backup.
+2. Prepare a MySQL or MariaDB database named `krs_db`. The repository contains `krs_db.sql`, a historical coursework snapshot used by the Codespaces setup.
+3. For local experiments, restore a trusted copy of the coursework database. Some legacy Java Swing module queries still differ from this snapshot, so do not treat the dump as a verified production schema.
 4. Set the database environment variables:
    - `DB_URL` (optional; default: `jdbc:mysql://127.0.0.1:3306/krs_db?serverTimezone=UTC`)
    - `DB_USER`

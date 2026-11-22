@@ -14,11 +14,19 @@
       "vncPort": "5901"
     }
   },
-  "forwardPorts": [6080],
+  "forwardPorts": [
+    6080,
+    8081
+  ],
   "portsAttributes": {
     "6080": {
       "label": "KRS desktop (private)",
       "onAutoForward": "openBrowser"
+    },
+    "8081": {
+      "label": "KRS web (private)",
+      "onAutoForward": "notify",
+      "protocol": "http"
     }
   },
   "postStartCommand": "bash .devcontainer/start-desktop-app.sh",
