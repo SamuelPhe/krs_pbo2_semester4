@@ -3,12 +3,19 @@ package PBO_Project_2;
 import java.sql.*;
 
 public class database {
-    private static final String HOST     = "localhost";
-    private static final String PORT     = "3306";
-    private static final String DB_NAME  = "krs_db";
-    private static final String USER     = "root";
-    private static final String PASSWORD = "";
-    private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String HOST = env("DB_HOST", "localhost");
+    private static final String PORT = env("DB_PORT", "3306");
+    private static final String DB_NAME = env("DB_DATABASE", "krs_db");
+    private static final String USER = env("DB_USER", "root");
+    private static final String PASSWORD = env("DB_PASSWORD", "");
+
+    private static String env(String name, String fallback) {
+        String value = System.getenv(name);
+        return value == null || value.trim().isEmpty() ? fallback : value;
+    }
+
+    private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME
+            + "?useSSL=true&requireSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     
     private Connection conn;
 
@@ -27,6 +34,23 @@ public class database {
 
     public Connection getConnection() {
         return conn;
+    }
+
+    private boolean verifyAndUpgradePassword(ResultSet row, String submittedPassword,
+                                               String tableName, String idColumn) throws SQLException {
+        String storedPassword = row.getString("password");
+        if (!PasswordUtil.verify(submittedPassword, storedPassword)) {
+            return false;
+        }
+        if (PasswordUtil.needsUpgrade(storedPassword)) {
+            String sql = "UPDATE " + tableName + " SET password = ? WHERE " + idColumn + " = ?";
+            try (PreparedStatement update = conn.prepareStatement(sql)) {
+                update.setString(1, PasswordUtil.hash(submittedPassword));
+                update.setInt(2, row.getInt(idColumn));
+                update.executeUpdate();
+            }
+        }
+        return true;
     }
 
     // FUNGSI LOGIN (Hanya melakukan query, tidak membuka dashboard)
