@@ -141,7 +141,8 @@ button{border:1px solid #0b7068;background:#0b7068;color:white;padding:9px 13px;
 .alert{padding:10px 12px;background:#eef8f1;border:1px solid #b8d6c3;color:#265c40;margin-bottom:13px;font-size:13px}.alert.error{background:#fff0ed;border-color:#dfb8ae;color:#8c3428}
 .small{font-size:12px;color:#6b7974}.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:15px}.meta div{background:#ffffffdf;padding:9px;border:1px solid #b1c3bc}.meta small{display:block;color:#71807a;font-size:11px}.meta strong{display:block;margin-top:4px;color:#2f4c44;font-size:14px}
 @media(max-width:720px){body{padding:0}.content{padding:22px 14px}.heading{align-items:flex-start}.meta{grid-template-columns:1fr 1fr}.table-wrap table{min-width:750px}}
-</style></head><body>
+</style><link rel="stylesheet" href="ui.css?v=20261122">
+</head><body>
 <main class="canvas"><img class="bg" src="https://raw.githubusercontent.com/SamuelPhe/krs_pbo2_semester4/master/src/main/resources/desain/Rectangle%20(right).png" alt="">
 <div class="content"><header class="heading"><div><h1><?=($detailId>0?'Detail Finalisasi KRS':'Daftar KRS yang Perlu Difinalisasi')?></h1><p><?=krs_e((string)$account['name'])?> · Kaprodi</p></div><a class="back" href="<?=($detailId>0?'finalisasi.php':'index.php')?>">Back</a></header>
 <?php if($success!==''): ?><div class="alert" role="status"><?=krs_e($success)?></div><?php endif; ?><?php if($error!==''): ?><div class="alert error" role="alert"><?=krs_e($error)?></div><?php endif; ?>
