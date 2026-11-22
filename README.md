@@ -85,7 +85,7 @@ The web page shows the KRS login screen and a dashboard with counts read from th
 
 Both ports must remain **Private**. Do not change either port to Public. If a Codespace was created before the PHP web service was added and port `8081` does not appear, run **Codespaces: Rebuild Container** from the VS Code Command Palette, then check the Ports tab again.
 
-The PHP web version currently provides role-based login, a database-summary dashboard, and a working **Edit Profile** module. It is **not yet a complete web port** of the Java Swing CRUD, KRS submission, academic-advisor approval, finalization, and reporting modules. The separate GitHub Pages demo remains a static browser simulation and does not connect to this database.
+The PHP web version currently provides role-based login, a database-summary dashboard, **Edit Profile** for all five account roles, and **Admin KRS session management** (list, create, edit, overlap validation, and guarded deletion). The Admin KRS screen reuses the original Swing Manajemen Data background asset. The web version is **not yet a complete web port** of student KRS submission/course selection, academic-advisor approval, finalization, and reporting. The separate GitHub Pages demo remains a static browser simulation and does not connect to this database.
 
 The original Java application can still be run locally:
 
