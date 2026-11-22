@@ -100,7 +100,7 @@ h1, .heading h1, .content > h1, .top h1 {
   border-color: var(--krs-border);
   border-left: 4px solid var(--krs-primary);
 }
-.table-wrap, .table-scroll, .table-wrap, .table-scroll, .table-wrap {
+.table-wrap, .table-scroll {
   border: 1px solid var(--krs-border);
   border-radius: 4px;
   background: var(--krs-surface);
