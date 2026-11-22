@@ -21,8 +21,10 @@ public class login_form extends javax.swing.JFrame {
         
         jComboBox1.removeAllItems();
         jComboBox1.addItem("Mahasiswa");
-        jComboBox1.addItem("Dosen");
         jComboBox1.addItem("Admin");
+        jComboBox1.addItem("Kaprodi");
+        jComboBox1.addItem("Dosen PA");
+        jComboBox1.addItem("Dosen");
     }
 
     // 3. Logic Login
