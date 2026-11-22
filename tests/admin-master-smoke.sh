@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-set -x
 : "$KRS_REMAINING_PASSWORD"
 BASE_URL="http://127.0.0.1:8081"
 if [ "$#" -gt 0 ]; then BASE_URL="$1"; fi
