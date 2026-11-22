@@ -1,0 +1,33 @@
+{
+  "name": "KRS Nostalgia Desktop",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "workspace",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installMaven": true
+    },
+    "ghcr.io/devcontainers/features/desktop-lite:1": {
+      "password": "noPassword",
+      "webPort": "6080",
+      "vncPort": "5901"
+    }
+  },
+  "forwardPorts": [6080],
+  "portsAttributes": {
+    "6080": {
+      "label": "KRS desktop (private)",
+      "onAutoForward": "openBrowser",
+      "visibility": "private"
+    }
+  },
+  "postStartCommand": "bash .devcontainer/start-desktop-app.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack"
+      ]
+    }
+  }
+}
