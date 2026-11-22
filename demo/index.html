@@ -71,12 +71,12 @@ body{background:#e8edeb}
 .page:not(#page-dashboard) .head{display:flex;gap:20px}
 .page:not(#page-dashboard) .head h1{color:#214d42;font-size:25px}
 .page:not(#page-dashboard) .panel{border-radius:2px;box-shadow:none;border:1px solid #cbd9d2}
-@media(max-width:760px){.layout{width:calc(100% - 8px);height:auto;min-height:635px;margin:4px}.main{height:auto;min-height:635px}.content{height:auto;min-height:593px}#page-dashboard{min-height:593px}.swing-launch{width:190px;left:14px}. #page-dashboard .head{left:225px;right:10px}#page-dashboard .head h1{font-size:18px}}
+@media(max-width:760px){.layout{width:calc(100% - 8px);height:auto;min-height:635px;margin:4px}.main{height:auto;min-height:635px}.content{height:auto;min-height:593px}#page-dashboard{min-height:593px}.swing-launch{width:190px;left:14px}#page-dashboard .head{left:225px;right:10px}#page-dashboard .head h1{font-size:18px}}
 </style></head><body>
 <div class="layout"><aside class="side"><div class="brand"><div class="mark">K</div><div><strong>KRS Academic</strong><small>Academic Management</small></div></div><div><div class="navhead">Academic workspace</div><nav class="nav">
 <button class="active" data-page="dashboard"><span class="sym">▦</span>Dashboard</button><button data-page="schedule"><span class="sym">▤</span>Jadwal Ajar</button><button data-page="enroll"><span class="sym">＋</span>Pengajuan KRS</button><button data-page="approval"><span class="sym">✓</span>Mahasiswa PA</button><button data-page="finalize"><span class="sym">▣</span>Finalisasi KRS</button><button data-page="master"><span class="sym">♙</span>Master Data</button>
 </nav></div><div class="side-note"><b>Demo akademik</b>Gunakan pilihan peran untuk melihat alur Mahasiswa, Dosen PA, dan Admin/Kaprodi. Semua data bersifat fiktif.</div></aside>
-<main class="main"><header class="top"><div class="crumb">Academic / <b id="crumb">Dashboard</b></div><div class="right"><span class="demo">Interactive demo</span><select class="role" id="role"><option value="student">Mahasiswa</option><option value="lecturer">Dosen PA</option><option value="admin">Admin</option><option value="kaprodi">Kaprodi</option></select><div class="avatar" id="avatar">MR</div></div></header>
+<main class="main"><header class="top"><div class="crumb"><button class="window-back" onclick="go('dashboard')">← Dashboard</button><b id="crumb">Dashboard</b></div><div class="right"><span class="demo">Interactive demo</span><select class="role" id="role"><option value="student">Mahasiswa</option><option value="lecturer">Dosen PA</option><option value="admin">Admin</option><option value="kaprodi">Kaprodi</option></select><div class="avatar" id="avatar">MR</div></div></header>
 <div class="content">
 <section class="page active" id="page-dashboard">
 <div class="swing-launch">
