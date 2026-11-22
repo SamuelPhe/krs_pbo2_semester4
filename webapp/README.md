@@ -1,6 +1,6 @@
-# KRS PHP web login (database-backed)
+# KRS PHP web application
 
-This folder adds a browser entry point with a login layout based on the original NetBeans Swing form. It authenticates against the uploaded `krs_db.sql` tables and displays live row counts after login. It is separate from GitHub Pages, which cannot execute PHP or connect to MySQL.
+This folder provides a browser entry point with a login layout based on the original NetBeans Swing form. It authenticates against the original `krs_db.sql` tables and displays live row counts after login. It also contains a working Edit Profile page. It is separate from GitHub Pages, which cannot execute PHP or connect to MySQL.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ Set the web document root to this `webapp` directory or copy its contents to the
 
 The original role choices are supported: Mahasiswa, Admin, Kaprodi, Dosen PA, and Dosen. Dosen roles are checked against the `posisi` value in the `dosen` table. Password matching uses the original account names from the dump and prepared statements.
 
-The first web version includes authentication and database-backed dashboard counts. The remaining Swing CRUD screens still need to be ported and reconciled with the SQL schema; the existing Java source currently references some columns that are not present in the uploaded dump.
+The browser version currently includes authentication, database-backed dashboard counts, and Edit Profile. The profile page allows an authenticated user to change their account name and optionally set a new password. Account IDs and academic/job attributes are read-only. The page uses prepared statements, CSRF validation, output escaping, and the shared PBKDF2-SHA256 password format. Other Swing CRUD, KRS submission, approval, finalization, and reporting modules are still being ported and must be checked against the original SQL schema before implementation.
 
 ## Local server
 
