@@ -9,7 +9,7 @@ This configuration runs the original Java Swing KRS application in a private vir
 3. Wait for the Codespace setup to finish. The original KRS login form is started automatically.
 4. Open the **Ports** tab and open **KRS desktop (private)**, port `6080`.
 
-The forwarded desktop port is explicitly configured as **Private**. GitHub authentication controls access; the port is not a public demo.
+GitHub Codespaces forwards ports as **Private by default**. After the Codespace starts, confirm port `6080` shows **Private** in the Ports tab; do not change it to Public. GitHub authentication controls access; the port is not a public demo.
 
 ## Database
 
