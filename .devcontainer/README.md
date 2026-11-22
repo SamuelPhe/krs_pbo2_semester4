@@ -1,6 +1,6 @@
 # KRS Nostalgia — GitHub Codespaces
 
-This configuration runs the original Java Swing KRS application and a separate PHP web application in one private Codespace. The web app provides login, a database-backed dashboard, Edit Profile, Admin KRS session management, student KRS submission, and Dosen PA review. Both connect to the same MariaDB database restored from `krs_db.sql`.
+This configuration runs the original Java Swing KRS application and a separate PHP web application in one private Codespace. The web app provides login, a database-backed dashboard, Edit Profile, Admin Master User and Master Data, KRS session management, student submission/course selection, Dosen PA review, Kaprodi finalization, lecturer schedules, advisor student views, and KRS archive/reporting. Both connect to the same MariaDB database restored from `krs_db.sql`.
 
 ## Open the browser-based web version
 
@@ -10,7 +10,7 @@ This configuration runs the original Java Swing KRS application and a separate P
 4. Open the **Ports** tab in the Codespaces editor.
 5. Find **KRS web (private)**, port `8081`, and choose **Open in Browser**.
 
-The browser should display the KRS login page. After login, the dashboard displays database-backed counts and role-based menus. Edit Profile supports all five roles. Data KRS opens session management for Admin, KRS submission for Mahasiswa, and advisor review for Dosen PA/Kaprodi.
+The browser should display the KRS login page. After login, the dashboard displays database-backed counts and role-based menus. Admin can manage accounts, academic master data, KRS sessions, and archives. Mahasiswa can submit KRS and choose courses. Dosen can view their schedules and rosters. Dosen PA can review submissions and assigned students. Kaprodi can finalize advisor-approved submissions.
 
 ## Open the original Java Swing application
 
