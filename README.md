@@ -75,7 +75,7 @@ The repository can run both interfaces in the same private GitHub Codespace. The
 4. Open the **Ports** tab at the bottom of the Codespaces editor.
 5. Find **KRS web (private)** on port `8081`, then select **Open in Browser**.
 
-The web page should show the KRS login screen. After a successful login it shows a dashboard with counts read from the Codespaces database.
+The web page shows the KRS login screen and a dashboard with counts read from the Codespaces database. The **Edit Profile** menu opens a working browser form for all five account roles. Other academic menu items are clearly marked as not yet available in the web version.
 
 **Open the original Java Swing desktop version:**
 
@@ -85,7 +85,7 @@ The web page should show the KRS login screen. After a successful login it shows
 
 Both ports must remain **Private**. Do not change either port to Public. If a Codespace was created before the PHP web service was added and port `8081` does not appear, run **Codespaces: Rebuild Container** from the VS Code Command Palette, then check the Ports tab again.
 
-The PHP web version is currently a browser-based login and database-summary dashboard. It is **not yet a complete web port** of the Java Swing CRUD, KRS submission, approval, and reporting modules. The separate GitHub Pages demo remains a static browser simulation and does not connect to this database.
+The PHP web version currently provides role-based login, a database-summary dashboard, and a working **Edit Profile** module. It is **not yet a complete web port** of the Java Swing CRUD, KRS submission, academic-advisor approval, finalization, and reporting modules. The separate GitHub Pages demo remains a static browser simulation and does not connect to this database.
 
 The original Java application can still be run locally:
 
