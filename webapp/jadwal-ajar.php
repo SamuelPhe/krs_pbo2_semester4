@@ -45,7 +45,8 @@ if($scheduleId>0){
 .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;background:white;font-size:13px}th{background:#0b7068;color:white;padding:10px;text-align:left;white-space:nowrap}td{padding:9px;border-bottom:1px solid #dce5e1}tbody tr:nth-child(even){background:#f1f5f3}
 .status{display:inline-block;padding:4px 8px;border-radius:14px;font-size:11px;background:#e8f0ed;color:#3e6156;font-weight:700}.alert{background:#fff0ed;border:1px solid #dfb8ae;padding:10px;color:#8c3428}
 @media(max-width:720px){body{padding:0}.content{padding:22px 13px}.heading{align-items:flex-start}.table-wrap table{min-width:750px}}
-</style></head><body><main class="canvas"><img class="bg" src="https://raw.githubusercontent.com/SamuelPhe/krs_pbo2_semester4/master/src/main/resources/desain/Rectangle%20(right).png" alt=""><div class="content">
+</style><link rel="stylesheet" href="ui.css?v=20261122">
+</head><body><main class="canvas"><img class="bg" src="https://raw.githubusercontent.com/SamuelPhe/krs_pbo2_semester4/master/src/main/resources/desain/Rectangle%20(right).png" alt=""><div class="content">
 <header class="heading"><div><h1><?=($scheduleId>0?'Daftar Mahasiswa pada Jadwal':'Jadwal Ajar Saya')?></h1><p><?=krs_e((string)$lecturer['nama_dosen'])?></p></div><a class="back" href="<?=($scheduleId>0?'jadwal-ajar.php':'index.php')?>">Back</a></header>
 <?php if($error!==''): ?><div class="alert"><?=krs_e($error)?></div><?php endif; ?>
 <?php if($scheduleId>0&&isset($subject)): ?>
