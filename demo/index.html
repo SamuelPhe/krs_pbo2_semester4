@@ -42,13 +42,56 @@ table{border-collapse:collapse}
 th{background:#eff5f2;color:#31574d}
 @media(max-width:760px){.layout{width:calc(100% - 12px);height:auto;min-height:600px;margin:8px auto;grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid #cbd9d2}.main{height:auto;overflow:visible}.content{height:auto}.nav{display:flex;flex-wrap:wrap}}
 
+</style>
+<style>
+body{background:#e8edeb}
+.layout{width:min(1000px,calc(100vw - 20px));height:635px;min-height:635px;margin:28px auto 20px;display:block;overflow:hidden;background:#fff}
+.side{display:none!important}
+.main{width:100%;height:635px;overflow:hidden}
+.top{height:42px;padding:0 18px;background:#f7faf8;border-bottom:1px solid #d5e2dc}
+.crumb{display:flex;align-items:center;gap:18px}
+.crumb b{color:#2b584e}
+.right{margin-left:auto}
+.content{height:593px;padding:0;max-width:none;overflow:auto;position:relative;background:#fff}
+.page{min-height:100%;position:relative}
+#page-dashboard{height:593px;min-height:593px;padding:0;background:linear-gradient(90deg,#f7fbf8,#fff 30%)}
+#page-dashboard .head{position:absolute;left:250px;top:28px;margin:0;display:block;z-index:2}
+#page-dashboard .head .kicker{display:none}
+#page-dashboard .head h1{font:700 24px "Segoe UI",sans-serif;color:#203e39;margin:0 0 8px}
+#page-dashboard .head p{font:13px "Segoe UI",sans-serif;color:#5d716c;margin:0}
+#page-dashboard .head #dashboard-action{display:none!important}
+.swing-launch{position:absolute;z-index:3;left:20px;top:118px;width:190px;display:flex;flex-direction:column;gap:7px}
+.launch-prompt{font:700 12px "Segoe UI",sans-serif;color:#274c43;margin:0 0 5px}
+.swing-launch button{height:38px;border:1px solid #9eb7ac;border-radius:2px;background:#eef4f0;color:#214d42;text-align:left;padding:0 12px;font:700 16px "Segoe UI",sans-serif;box-shadow:0 1px 1px rgba(0,0,0,.05)}
+.swing-launch button:hover{background:#dcebe3;border-color:#6e9c87}
+.swing-launch button.logout{margin-top:8px;background:#f5efed;color:#8a3f3f;border-color:#d8b8b3}
+#page-dashboard .student-card,#page-dashboard .cards,#page-dashboard .notice,#page-dashboard .panel{display:none!important}
+#page-dashboard:after{content:"";position:absolute;inset:0 0 0 225px;pointer-events:none;background:radial-gradient(circle at 70% 75%,rgba(35,138,120,.055),transparent 42%)}
+.page:not(#page-dashboard){padding:22px 24px 30px}
+.page:not(#page-dashboard) .head{display:flex;gap:20px}
+.page:not(#page-dashboard) .head h1{color:#214d42;font-size:25px}
+.page:not(#page-dashboard) .panel{border-radius:2px;box-shadow:none;border:1px solid #cbd9d2}
+@media(max-width:760px){.layout{width:calc(100% - 8px);height:auto;min-height:635px;margin:4px}.main{height:auto;min-height:635px}.content{height:auto;min-height:593px}#page-dashboard{min-height:593px}.swing-launch{width:190px;left:14px}. #page-dashboard .head{left:225px;right:10px}#page-dashboard .head h1{font-size:18px}}
 </style></head><body>
 <div class="layout"><aside class="side"><div class="brand"><div class="mark">K</div><div><strong>KRS Academic</strong><small>Academic Management</small></div></div><div><div class="navhead">Academic workspace</div><nav class="nav">
 <button class="active" data-page="dashboard"><span class="sym">▦</span>Dashboard</button><button data-page="schedule"><span class="sym">▤</span>Jadwal Ajar</button><button data-page="enroll"><span class="sym">＋</span>Pengajuan KRS</button><button data-page="approval"><span class="sym">✓</span>Mahasiswa PA</button><button data-page="finalize"><span class="sym">▣</span>Finalisasi KRS</button><button data-page="master"><span class="sym">♙</span>Master Data</button>
 </nav></div><div class="side-note"><b>Demo akademik</b>Gunakan pilihan peran untuk melihat alur Mahasiswa, Dosen PA, dan Admin/Kaprodi. Semua data bersifat fiktif.</div></aside>
-<main class="main"><header class="top"><div class="crumb">Academic / <b id="crumb">Dashboard</b></div><div class="right"><span class="demo">Interactive demo</span><select class="role" id="role"><option value="student">Mahasiswa</option><option value="lecturer">Dosen PA</option><option value="admin">Admin / Kaprodi</option></select><div class="avatar" id="avatar">MR</div></div></header>
+<main class="main"><header class="top"><div class="crumb">Academic / <b id="crumb">Dashboard</b></div><div class="right"><span class="demo">Interactive demo</span><select class="role" id="role"><option value="student">Mahasiswa</option><option value="lecturer">Dosen PA</option><option value="admin">Admin</option><option value="kaprodi">Kaprodi</option></select><div class="avatar" id="avatar">MR</div></div></header>
 <div class="content">
-<section class="page active" id="page-dashboard"><div class="head"><div><div class="kicker">Academic overview</div><h1>Selamat datang, <span id="welcome">Mahasiswa</span></h1><p>Ringkasan aktivitas akademik semester berjalan.</p></div><button class="btn primary" id="dashboard-action" onclick="go('enroll')">＋ Ajukan KRS</button></div>
+<section class="page active" id="page-dashboard">
+<div class="swing-launch">
+<div class="launch-prompt">Pilih Fitur yang Ingin Digunakan:</div>
+<button data-roles="student,lecturer,admin,kaprodi" onclick="toast('Form Edit Profile ditampilkan sebagai bagian simulasi demo.')">Edit Profile</button>
+<button data-roles="lecturer,kaprodi" onclick="go('schedule')">Jadwal Ajar</button>
+<button data-roles="lecturer,kaprodi" onclick="go('approval')">Mahasiswa PA</button>
+<button data-roles="student" onclick="go('enroll')">Data KRS</button>
+<button data-roles="lecturer,kaprodi,admin" onclick="go('master')">Data KRS</button>
+<button data-roles="kaprodi" onclick="go('finalize')">Finalisasi KRS</button>
+<button data-roles="admin" onclick="go('master')">Master User</button>
+<button data-roles="admin" onclick="go('master')">Master Data</button>
+<button data-roles="admin" onclick="go('master')">Riwayat KRS</button>
+<button data-roles="student,lecturer,admin,kaprodi" class="logout" onclick="toast('Tombol Log Out hanya tersedia pada aplikasi desktop asli.')">Log Out</button>
+</div><div class="head"><div><div class="kicker">Academic overview</div><h1>Selamat datang, <span id="welcome">Mahasiswa</span></h1><p>Ringkasan aktivitas akademik semester berjalan.</p></div><button class="btn primary" id="dashboard-action" onclick="go('enroll')">＋ Ajukan KRS</button></div>
 <div class="student-card"><div class="student-avatar" id="student-avatar">MR</div><div><b id="student-name">Michael Ryan</b><small id="student-detail">NIM 24110019 · Sistem dan Teknologi Informasi · Semester 5</small></div></div>
 <div class="cards"><div class="stat"><div class="statline">Mata kuliah diambil <span class="ico">▤</span></div><strong id="stat-courses">4</strong><small>Semester Ganjil 2026/2027</small></div><div class="stat"><div class="statline">Total SKS <span class="ico">Σ</span></div><strong id="stat-sks">12</strong><small>Batas pengambilan 24 SKS</small></div><div class="stat"><div class="statline">Status pengajuan <span class="ico">◷</span></div><strong id="stat-status" style="font-size:18px">Disetujui</strong><small>Alur persetujuan akademik</small></div><div class="stat"><div class="statline">Jadwal tersedia <span class="ico">▦</span></div><strong id="stat-available">6</strong><small>Kelas pada semester ini</small></div></div>
 <div class="notice">Preview ini menggunakan data contoh dan tidak terhubung ke database kampus. Perubahan KRS hanya tersimpan di browser.</div>
@@ -82,7 +125,7 @@ function pill(s){return '<span class="pill '+(s==='Difinalisasi'||s==='Disetujui
 function getSelected(){return selected.map(c=>courses.find(x=>x.code===c)).filter(Boolean)}
 function totalSks(){return getSelected().reduce((a,c)=>a+c.sks,0)}
 function go(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));document.getElementById('page-'+page).classList.add('active');document.getElementById('crumb').textContent=({dashboard:'Dashboard',schedule:'Jadwal Kuliah',enroll:'Pengajuan KRS',approval:'Persetujuan',finalize:'Finalisasi',master:'Data Master'})[page];render()}
-function render(){const role=document.getElementById('role').value,student=role==='student',lecturer=role==='lecturer',admin=role==='admin';const names={student:['Michael Ryan','MR'],lecturer:['Dwi Anggraini','DA'],admin:['Admin Program Studi','AP']};document.getElementById('welcome').textContent=names[role][0];document.getElementById('avatar').textContent=names[role][1];document.getElementById('student-name').textContent=student?'Michael Ryan':lecturer?'Dwi Anggraini':'Program Studi';document.getElementById('student-detail').textContent=student?'NIM 24110019 · Sistem dan Teknologi Informasi · Semester 5':lecturer?'Dosen Pembimbing Akademik · Sistem dan Teknologi Informasi':'Administrator · Finalisasi akademik';document.getElementById('student-avatar').textContent=names[role][1];document.getElementById('dashboard-action').style.display=student?'inline-flex':'none';document.querySelector('[data-page="enroll"]').style.display=student?'flex':'none';document.querySelector('[data-page="approval"]').style.display=lecturer?'flex':'none';document.querySelector('[data-page="finalize"]').style.display=admin?'flex':'none';document.querySelector('[data-page="master"]').style.display=admin?'flex':'none';
+function render(){const role=document.getElementById('role').value,student=role==='student',lecturer=role==='lecturer',admin=role==='admin',kaprodi=role==='kaprodi';const names={student:['Michael Ryan','MR'],lecturer:['Dwi Anggraini','DA'],admin:['Admin Program Studi','AP'],kaprodi:['Kaprodi','KP']};document.getElementById('welcome').textContent=names[role][0];document.getElementById('avatar').textContent=names[role][1];document.getElementById('student-name').textContent=student?'Michael Ryan':lecturer?'Dwi Anggraini':'Program Studi';document.getElementById('student-detail').textContent=student?'NIM 24110019 · Sistem dan Teknologi Informasi · Semester 5':lecturer?'Dosen Pembimbing Akademik · Sistem dan Teknologi Informasi':kaprodi?'Kaprodi · Sistem dan Teknologi Informasi':'Administrator · Manajemen akademik';document.getElementById('student-avatar').textContent=names[role][1];document.getElementById('dashboard-action').style.display=student?'inline-flex':'none';document.querySelector('[data-page="enroll"]').style.display=student?'flex':'none';document.querySelector('[data-page="approval"]').style.display=(lecturer||kaprodi)?'flex':'none';document.querySelector('[data-page="finalize"]').style.display=kaprodi?'flex':'none';document.querySelector('[data-page="master"]').style.display=admin?'flex':'none';document.querySelectorAll('.swing-launch [data-roles]').forEach(b=>b.style.display=b.dataset.roles.split(',').includes(role)?'block':'none');
 if((student&&['approval','finalize','master'].includes(document.querySelector('.nav button.active')?.dataset.page))||(lecturer&&['enroll','finalize','master'].includes(document.querySelector('.nav button.active')?.dataset.page))||(admin&&['enroll','approval'].includes(document.querySelector('.nav button.active')?.dataset.page)))go('dashboard');
 document.getElementById('stat-courses').textContent=getSelected().length;document.getElementById('stat-sks').textContent=totalSks();document.getElementById('stat-status').textContent=finalized?'Difinalisasi':status;document.getElementById('stat-available').textContent=courses.length;
 document.getElementById('step-submit').textContent=status==='Belum diajukan'?'Belum diajukan':'Pengajuan dibuat';document.getElementById('step-approve').textContent=advisorDecision==='approved'?'Disetujui Dosen PA':advisorDecision==='rejected'?'Ditolak Dosen PA':'Menunggu Dosen PA';document.getElementById('step-final').textContent=finalized?'Difinalisasi':'Menunggu finalisasi';
