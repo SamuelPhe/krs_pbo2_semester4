@@ -1,6 +1,6 @@
 # KRS PHP web application
 
-This folder provides a browser entry point with a login layout based on the original NetBeans Swing form. It authenticates against the original `krs_db.sql` tables and displays live row counts after login. It also contains a working Edit Profile page. It is separate from GitHub Pages, which cannot execute PHP or connect to MySQL.
+This folder provides a browser entry point with a login layout based on the original NetBeans Swing form. It authenticates against the original `krs_db.sql` tables and displays live row counts after login. It includes Edit Profile, Admin KRS session management, student KRS submission/course selection, and Dosen PA review. It is separate from GitHub Pages, which cannot execute PHP or connect to MySQL.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ Set the web document root to this `webapp` directory or copy its contents to the
 
 The original role choices are supported: Mahasiswa, Admin, Kaprodi, Dosen PA, and Dosen. Dosen roles are checked against the `posisi` value in the `dosen` table. Password matching uses the original account names from the dump and prepared statements.
 
-The browser version currently includes authentication, database-backed dashboard counts, and Edit Profile. The profile page allows an authenticated user to change their account name and optionally set a new password. Account IDs and academic/job attributes are read-only. The page uses prepared statements, CSRF validation, output escaping, and the shared PBKDF2-SHA256 password format. Other Swing CRUD, KRS submission, approval, finalization, and reporting modules are still being ported and must be checked against the original SQL schema before implementation.
+The browser version currently includes authentication, database-backed dashboard counts, Edit Profile, Admin management of KRS sessions, student KRS submission/course selection, and Dosen PA review. Profile changes use prepared statements, CSRF validation, output escaping, and the shared PBKDF2-SHA256 password format. Admin session management checks overlapping dates and blocks deletion when submissions are linked. Student submissions enforce advisor assignment, matching active sessions, duplicate-course and timetable-conflict checks, a 24-SKS maximum, and locking before review. Dosen PA review is restricted to assigned students and supports per-course approval or revision notes; successful review moves the application to `AccDosenPA`, while a revision returns it to the student. Kaprodi finalization and reports remain unported. The pages reuse Swing background assets and table concepts but are not pixel-identical to the desktop UI.
 
 ## Local server
 
