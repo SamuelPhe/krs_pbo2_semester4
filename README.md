@@ -60,7 +60,11 @@ flowchart TD
 
 ## 5. Demo and local setup
 
-There is **no publicly hosted demo** because this is a desktop application. To run it locally:
+A **browser-based simulation** of the academic workflows is available in [`demo/index.html`](demo/index.html). It demonstrates student course selection, duplicate and timetable-conflict checks, Dosen PA approval, and study-program finalization using fictional sample data. It is a web adaptation for portfolio viewing, not the original Java Swing executable, and it does not connect to the campus database.
+
+To publish the demo, enable GitHub Pages at **Settings → Pages → Build and deployment → Source: GitHub Actions**, then run **Deploy browser demo** from the Actions tab. After deployment, the public URL will be: https://samuelphe.github.io/krs_pbo2_semester4/.
+
+The original Java application can still be run locally:
 
 1. Install JDK 17 and Maven.
 2. Prepare a MySQL or MariaDB database named `krs_db`. The repository does not include a complete database dump or schema.
