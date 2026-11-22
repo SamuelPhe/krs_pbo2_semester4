@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             );
                             $update->execute([$applicationId, $studentId]);
                             $reset = $pdo->prepare(
-                                "UPDATE krs_detail SET status_acc = 'Draft'
+                                "UPDATE krs_detail SET status_acc = 'Draft', catatan_revisi = ''
                                  WHERE id_pengajuan = ? AND status_acc = 'Ditolak'"
                             );
                             $reset->execute([$applicationId]);
@@ -533,9 +533,9 @@ tbody tr:hover{background:#fff5dc}
 <h2>Mata Kuliah dalam Pengajuan</h2>
 <div class="table-scroll">
 <table>
-<thead><tr><th>Mata Kuliah</th><th>SKS</th><th>Kelas</th><th>Hari</th><th>Jam</th><th>Ruang</th><th>Status</th><?php if ($canEdit): ?><th>Aksi</th><?php endif; ?></tr></thead>
+<thead><tr><th>Mata Kuliah</th><th>SKS</th><th>Kelas</th><th>Hari</th><th>Jam</th><th>Ruang</th><th>Status</th><th>Catatan Revisi</th><?php if ($canEdit): ?><th>Aksi</th><?php endif; ?></tr></thead>
 <tbody>
-<?php if (!$detailRows): ?><tr><td colspan="<?=($canEdit ? 8 : 7)?>">Belum ada mata kuliah yang ditambahkan.</td></tr>
+<?php if (!$detailRows): ?><tr><td colspan="<?=($canEdit ? 9 : 8)?>">Belum ada mata kuliah yang ditambahkan.</td></tr>
 <?php else: foreach ($detailRows as $row): ?>
 <tr>
 <td><?=krs_e((string)$row['nama_matkul'])?></td><td><?=krs_e((string)$row['sks'])?></td>
@@ -544,6 +544,7 @@ tbody tr:hover{background:#fff5dc}
 <td><?=krs_e((string)$row['jam_mulai'])?>–<?=krs_e((string)$row['jam_selesai'])?></td>
 <td><?=krs_e((string)($row['nama_ruang'] ?? '-'))?></td>
 <td><span class="status <?=krs_status_class((string)$row['status_acc'])?>"><?=krs_e((string)$row['status_acc'])?></span></td>
+<td><?=krs_e((string)($row['catatan_revisi'] ?? '') !== '' ? (string)$row['catatan_revisi'] : '-')?></td>
 <?php if ($canEdit): ?><td><form class="inline-form" method="post" action="pengajuan.php?detail=<?=$detailId?>">
 <input type="hidden" name="csrf_token" value="<?=krs_e((string)($_SESSION['csrf_token'] ?? ''))?>">
 <input type="hidden" name="action" value="remove_course"><input type="hidden" name="id_pengajuan" value="<?=$detailId?>">
