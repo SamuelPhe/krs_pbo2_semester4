@@ -7,9 +7,44 @@
 @media(max-width:950px){.layout{grid-template-columns:1fr}.side{padding:13px;gap:12px}.nav{grid-template-columns:repeat(3,1fr)}.navhead,.side-note{display:none}.nav button{justify-content:center;font-size:11px;padding:9px 4px}.nav .sym{display:none}.content{padding:20px 16px}.top{padding:0 16px}.cards{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.course-grid{grid-template-columns:1fr}}
 @media(max-width:520px){.top{height:auto;flex-wrap:wrap;padding:12px;gap:10px}.right{width:100%;justify-content:space-between}.content{padding:17px 12px}.head{display:block}.head .btn{margin-top:12px}.cards{gap:8px}.stat{padding:12px}.stat strong{font-size:21px}.panel{padding:13px}.form{grid-template-columns:1fr}.f.full{grid-column:auto}.steps{grid-template-columns:1fr}.nav{grid-template-columns:repeat(3,1fr)}}
+</style>
+<style>
+
+/* Desktop frame inspired by the original NetBeans Swing forms (about 1024x600) */
+body{background:#e8edeb;color:#263b39;font-family:"Segoe UI",Arial,sans-serif}
+.layout{width:min(1024px,calc(100vw - 24px));height:600px;min-height:600px;margin:42px auto 24px;grid-template-columns:220px minmax(0,1fr);background:#fff;border:1px solid #b9c9c3;box-shadow:0 12px 35px rgba(32,67,59,.16);overflow:hidden}
+.side{background:#eef4f1;color:#24423d;border-right:1px solid #cbd9d2;padding:18px 10px;gap:18px;overflow:auto}
+.brand{padding:0 8px 14px;border-bottom:1px solid #cedbd5}
+.mark{background:#1f7567;color:#fff;border-radius:3px}
+.brand strong{color:#164b42}
+.brand small{color:#708c83;letter-spacing:.7px}
+.navhead{color:#718c83;margin:0 8px 7px}
+.nav{gap:4px}
+.nav button{background:transparent;color:#294b44;border-radius:2px;padding:9px 9px;border-left:3px solid transparent}
+.nav button:hover,.nav button.active{background:#dcebe4;color:#145e50;border-left-color:#238a78}
+.side-note{margin-top:auto;background:#fff;border:1px solid #cfddd6;border-radius:3px;color:#6c8079}
+.side-note b{color:#28584d}
+.main{background:#fff;min-width:0;height:600px;overflow:hidden}
+.top{height:42px;padding:0 14px;background:#f8faf9;border-bottom:1px solid #e2ebe6}
+.crumb{display:none}
+.right{margin-left:auto;gap:8px}
+.demo{font-size:9px;padding:4px 8px;background:#e5f2ed;border-color:#c9e2d7;color:#286759}
+.role{padding:6px 8px;border-radius:2px;border-color:#b8cbc3}
+.avatar{display:none}
+.content{height:558px;overflow:auto;padding:22px 24px 30px;max-width:none}
+.head h1{font-family:"Segoe UI",sans-serif;font-size:24px;color:#244b42;font-weight:700}
+.kicker{color:#238a78}
+.panel,.stat,.student-card{border:1px solid #cbd9d2;border-radius:2px;box-shadow:none}
+.btn.primary{background:#237968;border-radius:2px}
+.btn.soft{border-radius:2px}
+.field{border-radius:2px;border-color:#bdcec6}
+table{border-collapse:collapse}
+th{background:#eff5f2;color:#31574d}
+@media(max-width:760px){.layout{width:calc(100% - 12px);height:auto;min-height:600px;margin:8px auto;grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid #cbd9d2}.main{height:auto;overflow:visible}.content{height:auto}.nav{display:flex;flex-wrap:wrap}}
+
 </style></head><body>
-<div class="layout"><aside class="side"><div class="brand"><div class="mark">K</div><div><strong>KRS Academic</strong><small>Campus portal</small></div></div><div><div class="navhead">Academic workspace</div><nav class="nav">
-<button class="active" data-page="dashboard"><span class="sym">▦</span>Dashboard</button><button data-page="schedule"><span class="sym">▤</span>Jadwal kuliah</button><button data-page="enroll"><span class="sym">＋</span>Pengajuan KRS</button><button data-page="approval"><span class="sym">✓</span>Persetujuan</button><button data-page="finalize"><span class="sym">▣</span>Finalisasi</button><button data-page="master"><span class="sym">♙</span>Data master</button>
+<div class="layout"><aside class="side"><div class="brand"><div class="mark">K</div><div><strong>KRS Academic</strong><small>Academic Management</small></div></div><div><div class="navhead">Academic workspace</div><nav class="nav">
+<button class="active" data-page="dashboard"><span class="sym">▦</span>Dashboard</button><button data-page="schedule"><span class="sym">▤</span>Jadwal Ajar</button><button data-page="enroll"><span class="sym">＋</span>Pengajuan KRS</button><button data-page="approval"><span class="sym">✓</span>Mahasiswa PA</button><button data-page="finalize"><span class="sym">▣</span>Finalisasi KRS</button><button data-page="master"><span class="sym">♙</span>Master Data</button>
 </nav></div><div class="side-note"><b>Demo akademik</b>Gunakan pilihan peran untuk melihat alur Mahasiswa, Dosen PA, dan Admin/Kaprodi. Semua data bersifat fiktif.</div></aside>
 <main class="main"><header class="top"><div class="crumb">Academic / <b id="crumb">Dashboard</b></div><div class="right"><span class="demo">Interactive demo</span><select class="role" id="role"><option value="student">Mahasiswa</option><option value="lecturer">Dosen PA</option><option value="admin">Admin / Kaprodi</option></select><div class="avatar" id="avatar">MR</div></div></header>
 <div class="content">
@@ -18,16 +53,16 @@
 <div class="cards"><div class="stat"><div class="statline">Mata kuliah diambil <span class="ico">▤</span></div><strong id="stat-courses">4</strong><small>Semester Ganjil 2026/2027</small></div><div class="stat"><div class="statline">Total SKS <span class="ico">Σ</span></div><strong id="stat-sks">12</strong><small>Batas pengambilan 24 SKS</small></div><div class="stat"><div class="statline">Status pengajuan <span class="ico">◷</span></div><strong id="stat-status" style="font-size:18px">Disetujui</strong><small>Alur persetujuan akademik</small></div><div class="stat"><div class="statline">Jadwal tersedia <span class="ico">▦</span></div><strong id="stat-available">6</strong><small>Kelas pada semester ini</small></div></div>
 <div class="notice">Preview ini menggunakan data contoh dan tidak terhubung ke database kampus. Perubahan KRS hanya tersimpan di browser.</div>
 <div class="panel"><div class="panelhead"><div><h2>Alur pengajuan KRS</h2><p>Proses akademik yang disimulasikan</p></div></div><div class="steps"><div class="step"><span>01 · Student</span><b id="step-submit">Pengajuan dibuat</b></div><div class="step"><span>02 · Academic advisor</span><b id="step-approve">Disetujui Dosen PA</b></div><div class="step"><span>03 · Study program</span><b id="step-final">Menunggu finalisasi</b></div></div></div>
-<div class="panel"><div class="panelhead"><div><h2>Jadwal kuliah saya</h2><p>Ringkasan jadwal dari mata kuliah yang dipilih.</p></div><button class="btn soft" onclick="go('schedule')">Lihat jadwal →</button></div><div class="tablewrap"><table><thead><tr><th>Mata kuliah</th><th>Hari</th><th>Jam</th><th>Dosen</th><th>Ruang</th></tr></thead><tbody id="my-schedule"></tbody></table></div></div>
+<div class="panel"><div class="panelhead"><div><h2>Jadwal Ajar saya</h2><p>Ringkasan jadwal dari mata kuliah yang dipilih.</p></div><button class="btn soft" onclick="go('schedule')">Lihat jadwal →</button></div><div class="tablewrap"><table><thead><tr><th>Mata kuliah</th><th>Hari</th><th>Jam</th><th>Dosen</th><th>Ruang</th></tr></thead><tbody id="my-schedule"></tbody></table></div></div>
 </section>
-<section class="page" id="page-schedule"><div class="head"><div><div class="kicker">Timetable</div><h1>Jadwal kuliah</h1><p>Daftar mata kuliah dan jadwal kelas semester berjalan.</p></div></div><div class="panel"><div class="filters"><input class="field search" id="schedule-search" placeholder="Cari mata kuliah atau dosen…" oninput="renderSchedule()"><select class="field" id="day-filter" onchange="renderSchedule()"><option value="">Semua hari</option><option>Senin</option><option>Selasa</option><option>Rabu</option><option>Kamis</option><option>Jumat</option></select></div><div class="tablewrap"><table><thead><tr><th>Kode / Mata kuliah</th><th>SKS</th><th>Dosen</th><th>Hari</th><th>Waktu</th><th>Kelas / Ruang</th></tr></thead><tbody id="schedule-table"></tbody></table></div></div></section>
+<section class="page" id="page-schedule"><div class="head"><div><div class="kicker">Timetable</div><h1>Jadwal Ajar</h1><p>Daftar mata kuliah dan jadwal kelas semester berjalan.</p></div></div><div class="panel"><div class="filters"><input class="field search" id="schedule-search" placeholder="Cari mata kuliah atau dosen…" oninput="renderSchedule()"><select class="field" id="day-filter" onchange="renderSchedule()"><option value="">Semua hari</option><option>Senin</option><option>Selasa</option><option>Rabu</option><option>Kamis</option><option>Jumat</option></select></div><div class="tablewrap"><table><thead><tr><th>Kode / Mata kuliah</th><th>SKS</th><th>Dosen</th><th>Hari</th><th>Waktu</th><th>Kelas / Ruang</th></tr></thead><tbody id="schedule-table"></tbody></table></div></div></section>
 <section class="page" id="page-enroll"><div class="head"><div><div class="kicker">Student workflow</div><h1>Pengajuan KRS</h1><p>Pilih mata kuliah yang ingin diambil. Sistem memeriksa duplikasi dan bentrok jadwal.</p></div><button class="btn soft" onclick="resetDemo()">Reset demo</button></div>
 <div class="panel"><div class="panelhead"><div><h2>Daftar mata kuliah tersedia</h2><p>Semester Ganjil 2026/2027 · Pilih kelas yang sesuai.</p></div><span class="pill info" id="selected-count">4 dipilih</span></div><div class="course-grid" id="course-grid"></div></div>
 <div class="panel"><div class="panelhead"><div><h2>Ringkasan KRS</h2><p>Pastikan pilihan mata kuliah tidak melebihi batas SKS.</p></div></div><div class="tablewrap"><table><thead><tr><th>Kode</th><th>Mata kuliah</th><th>SKS</th><th>Hari / jam</th><th>Action</th></tr></thead><tbody id="selected-table"></tbody></table></div><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:14px"><b>Total: <span id="selected-sks">12</span> SKS</b><button class="btn primary" onclick="submitKRS()">Kirim pengajuan KRS →</button></div></div>
 </section>
 <section class="page" id="page-approval"><div class="head"><div><div class="kicker">Academic advisor</div><h1>Persetujuan KRS</h1><p>Tinjau pengajuan mahasiswa bimbingan sebelum diteruskan.</p></div></div><div class="panel"><div class="panelhead"><div><h2>Pengajuan menunggu</h2><p>Contoh daftar pengajuan KRS mahasiswa.</p></div><span class="pill warn" id="pending-count">1 menunggu</span></div><div class="tablewrap"><table><thead><tr><th>Mahasiswa</th><th>NIM</th><th>Semester</th><th>SKS</th><th>Status</th><th>Action</th></tr></thead><tbody id="approval-table"></tbody></table></div></div></section>
 <section class="page" id="page-finalize"><div class="head"><div><div class="kicker">Study program office</div><h1>Finalisasi KRS</h1><p>Validasi pengajuan yang sudah disetujui Dosen PA.</p></div></div><div class="panel"><div class="panelhead"><div><h2>Approved registrations</h2><p>Daftar KRS yang dapat difinalisasi.</p></div></div><div class="tablewrap"><table><thead><tr><th>Mahasiswa</th><th>NIM</th><th>Program studi</th><th>SKS</th><th>Status</th><th>Action</th></tr></thead><tbody id="final-table"></tbody></table></div></div></section>
-<section class="page" id="page-master"><div class="head"><div><div class="kicker">Master records</div><h1>Data master akademik</h1><p>Contoh data program studi, dosen, mahasiswa, dan mata kuliah.</p></div><button class="btn soft" onclick="window.print()">Cetak ringkasan</button></div><div class="panel"><div class="panelhead"><h2>Mata kuliah</h2></div><div class="tablewrap"><table><thead><tr><th>Kode</th><th>Nama mata kuliah</th><th>SKS</th><th>Dosen</th><th>Jadwal</th></tr></thead><tbody id="master-table"></tbody></table></div></div></section>
+<section class="page" id="page-master"><div class="head"><div><div class="kicker">Master records</div><h1>Master Data akademik</h1><p>Contoh data program studi, dosen, mahasiswa, dan mata kuliah.</p></div><button class="btn soft" onclick="window.print()">Cetak ringkasan</button></div><div class="panel"><div class="panelhead"><h2>Mata kuliah</h2></div><div class="tablewrap"><table><thead><tr><th>Kode</th><th>Nama mata kuliah</th><th>SKS</th><th>Dosen</th><th>Jadwal</th></tr></thead><tbody id="master-table"></tbody></table></div></div></section>
 </div></main></div><div class="toast" id="toast"></div>
 <script>
 const seedCourses=[
