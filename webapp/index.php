@@ -101,7 +101,7 @@ if ($account) {
 
 $features = match ($account['role'] ?? '') {
     'Mahasiswa' => ['Edit Profile', 'Data KRS'],
-    'Dosen' => ['Edit Profile', 'Jadwal Ajar', 'Data KRS'],
+    'Dosen' => ['Edit Profile', 'Jadwal Ajar'],
     'Dosen PA' => ['Edit Profile', 'Jadwal Ajar', 'Mahasiswa PA', 'Data KRS'],
     'Kaprodi' => ['Edit Profile', 'Jadwal Ajar', 'Mahasiswa PA', 'Data KRS', 'Finalisasi KRS'],
     'Admin' => ['Edit Profile', 'Data KRS', 'Master User', 'Master Data', 'Riwayat KRS'],
@@ -161,6 +161,8 @@ button,input,select{font:inherit}.screen{width:min(1024px,100%);height:min(600px
 <?php foreach ($features as $feature): ?>
     <?php if ($feature === 'Edit Profile'): ?>
         <a class="feature-link" href="profile.php"><?=krs_e($feature)?></a>
+    <?php elseif ($feature === 'Data KRS' && ($account['role'] ?? '') === 'Admin'): ?>
+        <a class="feature-link" href="krs.php"><?=krs_e($feature)?></a>
     <?php else: ?>
         <div class="feature-disabled" aria-disabled="true">
             <span><?=krs_e($feature)?></span>
@@ -169,7 +171,7 @@ button,input,select{font:inherit}.screen{width:min(1024px,100%);height:min(600px
     <?php endif; ?>
 <?php endforeach; ?>
 </div>
-<p class="footnote">Edit Profile sudah tersedia di versi web. Menu akademik lainnya masih dalam tahap pemindahan dari Java Swing.</p>
+<p class="footnote">Edit Profile dan manajemen sesi KRS untuk Admin sudah tersedia. Modul akademik untuk Mahasiswa, Dosen PA, dan Kaprodi masih dalam tahap pemindahan dari Java Swing.</p>
 </div>
 <?php endif; ?>
 </div></body></html>
