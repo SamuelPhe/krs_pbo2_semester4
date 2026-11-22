@@ -1,0 +1,48 @@
+name: Verify KRS web login
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "webapp/**"
+      - "database/web_auth_password_migration.sql"
+      - "src/main/java/PBO_Project_2/database.java"
+      - "src/main/java/PBO_Project_2/login_form.java"
+      - "src/main/java/PBO_Project_2/PasswordUtil.java"
+      - ".github/workflows/verify-web-login.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "webapp/**"
+      - "database/web_auth_password_migration.sql"
+      - "src/main/java/PBO_Project_2/database.java"
+      - "src/main/java/PBO_Project_2/login_form.java"
+      - "src/main/java/PBO_Project_2/PasswordUtil.java"
+      - ".github/workflows/verify-web-login.yml"
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+      - name: Check PHP syntax
+        run: |
+          php -l webapp/config.php
+          php -l webapp/index.php
+
+  java-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Compile project
+        run: mvn -B -DskipTests compile
