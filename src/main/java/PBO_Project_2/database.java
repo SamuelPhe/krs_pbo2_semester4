@@ -31,33 +31,48 @@ public class database {
 
     // FUNGSI LOGIN (Hanya melakukan query, tidak membuka dashboard)
     public ResultSet loginMahasiswa(String nama, String password) {
+        String sql = "SELECT * FROM mahasiswa WHERE nama_mahasiswa = ?";
         try {
-            String sql = "SELECT * FROM mahasiswa WHERE nama_mahasiswa = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, nama);
-            pst.setString(2, password);
-            return pst.executeQuery();
-        } catch (SQLException e) { return null; }
+            ResultSet rs = pst.executeQuery();
+            if (rs.next() && verifyAndUpgradePassword(rs, password, "mahasiswa", "id_mahasiswa")) {
+                return rs;
+            }
+        } catch (Exception e) {
+            System.out.println("Login mahasiswa gagal: " + e.getMessage());
+        }
+        return null;
     }
 
     public ResultSet loginDosen(String username, String password) {
+        String sql = "SELECT * FROM dosen WHERE nama_dosen = ?";
         try {
-            String sql = "SELECT * FROM dosen WHERE nama_dosen = ? AND password = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, username);
-            ps.setString(2, password);
-            return ps.executeQuery();
-        } catch (Exception e) { return null; }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next() && verifyAndUpgradePassword(rs, password, "dosen", "id_dosen")) {
+                return rs;
+            }
+        } catch (Exception e) {
+            System.out.println("Login dosen gagal: " + e.getMessage());
+        }
+        return null;
     }
 
     public ResultSet loginAdmin(String nama, String password) {
+        String sql = "SELECT * FROM admin WHERE nama_admin = ?";
         try {
-            String sql = "SELECT * FROM admin WHERE nama_admin = ? AND password = ?";
             PreparedStatement pst = conn.prepareStatement(sql);
             pst.setString(1, nama);
-            pst.setString(2, password);
-            return pst.executeQuery();
-        } catch (SQLException e) { return null; }
+            ResultSet rs = pst.executeQuery();
+            if (rs.next() && verifyAndUpgradePassword(rs, password, "admin", "id_admin")) {
+                return rs;
+            }
+        } catch (Exception e) {
+            System.out.println("Login admin gagal: " + e.getMessage());
+        }
+        return null;
     }
 
 
