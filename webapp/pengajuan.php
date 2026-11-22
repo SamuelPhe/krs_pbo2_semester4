@@ -505,6 +505,7 @@ tbody tr:hover{background:#fff5dc}
 .total{display:flex;justify-content:flex-end;gap:10px;align-items:center;margin:12px 0 0;color:#31544d;font-weight:700}
 @media(max-width:720px){body{padding:0}.canvas{min-height:100vh}.content{padding:22px 14px}.heading{align-items:flex-start}.meta{grid-template-columns:1fr 1fr}.panel{padding:11px}.table-scroll table{min-width:650px}}
 </style>
+<link rel="stylesheet" href="ui.css?v=20261122">
 </head>
 <body>
 <main class="canvas">
