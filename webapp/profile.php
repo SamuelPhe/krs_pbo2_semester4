@@ -150,6 +150,7 @@ input[readonly]{background:#f0f2f2;color:#64716f}.help{margin:5px 0 0;color:#718
 .note{margin:20px 0 0;color:#71817f;font-size:12px}
 @media(max-width:600px){body{padding:12px}.header{padding:19px}.content{padding:20px}.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.actions{align-items:stretch;flex-direction:column-reverse}.button{width:100%}.role{white-space:normal;text-align:center}}
 </style>
+<link rel="stylesheet" href="ui.css?v=20261122">
 </head>
 <body>
 <main class="page">
