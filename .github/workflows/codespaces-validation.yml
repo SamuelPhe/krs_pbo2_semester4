@@ -47,6 +47,7 @@ jobs:
           bash -n .devcontainer/start-desktop-app.sh
           bash -n tests/profile-guard.sh
           bash -n tests/profile-http-smoke.sh
+          bash -n tests/krs-period-smoke.sh
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml config -q
           test -f .devcontainer/php/Dockerfile
 
@@ -67,6 +68,7 @@ jobs:
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/config.php
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/index.php
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/profile.php
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/krs.php
           web_page=$(curl --fail --silent --show-error http://127.0.0.1:8081/)
           printf '%s' "$web_page" | grep -q 'KRS — Sistem Informasi Akademik'
           db_counts=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -r '$pdo = new PDO("mysql:host=".getenv("DB_HOST").";dbname=".getenv("DB_DATABASE"), getenv("DB_USER"), getenv("DB_PASSWORD")); echo $pdo->query("SELECT COUNT(*) FROM mahasiswa")->fetchColumn();')
@@ -96,6 +98,18 @@ jobs:
             echo krs_password_verify((string)getenv("KRS_PROFILE_NEXT_PASSWORD"), $stored) ? "verified" : "failed";
           ')
           test "$password_status" = "verified"
+
+      - name: Verify admin KRS period management
+        run: |
+          period_password="$(openssl rand -hex 20)"
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T -e KRS_PERIOD_TEST_PASSWORD="$period_password" web php -r '
+            require "/var/www/html/config.php";
+            $pdo = krs_db();
+            $hash = krs_password_hash((string)getenv("KRS_PERIOD_TEST_PASSWORD"));
+            $pdo->prepare("INSERT INTO admin (id_admin, nama_admin, password) VALUES (?, ?, ?)")->execute([991001, "KRS Period Admin", $hash]);
+            $pdo->prepare("INSERT INTO mahasiswa (id_mahasiswa, id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, password, semester) VALUES (?, ?, ?, ?, ?, ?, ?)")->execute([991001, 111, 10002, "KRS Period Student", 2025, $hash, 4]);
+          '
+          KRS_PERIOD_TEST_PASSWORD="$period_password" bash tests/krs-period-smoke.sh http://127.0.0.1:8081
 
       - name: Stop local services
         if: always()
