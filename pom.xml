@@ -8,7 +8,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>8</maven.compiler.release>
-        <exec.mainClass>PBO_Project_2.login_form</exec.mainClass>
+        <exec.mainClass>com.mycompany.pbo_project_2.PBO_Project_2</exec.mainClass>
     </properties>
 <dependencies>
         <dependency>
@@ -28,16 +28,4 @@
       <type>jar</type>
     </dependency>
 </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <mainClass>PBO_Project_2.login_form</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

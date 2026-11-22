@@ -1,13 +1,15 @@
 package PBO_Project_2;
 
 import java.sql.*;
-import javax.sql.rowset.CachedRowSet;
-import javax.sql.rowset.RowSetProvider;
 
 public class database {
-    private static final String DEFAULT_URL =
-            "jdbc:mysql://127.0.0.1:3306/krs_db?serverTimezone=UTC";
-
+    private static final String HOST     = "localhost";
+    private static final String PORT     = "3306";
+    private static final String DB_NAME  = "krs_db";
+    private static final String USER     = "root";
+    private static final String PASSWORD = "";
+    private static final String URL = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    
     private Connection conn;
 
     public database() {
@@ -15,20 +17,11 @@ public class database {
     }
 
     public void connect() {
-        String url = System.getenv("DB_URL");
-        String user = System.getenv("DB_USER");
-        String password = System.getenv("DB_PASSWORD");
-
-        if (url == null || url.trim().isEmpty()) url = DEFAULT_URL;
-        if (user == null || user.trim().isEmpty() || password == null) {
-            throw new IllegalStateException("Set DB_USER and DB_PASSWORD before starting the application.");
-        }
-
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(url, user, password);
+            conn = DriverManager.getConnection(URL, USER, PASSWORD);
         } catch (Exception e) {
-            throw new IllegalStateException("Database connection failed. Check DB_URL, DB_USER and DB_PASSWORD.", e);
+            System.out.println("Gagal koneksi: " + e.getMessage());
         }
     }
 
@@ -36,66 +29,37 @@ public class database {
         return conn;
     }
 
-    // Login verifies password hashes; legacy plain-text passwords are upgraded
-    // after the first successful login.
-    private ResultSet authenticateUser(
-            String table, String usernameColumn, String idColumn,
-            String username, String password) {
-        CachedRowSet cached = null;
-        try {
-            String sql = "SELECT * FROM " + table + " WHERE " + usernameColumn + " = ?";
-            cached = RowSetProvider.newFactory().createCachedRowSet();
-
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, username);
-                try (ResultSet rs = ps.executeQuery()) {
-                    cached.populate(rs);
-                }
-            }
-
-            if (!cached.next()) {
-                cached.close();
-                return null;
-            }
-
-            String storedPassword = cached.getString("password");
-            Object recordId = cached.getObject(idColumn);
-            if (!PasswordUtil.verify(password, storedPassword)) {
-                cached.close();
-                return null;
-            }
-
-            if (PasswordUtil.needsUpgrade(storedPassword)) {
-                String updateSql = "UPDATE " + table + " SET password = ? WHERE " + idColumn + " = ?";
-                try (PreparedStatement update = conn.prepareStatement(updateSql)) {
-                    update.setString(1, PasswordUtil.hash(password));
-                    update.setObject(2, recordId);
-                    update.executeUpdate();
-                }
-            }
-
-            cached.beforeFirst();
-            return cached;
-        } catch (Exception e) {
-            if (cached != null) {
-                try { cached.close(); } catch (SQLException ignored) { }
-            }
-            System.err.println("Login verification failed: " + e.getMessage());
-            return null;
-        }
-    }
-
+    // FUNGSI LOGIN (Hanya melakukan query, tidak membuka dashboard)
     public ResultSet loginMahasiswa(String nama, String password) {
-        return authenticateUser("mahasiswa", "nama_mahasiswa", "id_mahasiswa", nama, password);
+        try {
+            String sql = "SELECT * FROM mahasiswa WHERE nama_mahasiswa = ? AND password = ?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, nama);
+            pst.setString(2, password);
+            return pst.executeQuery();
+        } catch (SQLException e) { return null; }
     }
 
     public ResultSet loginDosen(String username, String password) {
-        return authenticateUser("dosen", "nama_dosen", "id_dosen", username, password);
+        try {
+            String sql = "SELECT * FROM dosen WHERE nama_dosen = ? AND password = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            return ps.executeQuery();
+        } catch (Exception e) { return null; }
     }
 
     public ResultSet loginAdmin(String nama, String password) {
-        return authenticateUser("admin", "nama_admin", "id_admin", nama, password);
+        try {
+            String sql = "SELECT * FROM admin WHERE nama_admin = ? AND password = ?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, nama);
+            pst.setString(2, password);
+            return pst.executeQuery();
+        } catch (SQLException e) { return null; }
     }
+
 
     // ══════════════════════════════════════════════════════════════════════════
     //  CRUD - PRODI
@@ -156,7 +120,7 @@ public class database {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, namaDosen);
             ps.setString(2, posisi);
-            ps.setString(3, PasswordUtil.hash(password));
+            ps.setString(3, password);
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -193,7 +157,7 @@ public class database {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, namaDosen);
             ps.setString(2, posisi);
-            ps.setString(3, PasswordUtil.hash(password));
+            ps.setString(3, password);
             ps.setInt(4, idDosen);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -246,7 +210,7 @@ public class database {
         ps.setString(3, nama);
         ps.setInt(4, angkatan);
         ps.setInt(5, semester);
-        ps.setString(6, PasswordUtil.hash(password));
+        ps.setString(6, password);
         return ps.executeUpdate() > 0;
     } catch (SQLException e) {
         return false;
@@ -304,7 +268,7 @@ public class database {
             ps.setInt(2, idDosenPA);
             ps.setString(3, namaMahasiswa);
             ps.setInt(4, angkatan);
-            ps.setString(5, PasswordUtil.hash(password));
+            ps.setString(5, password);
             ps.setInt(6, idMahasiswa);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -786,7 +750,7 @@ public class database {
         String sql = "INSERT INTO admin (nama_admin, password) VALUES (?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, namaAdmin);
-            ps.setString(2, PasswordUtil.hash(password));
+            ps.setString(2, password);
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -798,7 +762,7 @@ public class database {
         String sql = "UPDATE admin SET nama_admin = ?, password = ? WHERE id_admin = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, namaAdmin);
-            ps.setString(2, PasswordUtil.hash(password));
+            ps.setString(2, password);
             ps.setInt(3, idAdmin);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
