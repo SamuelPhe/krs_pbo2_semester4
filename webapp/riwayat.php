@@ -109,7 +109,8 @@ $backUrl='riwayat.php?'.http_build_query($queryParams);
 .meta{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}.meta div{background:#fff;border:1px solid #b1c3bc;padding:9px}.meta small{display:block;color:#71807a;font-size:11px}.meta strong{display:block;margin-top:3px;color:#2d4d44;font-size:13px}
 @media(max-width:760px){body{padding:0}.content{padding:20px 12px}.filters{grid-template-columns:1fr 1fr}.meta{grid-template-columns:1fr 1fr}.table-wrap table{min-width:850px}}
 @media print{body{padding:0;background:#fff}.canvas{box-shadow:none;width:100%;min-height:0}.bg{display:none}.content{padding:0}.no-print,.back{display:none!important}.panel{break-inside:avoid;border:1px solid #aaa}.table-wrap{overflow:visible}table{font-size:9pt}th{background:#ddd!important;color:#000!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}td{padding:5px}}
-</style></head><body>
+</style><link rel="stylesheet" href="ui.css?v=20261122">
+</head><body>
 <main class="canvas"><img class="bg" src="https://raw.githubusercontent.com/SamuelPhe/krs_pbo2_semester4/master/src/main/resources/desain/Manajemen%20data.png" alt="">
 <div class="content"><header class="heading"><div><h1><?=($detail?'Detail Riwayat KRS':'Riwayat KRS Mahasiswa')?></h1><p>Arsip pengajuan dan hasil pemeriksaan KRS</p></div><a class="back no-print" href="<?=($detail?$backUrl:'index.php')?>">Back</a></header>
 <?php if($error!==''): ?><div class="alert"><?=krs_e($error)?></div><?php endif; ?>
