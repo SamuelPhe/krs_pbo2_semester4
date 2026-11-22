@@ -126,7 +126,7 @@ button,input,select{font:inherit}.screen{width:min(1024px,100%);height:min(600px
 .login-form .signup{position:absolute;right:30.6%;bottom:10.5%;border:0;background:transparent;color:#1468b1;text-decoration:underline;cursor:pointer;font-size:14px}
 .error{position:absolute;left:34.18%;top:13%;width:49%;background:#fff0f0;border:1px solid #e6b5b5;color:#982d2d;padding:9px 12px;font-size:13px;z-index:2}
 .dashboard{height:100%;padding:22px 25px;background:linear-gradient(135deg,#f4f7f7,#fff)}
-.top{display:flex;justify-content:space-between;align-items:center;border-bottom:5px solid #08796e;padding:0 0 13px;gap:14px}.top h1{margin:0;color:#08796e;font-size:25px}.top form{margin:0}.btn{border:0;background:#08796e;color:white;padding:9px 14px;cursor:pointer}.welcome{margin:20px 0 14px}.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.tile{border:1px solid #d7e0df;border-top:4px solid #08796e;background:white;padding:14px}.tile small{display:block;color:#677a78}.tile strong{display:block;font-size:25px;margin-top:7px}.panel-title{margin:24px 0 10px;color:#08796e;font-size:18px}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.features a{display:block;background:#08796e;color:white;text-decoration:none;padding:13px 15px;min-height:46px}.features a:hover{background:#f0a72d;color:#243c3a}.footnote{color:#70817f;font-size:12px;margin-top:18px}
+.top{display:flex;justify-content:space-between;align-items:center;border-bottom:5px solid #08796e;padding:0 0 13px;gap:14px}.top h1{margin:0;color:#08796e;font-size:25px}.top form{margin:0}.btn{border:0;background:#08796e;color:white;padding:9px 14px;cursor:pointer}.welcome{margin:20px 0 14px}.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.tile{border:1px solid #d7e0df;border-top:4px solid #08796e;background:white;padding:14px}.tile small{display:block;color:#677a78}.tile strong{display:block;font-size:25px;margin-top:7px}.panel-title{margin:24px 0 10px;color:#08796e;font-size:18px}.features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.feature-link,.feature-disabled{display:flex;flex-direction:column;justify-content:center;gap:3px;min-height:56px;padding:10px 15px;text-decoration:none}.feature-link{background:#08796e;color:#fff}.feature-link:hover{background:#f0a72d;color:#243c3a}.feature-disabled{background:#edf2f1;color:#627470;border:1px dashed #cad7d4}.feature-disabled small{font-size:11px;color:#71817f}.footnote{color:#70817f;font-size:12px;margin-top:18px}
 @media(max-width:720px){body{padding:0}.screen{height:auto;min-height:100vh;width:100%;overflow:auto}.login-bg{object-fit:cover}.login-form select,.login-form input{left:9%;width:82%;height:44px}.login-form select{top:36%}.login-form input.username{top:48%}.login-form input.password{top:60%}.login-form .show{left:auto;right:10%;top:61%}.login-form button.submit{left:20%;top:71%;width:60%;height:46px}.login-form .signup{right:15%;bottom:9%}.error{left:8%;top:10%;width:84%}.dashboard{padding:18px}.tiles{grid-template-columns:repeat(2,1fr)}.features{grid-template-columns:1fr}.top h1{font-size:19px}}
 </style>
 </head><body>
@@ -157,8 +157,19 @@ button,input,select{font:inherit}.screen{width:min(1024px,100%);height:min(600px
 <div class="tile"><small>Pengajuan KRS</small><strong><?=$counts['pengajuan']?></strong></div>
 </div>
 <h2 class="panel-title">Pilih Fitur yang Ingin Digunakan:</h2>
-<div class="features"><?php foreach ($features as $feature): ?><a href="#<?=rawurlencode(strtolower(str_replace(' ', '-', $feature)))?>"><?=krs_e($feature)?></a><?php endforeach; ?></div>
-<p class="footnote">Login dan ringkasan data terhubung ke database KRS. Modul operasional selain autentikasi belum dipindahkan seluruhnya dari Java Swing.</p>
+<div class="features">
+<?php foreach ($features as $feature): ?>
+    <?php if ($feature === 'Edit Profile'): ?>
+        <a class="feature-link" href="profile.php"><?=krs_e($feature)?></a>
+    <?php else: ?>
+        <div class="feature-disabled" aria-disabled="true">
+            <span><?=krs_e($feature)?></span>
+            <small>Belum tersedia di versi web</small>
+        </div>
+    <?php endif; ?>
+<?php endforeach; ?>
+</div>
+<p class="footnote">Edit Profile sudah tersedia di versi web. Menu akademik lainnya masih dalam tahap pemindahan dari Java Swing.</p>
 </div>
 <?php endif; ?>
 </div></body></html>
