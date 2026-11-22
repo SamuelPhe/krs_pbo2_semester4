@@ -294,7 +294,10 @@ get_page "riwayat.php?detail=995001&year=$current_year&semester=3" "$admin" "$WO
 grep -Fq 'KRS Remaining Course' "$WORK/history-detail.html"
 status="$(curl -sS -b "$admin" -o "$WORK/history.csv" -w '%{http_code}' "$BASE_URL/riwayat.php?year=$current_year&semester=3&export=csv")"
 code_expected "$status" 200 "CSV export"
-sed '1s/^\xEF\xBB\xBF//' "$WORK/history.csv" | grep -Fq 'ID Pengajuan,ID Sesi,ID Mahasiswa'
+sed '1s/^\xEF\xBB\xBF//' "$WORK/history.csv" > "$WORK/history-no-bom.csv"
+grep -Fq 'ID Pengajuan' "$WORK/history-no-bom.csv"
+grep -Fq 'ID Sesi' "$WORK/history-no-bom.csv"
+grep -Fq 'ID Mahasiswa' "$WORK/history-no-bom.csv"
 get_page "riwayat.php?year=$current_year&semester=3&print=1" "$admin" "$WORK/history-print.html"
 grep -Fq 'window.print()' "$WORK/history-print.html"
 
