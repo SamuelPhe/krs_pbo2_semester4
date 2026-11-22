@@ -46,6 +46,7 @@ jobs:
           python3 -c 'import json; json.load(open(".devcontainer/devcontainer.json"))'
           bash -n .devcontainer/start-desktop-app.sh
           bash -n tests/profile-guard.sh
+          bash -n tests/profile-http-smoke.sh
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml config -q
           test -f .devcontainer/php/Dockerfile
 
@@ -71,8 +72,30 @@ jobs:
           db_counts=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -r '$pdo = new PDO("mysql:host=".getenv("DB_HOST").";dbname=".getenv("DB_DATABASE"), getenv("DB_USER"), getenv("DB_PASSWORD")); echo $pdo->query("SELECT COUNT(*) FROM mahasiswa")->fetchColumn();')
           test "$db_counts" -gt 0
 
-      - name: Verify profile requires authentication
-        run: bash tests/profile-guard.sh http://127.0.0.1:8081
+      - name: Verify authenticated profile workflows
+        run: |
+          profile_password="$(openssl rand -hex 20)"
+          next_password="$(openssl rand -hex 20)"
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T -e KRS_PROFILE_PASSWORD="$profile_password" web php -r '
+            require "/var/www/html/config.php";
+            $pdo = krs_db();
+            $hash = krs_password_hash((string)getenv("KRS_PROFILE_PASSWORD"));
+            $pdo->prepare("INSERT INTO admin (id_admin, nama_admin, password) VALUES (?, ?, ?)")->execute([990001, "KRS Profile Admin", $hash]);
+            $pdo->prepare("INSERT INTO mahasiswa (id_mahasiswa, id_prodi, id_dosen_pa, nama_mahasiswa, angkatan, password, semester) VALUES (?, ?, ?, ?, ?, ?, ?)")->execute([990001, 111, 10002, "KRS Profile Student", 2025, $hash, 4]);
+            $dosen = $pdo->prepare("INSERT INTO dosen (id_dosen, nama_dosen, posisi, password) VALUES (?, ?, ?, ?)");
+            $dosen->execute([990001, "KRS Profile Lecturer", "dosen", $hash]);
+            $dosen->execute([990002, "KRS Profile Advisor", "dosen pa", $hash]);
+            $dosen->execute([990003, "KRS Profile Head", "kaprodi", $hash]);
+          '
+          KRS_PROFILE_PASSWORD="$profile_password" KRS_PROFILE_NEXT_PASSWORD="$next_password" bash tests/profile-http-smoke.sh http://127.0.0.1:8081
+          password_status=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T -e KRS_PROFILE_NEXT_PASSWORD="$next_password" web php -r '
+            require "/var/www/html/config.php";
+            $statement = krs_db()->prepare("SELECT password FROM admin WHERE id_admin = ?");
+            $statement->execute([990001]);
+            $stored = (string)$statement->fetchColumn();
+            echo krs_password_verify((string)getenv("KRS_PROFILE_NEXT_PASSWORD"), $stored) ? "verified" : "failed";
+          ')
+          test "$password_status" = "verified"
 
       - name: Stop local services
         if: always()
