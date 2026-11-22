@@ -339,6 +339,7 @@ label{font-size:12px;font-weight:700;color:#38534c;display:block;margin:0 0 5px}
 .small{font-size:11px;color:#6b7974}.footer{font-size:11px;color:#66736e;margin:14px 0 0}
 @media(max-width:720px){body{padding:0}.canvas{min-height:100vh}.content{padding:22px 14px}.heading{align-items:flex-start}.meta{grid-template-columns:1fr 1fr}.panel{padding:11px}.table-scroll table{min-width:720px}}
 </style>
+<link rel="stylesheet" href="ui.css?v=20261122">
 </head>
 <body>
 <main class="canvas">
