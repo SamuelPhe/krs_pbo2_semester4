@@ -1,6 +1,6 @@
 # KRS PHP web application
 
-This folder provides a browser entry point with a login layout based on the original NetBeans Swing form. It authenticates against the original `krs_db.sql` tables and displays live row counts after login. It includes Edit Profile, Admin KRS session management, student KRS submission/course selection, and Dosen PA review. It is separate from GitHub Pages, which cannot execute PHP or connect to MySQL.
+This folder provides a browser entry point with a login layout based on the original NetBeans Swing form. It authenticates against the original `krs_db.sql` tables and displays live row counts after login. It includes Edit Profile, Admin Master User and Master Data, KRS session management, student submission/course selection, Dosen PA review, Kaprodi finalization, lecturer schedule/roster views, assigned-student history, and KRS archive/reporting. It is separate from GitHub Pages, which cannot execute PHP or connect to MySQL.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ Set the web document root to this `webapp` directory or copy its contents to the
 
 The original role choices are supported: Mahasiswa, Admin, Kaprodi, Dosen PA, and Dosen. Dosen roles are checked against the `posisi` value in the `dosen` table. Password matching uses the original account names from the dump and prepared statements.
 
-The browser version currently includes authentication, database-backed dashboard counts, Edit Profile, Admin management of KRS sessions, student KRS submission/course selection, and Dosen PA review. Profile changes use prepared statements, CSRF validation, output escaping, and the shared PBKDF2-SHA256 password format. Admin session management checks overlapping dates and blocks deletion when submissions are linked. Student submissions enforce advisor assignment, matching active sessions, duplicate-course and timetable-conflict checks, a 24-SKS maximum, and locking before review. Dosen PA review is restricted to assigned students and supports per-course approval or revision notes; successful review moves the application to `AccDosenPA`, while a revision returns it to the student. Kaprodi finalization and reports remain unported. The pages reuse Swing background assets and table concepts but are not pixel-identical to the desktop UI.
+The browser version includes authentication, dashboard counts, Edit Profile, Admin Master User CRUD for Admin/Dosen/Mahasiswa, Master Data CRUD for Prodi/Matkul/Jadwal/Kelas/Ruang, Admin KRS session management, student KRS submission/course selection, Dosen PA review, Kaprodi finalization, lecturer schedule/roster views, assigned-student/history views, and an Admin KRS archive with filters, CSV export, and browser print-to-PDF. Passwords are stored as PBKDF2-SHA256. State-changing requests use CSRF tokens and prepared statements; role and record ownership are checked on protected pages. Delete operations for academic master data are guarded when referenced records exist. The pages reuse Swing background assets and table concepts but are responsive browser layouts, not pixel-identical desktop screens.
 
 ## Local server
 
