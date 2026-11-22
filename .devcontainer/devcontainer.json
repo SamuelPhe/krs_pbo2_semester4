@@ -18,8 +18,7 @@
   "portsAttributes": {
     "6080": {
       "label": "KRS desktop (private)",
-      "onAutoForward": "openBrowser",
-      "visibility": "private"
+      "onAutoForward": "openBrowser"
     }
   },
   "postStartCommand": "bash .devcontainer/start-desktop-app.sh",
