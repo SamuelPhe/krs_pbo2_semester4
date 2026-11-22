@@ -271,6 +271,7 @@ input,select{min-height:39px;padding:8px 10px;border:1px solid #aebfba;backgroun
  .dialog-shade{position:fixed;overflow:auto}.footer{bottom:3%}
 }
 </style>
+<link rel="stylesheet" href="ui.css?v=20261122">
 </head>
 <body>
 <main class="canvas">
