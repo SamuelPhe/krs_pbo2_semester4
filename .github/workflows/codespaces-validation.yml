@@ -12,6 +12,7 @@ on:
       - "krs_db.sql"
       - "database/web_auth_password_migration.sql"
       - "webapp/**"
+      - "tests/**"
   pull_request:
     branches: [master]
     paths:
@@ -23,6 +24,7 @@ on:
       - "krs_db.sql"
       - "database/web_auth_password_migration.sql"
       - "webapp/**"
+      - "tests/**"
   workflow_dispatch:
 
 permissions:
@@ -43,6 +45,7 @@ jobs:
         run: |
           python3 -c 'import json; json.load(open(".devcontainer/devcontainer.json"))'
           bash -n .devcontainer/start-desktop-app.sh
+          bash -n tests/profile-guard.sh
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml config -q
           test -f .devcontainer/php/Dockerfile
 
@@ -62,10 +65,14 @@ jobs:
           test "$password_columns" -eq 3
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/config.php
           localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/index.php
+          localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -l /var/www/html/profile.php
           web_page=$(curl --fail --silent --show-error http://127.0.0.1:8081/)
           printf '%s' "$web_page" | grep -q 'KRS — Sistem Informasi Akademik'
           db_counts=$(localWorkspaceFolderBasename=krs docker compose -f .devcontainer/docker-compose.yml exec -T web php -r '$pdo = new PDO("mysql:host=".getenv("DB_HOST").";dbname=".getenv("DB_DATABASE"), getenv("DB_USER"), getenv("DB_PASSWORD")); echo $pdo->query("SELECT COUNT(*) FROM mahasiswa")->fetchColumn();')
           test "$db_counts" -gt 0
+
+      - name: Verify profile requires authentication
+        run: bash tests/profile-guard.sh http://127.0.0.1:8081
 
       - name: Stop local services
         if: always()
