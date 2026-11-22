@@ -90,8 +90,8 @@ The PHP web version is currently a browser-based login and database-summary dash
 The original Java application can still be run locally:
 
 1. Install JDK 17 and Maven.
-2. Prepare a MySQL or MariaDB database named `krs_db`. The repository contains `krs_db.sql`, a historical coursework snapshot used by the Codespaces setup.
-3. For local experiments, restore a trusted copy of the coursework database. Some legacy Java Swing module queries still differ from this snapshot, so do not treat the dump as a verified production schema.
+2. Prepare a MySQL or MariaDB database named `krs_db`. The repository contains `krs_db.sql`, a historical coursework snapshot used by the Codespaces setup. It includes legacy account records, plaintext password values, and academic rows; treat all values in that dump as exposed.
+3. For local experiments, use a disposable database copy populated with synthetic data. Do not reuse the dump's accounts or copy its personal/academic records into another environment. Some legacy Java Swing module queries still differ from this snapshot, so do not treat the dump as a verified production schema.
 4. Set the database environment variables:
    - `DB_URL` (optional; default: `jdbc:mysql://127.0.0.1:3306/krs_db?serverTimezone=UTC`)
    - `DB_USER`
@@ -108,7 +108,7 @@ The original Java application can still be run locally:
    mvn exec:java
    ```
 
-The provided migration script `database/password_hash_migration.sql` should only be applied to a backed-up database copy after reviewing its effect. No demo account or real student data is provided.
+The migration script `database/web_auth_password_migration.sql` should only be applied to a backed-up database copy after reviewing its effect. No dedicated safe demo credentials are provided; do not use the legacy account values from `krs_db.sql`.
 
 ## 6. Project structure
 
