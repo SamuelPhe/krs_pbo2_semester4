@@ -86,10 +86,69 @@ status="$(curl --silent --show-error --cookie "$ADMIN_JAR" --cookie-jar "$ADMIN_
 [[ "$status" == "200" ]]
 grep -Fq 'KRS Profile Admin Updated' "$WORK_DIR/updated-profile.html"
 
-check_role_profile "Mahasiswa" "KRS Profile Student" "Angkatan"
-grep -Fq 'Semester' "$WORK_DIR/Mahasiswa.html"
+check_student_profile_update() {
+  local jar="$WORK_DIR/student-profile.cookies"
+  local page="$WORK_DIR/student-profile.html" token status
+  login_account "Mahasiswa" "KRS Profile Student" "$jar"
+  status="$(curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" \
+    --output "$page" --write-out '%{http_code}' "$BASE_URL/profile.php")"
+  [[ "$status" == "200" ]]
+  grep -Fq 'name="angkatan"' "$page"
+  grep -Fq 'name="semester"' "$page"
+  token="$(csrf_from_file "$page")"
+
+  status="$(curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" \
+    --output "$WORK_DIR/student-profile-saved.html" --write-out '%{http_code}' \
+    --data-urlencode "csrf_token=$token" \
+    --data-urlencode 'name=KRS Profile Student' \
+    --data-urlencode 'angkatan=2026' \
+    --data-urlencode 'semester=5' "$BASE_URL/profile.php")"
+  [[ "$status" == "303" ]]
+
+  status="$(curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" \
+    --output "$page" --write-out '%{http_code}' "$BASE_URL/profile.php")"
+  [[ "$status" == "200" ]]
+  grep -Fq 'value="2026"' "$page"
+  grep -Fq 'value="5"' "$page"
+  token="$(csrf_from_file "$page")"
+
+  status="$(curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" \
+    --output "$WORK_DIR/student-profile-invalid.html" --write-out '%{http_code}' \
+    --data-urlencode "csrf_token=$token" \
+    --data-urlencode 'name=KRS Profile Student' \
+    --data-urlencode 'angkatan=not-a-year' \
+    --data-urlencode 'semester=0' "$BASE_URL/profile.php")"
+  [[ "$status" == "200" ]]
+  grep -Fq 'Angkatan harus berupa angka' "$WORK_DIR/student-profile-invalid.html"
+
+  curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" \
+    "$BASE_URL/profile.php" -o "$page"
+  grep -Fq 'value="2026"' "$page"
+  grep -Fq 'value="5"' "$page"
+}
+
+check_readonly_dosen_position() {
+  local jar="$WORK_DIR/advisor-profile.cookies"
+  local page="$WORK_DIR/advisor-profile.html" token status
+  login_account "Dosen PA" "KRS Profile Advisor" "$jar"
+  curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" "$BASE_URL/profile.php" -o "$page"
+  grep -Fq 'value="dosen pa" readonly' "$page"
+  token="$(csrf_from_file "$page")"
+  status="$(curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" \
+    --output "$WORK_DIR/advisor-profile-tamper.html" --write-out '%{http_code}' \
+    --data-urlencode "csrf_token=$token" \
+    --data-urlencode 'name=KRS Profile Advisor' \
+    --data-urlencode 'posisi=kaprodi' "$BASE_URL/profile.php")"
+  [[ "$status" == "303" ]]
+  status="$(curl --silent --show-error --cookie "$jar" --cookie-jar "$jar" \
+    --output "$page" --write-out '%{http_code}' "$BASE_URL/profile.php")"
+  [[ "$status" == "200" ]]
+  grep -Fq 'value="dosen pa" readonly' "$page"
+}
+
+check_student_profile_update
 check_role_profile "Dosen" "KRS Profile Lecturer" "Posisi / Jabatan"
-check_role_profile "Dosen PA" "KRS Profile Advisor" "Posisi / Jabatan"
+check_readonly_dosen_position
 check_role_profile "Kaprodi" "KRS Profile Head" "Posisi / Jabatan"
 
-echo "PASS: profile authorization, CSRF, database update, password change, and role-specific profile fields."
+echo "PASS: profile authorization, CSRF, name/password updates, student academic-field updates, invalid-input rejection, and role-specific field protection."
