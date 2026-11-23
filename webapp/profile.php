@@ -62,29 +62,67 @@ try {
             $newName = trim((string)($_POST['name'] ?? ''));
             $newPassword = (string)($_POST['new_password'] ?? '');
             $confirmation = (string)($_POST['confirm_password'] ?? '');
+            $currentName = (string)$profile['display_name'];
+            $newAngkatan = null;
+            $newSemester = null;
+            $angkatanInput = null;
+            $semesterInput = null;
+
+            if ($role === 'Mahasiswa') {
+                $angkatanInput = trim((string)($_POST['angkatan'] ?? ''));
+                $semesterInput = trim((string)($_POST['semester'] ?? ''));
+                $newAngkatan = filter_var($angkatanInput, FILTER_VALIDATE_INT);
+                $newSemester = filter_var($semesterInput, FILTER_VALIDATE_INT);
+            }
+
             preg_match_all('/./us', $newName, $characters);
             $nameLength = count($characters[0] ?? []);
 
             if ($newName === '' || $nameLength < 1 || $nameLength > 50) {
                 $error = 'Nama wajib diisi dan tidak boleh lebih dari 50 karakter.';
+            } elseif ($role === 'Mahasiswa' && ($newAngkatan === false || $newAngkatan < 1 || $newAngkatan > 9999)) {
+                $error = 'Angkatan harus berupa angka antara 1 dan 9999.';
+            } elseif ($role === 'Mahasiswa' && ($newSemester === false || $newSemester < 1 || $newSemester > 99)) {
+                $error = 'Semester harus berupa angka antara 1 dan 99.';
             } elseif (($newPassword === '') !== ($confirmation === '')) {
                 $error = 'Isi kedua kolom password untuk mengganti password, atau biarkan keduanya kosong.';
             } elseif ($newPassword !== '' && !hash_equals($newPassword, $confirmation)) {
                 $error = 'Konfirmasi password tidak cocok.';
             } elseif ($newPassword !== '' && (strlen($newPassword) < 8 || strlen($newPassword) > 1024)) {
                 $error = 'Password baru harus terdiri dari 8 sampai 1024 karakter.';
+            }
+
+            if ($error !== '') {
+                $profile['display_name'] = $newName;
+                if ($role === 'Mahasiswa') {
+                    $profile['angkatan'] = $angkatanInput;
+                    $profile['semester'] = $semesterInput;
+                }
             } else {
                 $passwordChanged = $newPassword !== '';
-                $nameChanged = $newName !== (string)$profile['display_name'];
+                $nameChanged = $newName !== $currentName;
+                $academicChanged = $role === 'Mahasiswa'
+                    && ($newAngkatan !== (int)$profile['angkatan']
+                        || $newSemester !== (int)$profile['semester']);
 
-                if (!$passwordChanged && !$nameChanged) {
+                if (!$passwordChanged && !$nameChanged && !$academicChanged) {
                     $_SESSION['krs_profile_flash'] = 'Tidak ada perubahan yang perlu disimpan.';
                     header('Location: profile.php', true, 303);
                     exit;
                 }
 
-                $sets = [$definition['name'] . ' = ?'];
-                $values = [$newName];
+                $sets = [];
+                $values = [];
+                if ($nameChanged) {
+                    $sets[] = $definition['name'] . ' = ?';
+                    $values[] = $newName;
+                }
+                if ($academicChanged) {
+                    $sets[] = 'angkatan = ?';
+                    $values[] = $newAngkatan;
+                    $sets[] = 'semester = ?';
+                    $values[] = $newSemester;
+                }
                 if ($passwordChanged) {
                     $sets[] = 'password = ?';
                     $values[] = krs_password_hash($newPassword);
@@ -97,11 +135,15 @@ try {
                 );
                 $update->execute($values);
 
-                $_SESSION['krs_user']['name'] = $newName;
+                if ($nameChanged) {
+                    $_SESSION['krs_user']['name'] = $newName;
+                }
                 session_regenerate_id(true);
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 $_SESSION['krs_profile_flash'] = $passwordChanged
-                    ? 'Profil dan password berhasil diperbarui.'
+                    ? (($nameChanged || $academicChanged)
+                        ? 'Profil dan password berhasil diperbarui.'
+                        : 'Password berhasil diperbarui.')
                     : 'Profil berhasil diperbarui.';
                 header('Location: profile.php', true, 303);
                 exit;
@@ -165,7 +207,16 @@ input[readonly]{background:#f0f2f2;color:#64716f}.help{margin:5px 0 0;color:#718
 <div class="field full"><label for="name">Nama Lengkap</label><input id="name" name="name" type="text" maxlength="50" value="<?=krs_e((string)$profile['display_name'])?>" required></div>
 <div class="field full"><label for="account_id">ID Anda</label><input id="account_id" type="text" value="<?=krs_e((string)$profile['account_id'])?>" readonly></div>
 <?php foreach ($definition['extras'] as $column): ?>
-<div class="field"><label for="extra_<?=krs_e($column)?>"><?=krs_e($labels[$column] ?? $column)?></label><input id="extra_<?=krs_e($column)?>" type="text" value="<?=krs_e((string)($profile[$column] ?? ''))?>" readonly></div>
+<div class="field">
+<label for="extra_<?=krs_e($column)?>"><?=krs_e($labels[$column] ?? $column)?></label>
+<?php if ($role === 'Mahasiswa' && $column === 'angkatan'): ?>
+<input id="extra_angkatan" name="angkatan" type="number" min="1" max="9999" step="1" inputmode="numeric" value="<?=krs_e((string)($profile['angkatan'] ?? ''))?>" required>
+<?php elseif ($role === 'Mahasiswa' && $column === 'semester'): ?>
+<input id="extra_semester" name="semester" type="number" min="1" max="99" step="1" inputmode="numeric" value="<?=krs_e((string)($profile['semester'] ?? ''))?>" required>
+<?php else: ?>
+<input id="extra_<?=krs_e($column)?>" type="text" value="<?=krs_e((string)($profile[$column] ?? ''))?>" readonly>
+<?php endif; ?>
+</div>
 <?php endforeach; ?>
 </div>
 <h2 class="section-title">Ganti Password</h2>
@@ -176,7 +227,7 @@ input[readonly]{background:#f0f2f2;color:#64716f}.help{margin:5px 0 0;color:#718
 <p class="help">Kosongkan kedua kolom password jika tidak ingin menggantinya. Password baru minimal 8 karakter.</p>
 <div class="actions"><a class="button secondary" href="index.php">Kembali ke Dashboard</a><button class="button primary" type="submit">Simpan Perubahan</button></div>
 </form>
-<p class="note">ID, angkatan, semester, dan posisi merupakan informasi tetap yang dikelola melalui data akademik.</p>
+<p class="note">Mahasiswa dapat memperbarui angkatan dan semester melalui halaman ini. ID akun serta posisi/jabatan dikelola melalui data akademik.</p>
 </section>
 </main>
 </body>
